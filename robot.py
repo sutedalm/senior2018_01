@@ -61,7 +61,7 @@ class Robot:
         return int(speed_left), int(speed_right)
 
     @staticmethod
-    def _min_speed(speed, min_speed):
+    def _min_speed(speed, min_speed=20):
         min_speed = abs(min_speed)
         if abs(speed) < min_speed:
             if speed > 0:
@@ -105,7 +105,7 @@ class Robot:
             if speed < 0 or speed_start < 0:
                 correction = -correction
 
-            speed_accelerated = self._min_speed(speed_start + driven_distance / distance * (speed - speed_start), 20)
+            speed_accelerated = self._min_speed(speed_start + driven_distance / distance * (speed - speed_start))
 
             for (motor, power) in zip((self._lMot, self._rMot),
                                       self._steering(direction + correction, speed_accelerated)):
@@ -132,5 +132,18 @@ class Robot:
             self._lMot.run_to_rel_pos(speed_sp=1000, position_sp=distance_degree, ramp_up_sp=1500,
                                       ramp_down_sp=1500, stop_action="hold")
             self._lMot.wait_while("running")
+
+    def align(self):
+        kp = -0.5
+        offset = 50
+        tolerance = 3
+        self._lMot.run_direct()
+        self._rMot.run_direct()
+        while not(offset - tolerance <= self._col_l.light_reflected() is self._col_r.light_reflected()
+                  <= offset + tolerance):
+            error_left = offset - self._col_l.light_reflected()
+            error_right = offset - self._col_r.light_reflected()
+            self._lMot.duty_cycle_sp = self._min_speed(error_left * kp)
+            self._rMot.duty_cycle_sp = self._min_speed(error_right * kp)
 
 # r._lMot.run_to_rel_pos(speed_sp=800, position_sp=3*360, ramp_up_sp=2000, stop_action="hold")
