@@ -134,16 +134,27 @@ class Robot:
             self._lMot.wait_while("running")
 
     def align(self):
-        kp = -0.5
+        k_dir = -0.5
+        k_speed = -0.5
         offset = 50
         tolerance = 3
         self._lMot.run_direct()
         self._rMot.run_direct()
         while not(offset - tolerance <= self._col_l.light_reflected() is self._col_r.light_reflected()
                   <= offset + tolerance):
-            error_left = offset - self._col_l.light_reflected()
-            error_right = offset - self._col_r.light_reflected()
-            self._lMot.duty_cycle_sp = self._min_speed(error_left * kp)
-            self._rMot.duty_cycle_sp = self._min_speed(error_right * kp)
+            l_val = self._col_l.light_reflected()
+            r_val = self._col_r.light_reflected()
+            error_dir = k_dir*(r_val - l_val)
+            error_dist = self._min_speed(k_speed*( offset - (r_val + l_val)/2))
+            print("dir: " + str(error_dir) + "; dist: " + str(error_dist))
+
+            for (motor, power) in zip((self._lMot, self._rMot),
+                                      self._steering(error_dir, error_dist)):
+                motor.duty_cycle_sp = power
+
+            # error_left = offset - self._col_l.light_reflected()
+            # error_right = offset - self._col_r.light_reflected()
+            # self._lMot.duty_cycle_sp = self._min_speed(error_left * kp)
+            # self._rMot.duty_cycle_sp = self._min_speed(error_right * kp)
 
 # r._lMot.run_to_rel_pos(speed_sp=800, position_sp=3*360, ramp_up_sp=2000, stop_action="hold")
