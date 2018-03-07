@@ -13,7 +13,10 @@ r = Robot()
 def main():
     try:
         print("running")
-        r.drive(0, 100, 50, 0, "hold")
+        time.sleep(1)
+        while not r._btn.any():  # While no button is pressed.
+            print("l: " + str(r._col_l.light_reflected()) + "; r: " + str(r._col_r.light_reflected()))
+        # r.drive(0, 100, 50, 0, "hold")
         # r.pivot(-90)
         # r.pivot(90)
         # r.pivot(-90, False)

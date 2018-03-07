@@ -2,23 +2,44 @@ from ev3dev.auto import *
 import os
 import math
 
+class MyColorSensorEV3:
+    def __init__(self, port=INPUT_1, min_val=0, max_val=100):
+        self._col = ColorSensor(port)
+        self._min_val = min_val
+        self._max_val = max_val
+        self._col.mode = 'COL-REFLECT'
+
+    def light_reflected(self):
+        if self._col.mode is not 'COL-REFLECT':
+            self._col.mode = 'COL-REFLECT'
+        val = self._col.value()/(self._max_val-self._min_val) * 100
+        val = min(100, val)
+        val = max(0, val)
+        return val
+
 
 class Robot:
-    _lMot = LargeMotor(OUTPUT_B)
-    _rMot = LargeMotor(OUTPUT_C)
-    _btn = Button()
-
     _tyre_size = 6.24               # Durchmesser des Motors in cm
     _motor_distance = 19.53         # Abstand der Rädermittelpunkte in cm
 
     def __init__(self):
         os.system('setfont Lat15-TerminusBold14')
+
+        self._lMot = LargeMotor(OUTPUT_B)
+        self._rMot = LargeMotor(OUTPUT_C)
+        self._col_l = MyColorSensorEV3(INPUT_1, 6, 69)
+        self._col_r = MyColorSensorEV3(INPUT_2, 4, 54)
+        self._btn = Button()
+
         self._lMot.reset()
         self._rMot.reset()
         self._lMot.polarity = "inversed"
         self._rMot.polarity = "inversed"
 
         print("press button to start")
+        self.wait_until_button()
+
+    def wait_until_button(self):
         while not self._btn.any():  # While no button is pressed.
             time.sleep(0.01)  # Wait 0.01 second
 
