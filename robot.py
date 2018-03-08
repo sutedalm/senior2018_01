@@ -2,6 +2,7 @@ from ev3dev.auto import *
 import os
 import math
 
+
 class MyColorSensorEV3:
     def __init__(self, port=INPUT_1, min_val=0, max_val=100):
         self._col = ColorSensor(port)
@@ -21,14 +22,15 @@ class MyColorSensorEV3:
 class Robot:
     _tyre_size = 6.24               # Durchmesser des Motors in cm
     _motor_distance = 19.53         # Abstand der Rädermittelpunkte in cm
+    _sensor_distance = 14.5
 
     def __init__(self):
         os.system('setfont Lat15-TerminusBold14')
 
         self._lMot = LargeMotor(OUTPUT_B)
         self._rMot = LargeMotor(OUTPUT_C)
-        self._col_l = MyColorSensorEV3(INPUT_1, 6, 69)
-        self._col_r = MyColorSensorEV3(INPUT_2, 4, 54)
+        self._col_l = MyColorSensorEV3(INPUT_1, 7, 81)
+        self._col_r = MyColorSensorEV3(INPUT_2, 4, 56)
         self._btn = Button()
 
         self._lMot.reset()
@@ -61,6 +63,25 @@ class Robot:
         return int(speed_left), int(speed_right)
 
     @staticmethod
+    def _steering_hard(direction, speed):
+
+        s = (50 - abs(float(direction))) / 50
+
+        speed_left = speed_right = speed
+        if direction >= 0:
+            speed_right *= s
+            if direction > 100:
+                speed_right = - speed
+        else:
+            speed_left *= s
+            if direction < -100:
+                speed_left = - speed
+
+        speed_left = max(-100, min(speed_left, 100))
+        speed_right = max(-100, min(speed_right, 100))
+        return int(speed_left), int(speed_right)
+
+    @staticmethod
     def _min_speed(speed, min_speed=20):
         min_speed = abs(min_speed)
         if abs(speed) < min_speed:
@@ -69,6 +90,32 @@ class Robot:
             elif speed < 0:
                 speed = -min_speed
         return speed
+
+    @staticmethod
+    def distance_to_parallel_line(distance, direction=0):
+        direction = abs(direction)
+        print("direction: " + str(direction))
+        assert direction < 90
+        print("distance " + str(distance / math.sin(math.radians(90 - direction))))
+        return distance / math.sin(math.radians(90 - direction))
+
+    def midpoint_distance_from_line(self, direction):
+        direction = math.radians(abs(direction))
+        return math.sin(direction) * self._sensor_distance/2
+
+    def get_turn_correction_values(self, direction, parallel_distance):
+        if direction is 0:
+            return parallel_distance, 0
+
+        r = parallel_distance / math.sin(math.radians(abs(direction)))
+        average_distance = math.pi * r * abs(direction) / 180
+        r1 = r + self._motor_distance/2
+        r2 = r - self._motor_distance/2
+        if direction > 0:
+            turn = 100 - 100 * r1/r2
+        else:
+            turn = 100 * r1/r2 - 100
+        return average_distance, turn
 
     def _cm_to_deg(self, cm):
         return 360 * cm / (math.pi * self._tyre_size)
@@ -79,7 +126,7 @@ class Robot:
         driven_distance = 0
         distance = self._cm_to_deg(distance)
 
-        direction = max(-100, min(direction, 100))
+        # direction = max(-100, min(direction, 100))
         if speed_start is 0:
             speed_start = math.copysign(5, speed)
 
@@ -133,28 +180,72 @@ class Robot:
                                       ramp_down_sp=1500, stop_action="hold")
             self._lMot.wait_while("running")
 
-    def align(self):
-        k_dir = -0.5
-        k_speed = -0.5
-        offset = 50
-        tolerance = 3
+    def align(self, k_dir=1, offset=50, tolerance=0):
+        k_dir *= -0.5
         self._lMot.run_direct()
         self._rMot.run_direct()
-        while not(offset - tolerance <= self._col_l.light_reflected() is self._col_r.light_reflected()
-                  <= offset + tolerance):
-            l_val = self._col_l.light_reflected()
-            r_val = self._col_r.light_reflected()
-            error_dir = k_dir*(r_val - l_val)
-            error_dist = self._min_speed(k_speed*( offset - (r_val + l_val)/2))
-            print("dir: " + str(error_dir) + "; dist: " + str(error_dist))
+        while not(
+                offset - tolerance <= self._col_l.light_reflected() is self._col_r.light_reflected()
+                <= offset + tolerance
+                or (self._lMot.is_stalled and self._rMot.is_stalled)):
+
+            error_left = offset - self._col_l.light_reflected()
+            error_right = offset - self._col_r.light_reflected()
+            self._lMot.duty_cycle_sp = error_left * k_dir
+            self._rMot.duty_cycle_sp = error_right * k_dir
+        self.brake()
+
+    def get_direction(self, speed, brake_action="run", kp=1, ki=0.05, kd=0.5):
+        self._rMot.position = 0
+        self._lMot.position = 0
+        start_distance = 0
+        l_triggered = r_triggered = finished = False
+        left_first = True
+        trigger_value = 50
+
+        last_error = integral = 0
+
+        self._rMot.run_direct()
+        self._lMot.run_direct()
+
+        while not finished:
+            driven_distance = (abs(self._rMot.position) + abs(self._lMot.position)) / 2
+
+            if self._col_l.light_reflected() < trigger_value:
+                l_triggered = True
+            if self._col_r.light_reflected() < trigger_value:
+                r_triggered = True
+
+            if l_triggered and r_triggered:
+                finished = True
+            elif (l_triggered ^ r_triggered) and start_distance is 0:   # XOR
+                start_distance = driven_distance
+                left_first = l_triggered
+
+            error = self._rMot.position - self._lMot.position
+            integral = float(0.5) * integral + error
+            derivative = error - last_error
+            last_error = error
+            correction = error * kp + ki * integral + kd * derivative
+            if speed < 0:
+                correction = -correction
 
             for (motor, power) in zip((self._lMot, self._rMot),
-                                      self._steering(error_dir, error_dist)):
+                                      self._steering(correction, speed)):
                 motor.duty_cycle_sp = power
 
-            # error_left = offset - self._col_l.light_reflected()
-            # error_right = offset - self._col_r.light_reflected()
-            # self._lMot.duty_cycle_sp = self._min_speed(error_left * kp)
-            # self._rMot.duty_cycle_sp = self._min_speed(error_right * kp)
+        if brake_action is not "run":
+            self.brake(brake_action)
+
+        s = driven_distance - start_distance
+        if s is 0:
+            return 0
+        direction = 90-math.degrees(math.atan(self._cm_to_deg(self._sensor_distance / s)))
+        if not left_first:
+            direction *= -1
+        if speed < 0:
+            direction *= -1
+        return direction
+
 
 # r._lMot.run_to_rel_pos(speed_sp=800, position_sp=3*360, ramp_up_sp=2000, stop_action="hold")

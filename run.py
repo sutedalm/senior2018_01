@@ -12,8 +12,20 @@ r = Robot()
 
 def main():
     try:
+        r.drive(0, 60, 5)
         print("running")
-        r.align()
+        direction = r.get_direction(60)
+        print("direction: " + str(direction))
+        distance, turn = r.get_turn_correction_values(direction, 7)
+        print("distance: " + str(distance) + "; turn: " + str(turn))
+        r.drive(60, 30, distance, turn, "hold")
+        r.pivot(90)
+        r.drive(0, 60, 5)
+        r.drive(60, 30, 10, 0, "hold")
+        # r.drive(30, 0, r.distance_to_parallel_line(10, direction), 0, "hold")
+        # r.pivot(90 - direction)
+
+        # r.align(1)
         # r.drive(0, 100, 50, 0, "hold")
         # r.pivot(-90)
         # r.pivot(90)
