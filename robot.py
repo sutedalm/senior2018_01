@@ -39,7 +39,7 @@ class Robot:
         self._rMot.polarity = "inversed"
 
         print("press button to start")
-        self.wait_until_button()
+        # self.wait_until_button()
 
     def wait_until_button(self):
         while not self._btn.any():  # While no button is pressed.
@@ -157,28 +157,67 @@ class Robot:
             for (motor, power) in zip((self._lMot, self._rMot),
                                       self._steering(direction + correction, speed_accelerated)):
                 motor.duty_cycle_sp = power
+        self.brake(brake_action)
 
-        if brake_action is not "run":
-            self.brake(brake_action)
+    def move_to_line(self, speed, l_trigger_value=50, r_trigger_value=50, brake_action="run", kp=1, ki=0.05, kd=0.5):
+        self._rMot.position = self._lMot.position = 0
+
+        last_error = integral = 0
+
+        self._rMot.run_direct()
+        self._lMot.run_direct()
+
+        while not(self._col_l.light_reflected() < l_trigger_value or self._col_r.light_reflected() < r_trigger_value):
+            error = self._rMot.position - self._lMot.position
+            integral = float(0.5) * integral + error
+            derivative = error - last_error
+            last_error = error
+            correction = error * kp + ki * integral + kd * derivative
+            if speed < 0:
+                correction = -correction
+
+            for (motor, power) in zip((self._lMot, self._rMot), self._steering(correction, speed)):
+                motor.duty_cycle_sp = power
+        self.brake(brake_action)
 
     def brake(self, action="hold"):
-        self._lMot.stop(stop_action=action)
-        self._rMot.stop(stop_action=action)
+        if action is not "run":
+            self._lMot.stop(stop_action=action)
+            self._rMot.stop(stop_action=action)
 
-    def pivot(self, direction, forward=True):
+    @staticmethod
+    def _acceleration_speed_forward(driven_distance, distance, start_speed, max_speed, min_speed, k_acceleration):
+        speed = k_acceleration * driven_distance + start_speed
+        speed = min(speed, k_acceleration * (distance - driven_distance), max_speed)
+        speed = max(speed, min_speed)
+        return speed
+
+    def pivot(self, direction, forward=True, start_speed=0, max_speed=100, k_acceleration=0.7):
         distance_degree = self._cm_to_deg(math.pi / 180 * abs(direction) * self._motor_distance)
-        if not forward:
-            distance_degree *= -1
+        driven_distance = self._rMot.position = self._lMot.position = 0
+        start_speed = abs(start_speed)
         if direction < 0:
             self._lMot.stop(stop_action="hold")
-            self._rMot.run_to_rel_pos(speed_sp=1000, position_sp=distance_degree, ramp_up_sp=1500,
-                                      ramp_down_sp=1500, stop_action="hold")
-            self._rMot.wait_while("running")
+            self._rMot.run_direct()
+            while driven_distance < distance_degree:
+                driven_distance = abs(self._rMot.position)
+                speed = self._acceleration_speed_forward(driven_distance, distance_degree, start_speed, max_speed, 20,
+                                                         k_acceleration)
+                if not forward:
+                    speed *= -1
+                self._rMot.duty_cycle_sp = speed
+            self._rMot.stop(stop_action="hold")
         else:
             self._rMot.stop(stop_action="hold")
-            self._lMot.run_to_rel_pos(speed_sp=1000, position_sp=distance_degree, ramp_up_sp=1500,
-                                      ramp_down_sp=1500, stop_action="hold")
-            self._lMot.wait_while("running")
+            self._lMot.run_direct()
+            while driven_distance < distance_degree:
+                driven_distance = abs(self._lMot.position)
+                speed = self._acceleration_speed_forward(driven_distance, distance_degree, start_speed, max_speed, 20,
+                                                         k_acceleration)
+                if not forward:
+                    speed *= -1
+                self._lMot.duty_cycle_sp = speed
+            self._lMot.stop(stop_action="hold")
 
     def align(self, k_dir=1, offset=50, tolerance=0):
         k_dir *= -0.5
@@ -234,8 +273,7 @@ class Robot:
                                       self._steering(correction, speed)):
                 motor.duty_cycle_sp = power
 
-        if brake_action is not "run":
-            self.brake(brake_action)
+        self.brake(brake_action)
 
         s = driven_distance - start_distance
         if s is 0:
