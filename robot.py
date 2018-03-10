@@ -120,6 +120,9 @@ class Robot:
     def _cm_to_deg(self, cm):
         return 360 * cm / (math.pi * self._tyre_size)
 
+    def _deg_to_cm(self, deg):
+        return deg * math.pi * self._tyre_size / 360
+
     def drive(self, speed_start, speed, distance, direction=0, brake_action="run", kp=1, ki=0.05, kd=0.5):
         self._rMot.position = 0
         self._lMot.position = 0
