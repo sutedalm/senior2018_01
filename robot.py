@@ -39,7 +39,7 @@ class Robot:
         self._rMot.polarity = "inversed"
 
         print("press button to start")
-        # self.wait_until_button()
+        self.wait_until_button()
 
     def wait_until_button(self):
         while not self._btn.any():  # While no button is pressed.
@@ -62,24 +62,24 @@ class Robot:
         speed_right = max(-100, min(speed_right, 100))
         return int(speed_left), int(speed_right)
 
-    @staticmethod
-    def _steering_hard(direction, speed):
-
-        s = (50 - abs(float(direction))) / 50
-
-        speed_left = speed_right = speed
-        if direction >= 0:
-            speed_right *= s
-            if direction > 100:
-                speed_right = - speed
-        else:
-            speed_left *= s
-            if direction < -100:
-                speed_left = - speed
-
-        speed_left = max(-100, min(speed_left, 100))
-        speed_right = max(-100, min(speed_right, 100))
-        return int(speed_left), int(speed_right)
+    # @staticmethod
+    # def _steering_hard(direction, speed):
+    #
+    #     s = (50 - abs(float(direction))) / 50
+    #
+    #     speed_left = speed_right = speed
+    #     if direction >= 0:
+    #         speed_right *= s
+    #         if direction > 100:
+    #             speed_right = - speed
+    #     else:
+    #         speed_left *= s
+    #         if direction < -100:
+    #             speed_left = - speed
+    #
+    #     speed_left = max(-100, min(speed_left, 100))
+    #     speed_right = max(-100, min(speed_right, 100))
+    #     return int(speed_left), int(speed_right)
 
     @staticmethod
     def _min_speed(speed, min_speed=20):
@@ -111,10 +111,11 @@ class Robot:
         average_distance = math.pi * r * abs(direction) / 180
         r1 = r + self._motor_distance/2
         r2 = r - self._motor_distance/2
-        if direction > 0:
-            turn = 100 - 100 * r1/r2
-        else:
-            turn = 100 * r1/r2 - 100
+
+        turn = 100 * r2/r1 - 100
+        if direction < 0:
+            turn *= -1
+
         return average_distance, turn
 
     def _cm_to_deg(self, cm):
@@ -124,14 +125,13 @@ class Robot:
         return deg * math.pi * self._tyre_size / 360
 
     def drive(self, speed_start, speed, distance, direction=0, brake_action="run", kp=1, ki=0.05, kd=0.5):
-        self._rMot.position = 0
-        self._lMot.position = 0
+        self._rMot.position = self._lMot.position = 0
         driven_distance = 0
         distance = self._cm_to_deg(distance)
 
-        # direction = max(-100, min(direction, 100))
+        min_speed = 20
         if speed_start is 0:
-            speed_start = math.copysign(5, speed)
+            speed_start = math.copysign(min_speed, speed)
 
         k_left_mot = k_right_mot = 1
         if direction >= 0:
@@ -155,7 +155,8 @@ class Robot:
             if speed < 0 or speed_start < 0:
                 correction = -correction
 
-            speed_accelerated = self._min_speed(speed_start + driven_distance / distance * (speed - speed_start))
+            speed_accelerated = self._min_speed(speed_start + driven_distance / distance * (speed - speed_start),
+                                                min_speed)
 
             for (motor, power) in zip((self._lMot, self._rMot),
                                       self._steering(direction + correction, speed_accelerated)):
@@ -188,14 +189,14 @@ class Robot:
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
-    @staticmethod
-    def _acceleration_speed_forward(driven_distance, distance, start_speed, max_speed, min_speed, k_acceleration):
+    # @staticmethod
+    def _acceleration_speed_forward(self, driven_distance, distance, start_speed, max_speed, min_speed, k_acceleration):
         speed = k_acceleration * driven_distance + start_speed
         speed = min(speed, k_acceleration * (distance - driven_distance), max_speed)
-        speed = max(speed, min_speed)
+        speed = self._min_speed(speed, min_speed)   # max(speed, min_speed)
         return speed
 
-    def pivot(self, direction, forward=True, start_speed=0, max_speed=100, k_acceleration=0.7):
+    def pivot(self, direction, forward=True, start_speed=0, min_speed = 30, max_speed=100, k_acceleration=0.7):
         distance_degree = self._cm_to_deg(math.pi / 180 * abs(direction) * self._motor_distance)
         driven_distance = self._rMot.position = self._lMot.position = 0
         start_speed = abs(start_speed)
@@ -204,8 +205,8 @@ class Robot:
             self._rMot.run_direct()
             while driven_distance < distance_degree:
                 driven_distance = abs(self._rMot.position)
-                speed = self._acceleration_speed_forward(driven_distance, distance_degree, start_speed, max_speed, 20,
-                                                         k_acceleration)
+                speed = self._acceleration_speed_forward(driven_distance, distance_degree, start_speed, max_speed,
+                                                         min_speed, k_acceleration)
                 if not forward:
                     speed *= -1
                 self._rMot.duty_cycle_sp = speed
@@ -215,8 +216,8 @@ class Robot:
             self._lMot.run_direct()
             while driven_distance < distance_degree:
                 driven_distance = abs(self._lMot.position)
-                speed = self._acceleration_speed_forward(driven_distance, distance_degree, start_speed, max_speed, 20,
-                                                         k_acceleration)
+                speed = self._acceleration_speed_forward(driven_distance, distance_degree, start_speed, max_speed,
+                                                         min_speed, k_acceleration)
                 if not forward:
                     speed *= -1
                 self._lMot.duty_cycle_sp = speed

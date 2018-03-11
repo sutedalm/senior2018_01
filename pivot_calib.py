@@ -10,12 +10,13 @@ r = Robot()
 
 def main():
     try:
-        r.align()
+        # r.align()
         r._lMot.position = r._rMot.position = 0
-        r._lMot.stop(brake_action="hold")
-        r._rMot.run_forever(speed_sp=300)
+        r._lMot.stop(stop_action="hold")
+        r._rMot.run_forever(speed_sp=150)
         while r._col_r.light_reflected() > 50:
-            time.sleep(0.1)
+            pass
+        r._rMot.position = 0
         while r._col_r.light_reflected() <= 50:
             time.sleep(0.1)
         while r._col_r.light_reflected() > 50:
@@ -24,7 +25,7 @@ def main():
             time.sleep(0.1)
         while r._col_r.light_reflected() > 50:
             pass
-        r._rMot.stop(brake_action="hold")
+        r._rMot.stop(stop_action="hold")
         distance_right = r._deg_to_cm(r._rMot.position)
         motor_distance = distance_right / (2 * math.pi)
         print("distance driven: " + str(distance_right))
