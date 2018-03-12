@@ -5,22 +5,17 @@ http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/stable/motors.html
 https://github.com/Klabbedi/ev3
 """
 from robot import Robot
+import pt_1
+import pt_2
 import time
-
-r = Robot()
 
 
 def main():
+    r = Robot()
     try:
         print("running")
-        r.drive(0, 70, 5)
-        direction = r.get_direction(70)
-        distance, turn = r.get_turn_correction_values(direction, 7.5 - r.midpoint_distance_from_line(direction))
-        r.drive(70, 50, distance, turn, "hold")
-        r.pivot(90, True, 50)
-        r.drive(0, 100, 5)
-        r.move_to_line(100)
-        r.drive(100, 30, 5, 0, "hold")
+        pt_1.run(r)
+        pt_2.run(r)
         # r.drive(60, 30, r.distance_to_parallel_line(10, direction), 0, "hold")
         # r.pivot(90 - direction, True, 30)
 

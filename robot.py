@@ -1,6 +1,7 @@
 from ev3dev.auto import *
 import os
 import math
+from enum import Enum
 
 
 class MyColorSensorEV3:
@@ -11,26 +12,36 @@ class MyColorSensorEV3:
         self._col.mode = 'COL-REFLECT'
 
     def light_reflected(self):
-        if self._col.mode is not 'COL-REFLECT':
-            self._col.mode = 'COL-REFLECT'
+        # if self._col.mode is not 'COL-REFLECT':
+        #    self._col.mode = 'COL-REFLECT'
         val = self._col.value()/(self._max_val-self._min_val) * 100
         val = min(100, val)
         val = max(0, val)
         return val
 
 
+class MyColor(Enum):
+    NOCOLOR = 0
+    BLUE = 2
+    GREEN = 3
+    YELLOW = 4
+    RED = 5
+
+
 class Robot:
     _tyre_size = 6.24               # Durchmesser des Motors in cm
-    _motor_distance = 19.53         # Abstand der Rädermittelpunkte in cm
+    _motor_distance = 19.6  # 19.53         # Abstand der Rädermittelpunkte in cm
     _sensor_distance = 14.5
+    container_colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]
 
     def __init__(self):
         os.system('setfont Lat15-TerminusBold14')
 
         self._lMot = LargeMotor(OUTPUT_B)
         self._rMot = LargeMotor(OUTPUT_C)
-        self._col_l = MyColorSensorEV3(INPUT_1, 7, 81)
-        self._col_r = MyColorSensorEV3(INPUT_2, 4, 56)
+        self._aMot = LargeMotor(OUTPUT_A)
+        self._col_l = MyColorSensorEV3(INPUT_1, 7, 73)
+        self._col_r = MyColorSensorEV3(INPUT_2, 3, 51)
         self._btn = Button()
 
         self._lMot.reset()
@@ -39,11 +50,25 @@ class Robot:
         self._rMot.polarity = "inversed"
 
         print("press button to start")
-        self.wait_until_button()
+        # self.wait_until_button()
 
     def wait_until_button(self):
         while not self._btn.any():  # While no button is pressed.
             time.sleep(0.01)  # Wait 0.01 second
+
+    @staticmethod
+    def speak(text, wait=True):
+        if wait:
+            Sound.speak(text).wait()
+        else:
+            Sound.speak(text)
+
+    @staticmethod
+    def beep(wait=False):
+        if wait:
+            Sound.beep().wait()
+        else:
+            Sound.beep()
 
     def reset(self):
         self._lMot.reset()
@@ -144,7 +169,7 @@ class Robot:
         self._rMot.run_direct()
         self._lMot.run_direct()
 
-        while driven_distance <= distance:
+        while driven_distance < distance:
             driven_distance = (abs(self._rMot.position) + abs(self._lMot.position)) / 2
 
             error = self._rMot.position * k_right_mot - self._lMot.position * k_left_mot
@@ -162,6 +187,14 @@ class Robot:
                                       self._steering(direction + correction, speed_accelerated)):
                 motor.duty_cycle_sp = power
         self.brake(brake_action)
+
+    def drive_triple(self,
+                     speed_start, speed_max, speed_end,
+                     distance_acceleration, distance_middle, distance_deceleration,
+                     direction=0, brake_action="run", kp=1, ki=0.05, kd=0.5):
+        self.drive(speed_start, speed_max, distance_acceleration, direction, "run", kp, ki, kd)
+        self.drive(speed_max, speed_max, distance_middle, direction, "run", kp, ki, kd)
+        self.drive(speed_max, speed_end, distance_deceleration, direction, brake_action, kp, ki, kd)
 
     def move_to_line(self, speed, l_trigger_value=50, r_trigger_value=50, brake_action="run", kp=1, ki=0.05, kd=0.5):
         self._rMot.position = self._lMot.position = 0
@@ -189,17 +222,19 @@ class Robot:
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
-    # @staticmethod
-    def _acceleration_speed_forward(self, driven_distance, distance, start_speed, max_speed, min_speed, k_acceleration):
+    @staticmethod
+    def _acceleration_speed_forward(driven_distance, distance, start_speed, max_speed, min_speed, k_acceleration):
         speed = k_acceleration * driven_distance + start_speed
         speed = min(speed, k_acceleration * (distance - driven_distance), max_speed)
-        speed = self._min_speed(speed, min_speed)   # max(speed, min_speed)
+        speed = max(speed, min_speed)
         return speed
 
-    def pivot(self, direction, forward=True, start_speed=0, min_speed = 30, max_speed=100, k_acceleration=0.7):
+    def pivot(self, direction, forward=True, start_speed=0, min_speed=30, max_speed=80, k_acceleration=0.7):
         distance_degree = self._cm_to_deg(math.pi / 180 * abs(direction) * self._motor_distance)
         driven_distance = self._rMot.position = self._lMot.position = 0
         start_speed = abs(start_speed)
+        min_speed = abs(min_speed)
+        max_speed = abs(max_speed)
         if direction < 0:
             self._lMot.stop(stop_action="hold")
             self._rMot.run_direct()
@@ -210,6 +245,9 @@ class Robot:
                 if not forward:
                     speed *= -1
                 self._rMot.duty_cycle_sp = speed
+                if self._rMot.is_stalled:
+                    self.beep()
+                    min_speed += 5
             self._rMot.stop(stop_action="hold")
         else:
             self._rMot.stop(stop_action="hold")
@@ -221,7 +259,23 @@ class Robot:
                 if not forward:
                     speed *= -1
                 self._lMot.duty_cycle_sp = speed
+                if self._lMot.is_stalled:
+                    self.beep()
+                    min_speed += 5
             self._lMot.stop(stop_action="hold")
+
+    def align_driving(self, speed=60, end_speed=40, distance_from_line=7.5, brake_action="run"):
+        end_speed = math.copysign(end_speed, speed)
+        direction = self.get_direction(speed)
+        if speed < 0:
+            direction *= -1
+        if self.midpoint_distance_from_line(direction) > distance_from_line:
+            self.speak("distance to short", False)
+        distance, turn = self.get_turn_correction_values(
+            direction, distance_from_line - self.midpoint_distance_from_line(direction))
+        # print("direction " + str(direction))
+        # print("distance " + str(distance))
+        self.drive(speed, end_speed, distance, turn, brake_action)
 
     def align(self, k_dir=1, offset=50, tolerance=0):
         k_dir *= -0.5
@@ -239,8 +293,7 @@ class Robot:
         self.brake()
 
     def get_direction(self, speed, brake_action="run", kp=1, ki=0.05, kd=0.5):
-        self._rMot.position = 0
-        self._lMot.position = 0
+        self._rMot.position = self._lMot.position = 0
         start_distance = 0
         l_triggered = r_triggered = finished = False
         left_first = True
@@ -256,12 +309,14 @@ class Robot:
 
             if self._col_l.light_reflected() < trigger_value:
                 l_triggered = True
+                # self.beep(False)
             if self._col_r.light_reflected() < trigger_value:
                 r_triggered = True
+                # self.beep(False)
 
             if l_triggered and r_triggered:
                 finished = True
-            elif (l_triggered ^ r_triggered) and start_distance is 0:   # XOR
+            if (l_triggered or r_triggered) and start_distance is 0:
                 start_distance = driven_distance
                 left_first = l_triggered
 
@@ -280,13 +335,16 @@ class Robot:
         self.brake(brake_action)
 
         s = driven_distance - start_distance
-        if s is 0:
-            return 0
-        direction = 90-math.degrees(math.atan(self._cm_to_deg(self._sensor_distance / s)))
-        if not left_first:
-            direction *= -1
-        if speed < 0:
-            direction *= -1
+        print("ANGLE: s = " + str(s))
+        if s <= 0:
+            direction = 0
+        else:
+            direction = 90-math.degrees(math.atan(self._cm_to_deg(self._sensor_distance / s)))
+            if not left_first:
+                direction *= -1
+            if speed < 0:
+                direction *= -1
+        print("measured angle: " + str(direction))
         return direction
 
 
