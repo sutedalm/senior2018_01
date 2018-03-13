@@ -15,21 +15,7 @@ def main():
     try:
         print("running")
         pt_1.run(r)
-        pt_2.run(r)
-        # r.drive(60, 30, r.distance_to_parallel_line(10, direction), 0, "hold")
-        # r.pivot(90 - direction, True, 30)
-
-        # r.align(1)
-        # r.drive(0, 100, 50, 0, "hold")
-        # r.pivot(-90)
-        # r.pivot(90)
-        # r.pivot(-90, False)
-        # r.pivot(90, False)
-        # r.drive(1, 100, 10, 0)
-        # r.drive(100, 100, 18, 0)
-        # r.drive(100, 0, 10, 0, "hold")
-        # r.pivot(-90)
-        # time.sleep(1)
+        # pt_2.run(r)
     finally:
         print("RESET")
         r.reset()

@@ -4,17 +4,19 @@ import math
 from enum import Enum
 
 
-class MyColorSensorEV3:
+class MyColorSensorEV3(ColorSensor):
     def __init__(self, port=INPUT_1, min_val=0, max_val=100):
-        self._col = ColorSensor(port)
+        # self._col = ColorSensor(port)
+        ColorSensor.__init__(self, port)
         self._min_val = min_val
         self._max_val = max_val
-        self._col.mode = 'COL-REFLECT'
+        self.mode = 'COL-REFLECT'
+        # self._col.mode = 'COL-REFLECT'
 
     def light_reflected(self):
-        # if self._col.mode is not 'COL-REFLECT':
-        #    self._col.mode = 'COL-REFLECT'
-        val = self._col.value()/(self._max_val-self._min_val) * 100
+        # if self.mode is not 'COL-REFLECT':
+        #    self.mode = 'COL-REFLECT'
+        val = self.value()/(self._max_val-self._min_val) * 100
         val = min(100, val)
         val = max(0, val)
         return val
@@ -28,8 +30,34 @@ class MyColor(Enum):
     RED = 5
 
 
+class MySlider(LargeMotor):
+    def __init__(self, port=OUTPUT_A):
+        LargeMotor.__init__(self, port)
+
+    def open(self, wait=True, speed=100, duration=12):
+        speed *= 10
+        duration *= 100
+        self.run_timed(time_sp=duration, speed_sp=speed, ramp_up_sp=800, ramp_down_sp=700)
+        if wait:
+            self.wait_while('running')
+
+    def close(self, wait=True, speed=100, duration=13):
+        speed *= -10
+        duration *= 100
+        self.run_timed(time_sp=duration, speed_sp=speed, ramp_up_sp=800, ramp_down_sp=700)
+        if wait:
+            self.wait_while('running')
+
+    def collect(self):
+        self.run_timed(time_sp=2000, speed_sp=-1000, ramp_up_sp=800)
+        self.wait_while('running')
+
+    def open_half_to_full(self, wait=True):
+        self.open(wait, 100, 7)
+
+
 class Robot:
-    _tyre_size = 6.24               # Durchmesser des Motors in cm
+    _tyre_size = 6.24                       # Durchmesser des Reifens in cm
     _motor_distance = 19.6  # 19.53         # Abstand der Rädermittelpunkte in cm
     _sensor_distance = 14.5
     container_colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]
@@ -39,7 +67,7 @@ class Robot:
 
         self._lMot = LargeMotor(OUTPUT_B)
         self._rMot = LargeMotor(OUTPUT_C)
-        self._aMot = LargeMotor(OUTPUT_A)
+        self.slider = MySlider(OUTPUT_A)
         self._col_l = MyColorSensorEV3(INPUT_1, 7, 73)
         self._col_r = MyColorSensorEV3(INPUT_2, 3, 51)
         self._btn = Button()
@@ -149,7 +177,7 @@ class Robot:
     def _deg_to_cm(self, deg):
         return deg * math.pi * self._tyre_size / 360
 
-    def drive(self, speed_start, speed, distance, direction=0, brake_action="run", kp=1, ki=0.05, kd=0.5):
+    def drive(self, speed_start, speed, distance, direction=0, brake_action="run", kp=8, ki=0.05, kd=1):
         self._rMot.position = self._lMot.position = 0
         driven_distance = 0
         distance = self._cm_to_deg(distance)
@@ -265,6 +293,7 @@ class Robot:
             self._lMot.stop(stop_action="hold")
 
     def align_driving(self, speed=60, end_speed=40, distance_from_line=7.5, brake_action="run"):
+        # TODO: add constant deceleration path
         end_speed = math.copysign(end_speed, speed)
         direction = self.get_direction(speed)
         if speed < 0:
@@ -273,8 +302,6 @@ class Robot:
             self.speak("distance to short", False)
         distance, turn = self.get_turn_correction_values(
             direction, distance_from_line - self.midpoint_distance_from_line(direction))
-        # print("direction " + str(direction))
-        # print("distance " + str(distance))
         self.drive(speed, end_speed, distance, turn, brake_action)
 
     def align(self, k_dir=1, offset=50, tolerance=0):
@@ -294,9 +321,8 @@ class Robot:
 
     def get_direction(self, speed, brake_action="run", kp=1, ki=0.05, kd=0.5):
         self._rMot.position = self._lMot.position = 0
-        start_distance = 0
-        l_triggered = r_triggered = finished = False
-        left_first = True
+        l_distance = r_distance = 0
+        l_triggered = r_triggered = False
         trigger_value = 50
 
         last_error = integral = 0
@@ -304,21 +330,15 @@ class Robot:
         self._rMot.run_direct()
         self._lMot.run_direct()
 
-        while not finished:
+        while not (l_triggered and r_triggered):
             driven_distance = (abs(self._rMot.position) + abs(self._lMot.position)) / 2
 
-            if self._col_l.light_reflected() < trigger_value:
+            if self._col_l.light_reflected() < trigger_value and not l_triggered:
                 l_triggered = True
-                # self.beep(False)
-            if self._col_r.light_reflected() < trigger_value:
+                l_distance = driven_distance
+            if self._col_r.light_reflected() < trigger_value and not r_triggered:
                 r_triggered = True
-                # self.beep(False)
-
-            if l_triggered and r_triggered:
-                finished = True
-            if (l_triggered or r_triggered) and start_distance is 0:
-                start_distance = driven_distance
-                left_first = l_triggered
+                r_distance = driven_distance
 
             error = self._rMot.position - self._lMot.position
             integral = float(0.5) * integral + error
@@ -334,13 +354,13 @@ class Robot:
 
         self.brake(brake_action)
 
-        s = driven_distance - start_distance
+        s = abs(r_distance - l_distance)
         print("ANGLE: s = " + str(s))
         if s <= 0:
             direction = 0
         else:
             direction = 90-math.degrees(math.atan(self._cm_to_deg(self._sensor_distance / s)))
-            if not left_first:
+            if not l_distance < r_distance:
                 direction *= -1
             if speed < 0:
                 direction *= -1

@@ -14,8 +14,8 @@ def main():
         r._lMot.run_to_rel_pos(speed_sp=150, position_sp=2*360, stop_action="hold")
         r._rMot.run_to_rel_pos(speed_sp=150, position_sp=2*360, stop_action="hold")
         while r._rMot.is_running:  # While no button is pressed.
-            l_val = r._col_l._col.value()
-            r_val = r._col_r._col.value()
+            l_val = r._col_l.value()
+            r_val = r._col_r.value()
             l_min = min(l_min, l_val)
             l_max = max(l_max, l_val)
             r_min = min(r_min, r_val)
