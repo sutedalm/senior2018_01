@@ -27,8 +27,8 @@ def run(r):
     r.slider.collect()
     # r.slider.close(True, 100, 15)
 
-    r.slider.open()
-    r.drive_triple(0, 30, 0, 3, 0.5, 2, 0, "hold")
+    r.slider.open_slow()
+    r.drive_triple(0, 30, 0, 3, 2, 2, 0, "hold")
     r.slider.collect()
     # r.slider.close(True, 100, 15)
 

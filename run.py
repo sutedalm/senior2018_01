@@ -14,6 +14,9 @@ def main():
     r = Robot()
     try:
         print("running")
+        # r.drive(0, 90, 90, 0, "hold")
+        # r.drive_triple(0, 30, 0, 30, 50, 30, 0, "hold")
+        # time.sleep(1)
         pt_1.run(r)
         # pt_2.run(r)
     finally:

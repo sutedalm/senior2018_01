@@ -49,7 +49,11 @@ class MySlider(LargeMotor):
             self.wait_while('running')
 
     def collect(self):
-        self.run_timed(time_sp=2000, speed_sp=-1000, ramp_up_sp=800)
+        self.run_timed(time_sp=5000, speed_sp=-300, ramp_up_sp=800)
+        self.wait_while('running')
+
+    def open_slow(self):
+        self.run_timed(time_sp=4000, speed_sp=300, ramp_up_sp=800)
         self.wait_while('running')
 
     def open_half_to_full(self, wait=True):
@@ -64,7 +68,7 @@ class Robot:
 
     def __init__(self):
         os.system('setfont Lat15-TerminusBold14')
-
+        # TODO: 4th motor
         self._lMot = LargeMotor(OUTPUT_B)
         self._rMot = LargeMotor(OUTPUT_C)
         self.slider = MySlider(OUTPUT_A)
@@ -113,26 +117,27 @@ class Robot:
 
         speed_left = max(-100, min(speed_left, 100))
         speed_right = max(-100, min(speed_right, 100))
+        # print("l: " + str(speed_left) + "; r: " + str(speed_right))
         return int(speed_left), int(speed_right)
 
-    # @staticmethod
-    # def _steering_hard(direction, speed):
-    #
-    #     s = (50 - abs(float(direction))) / 50
-    #
-    #     speed_left = speed_right = speed
-    #     if direction >= 0:
-    #         speed_right *= s
-    #         if direction > 100:
-    #             speed_right = - speed
-    #     else:
-    #         speed_left *= s
-    #         if direction < -100:
-    #             speed_left = - speed
-    #
-    #     speed_left = max(-100, min(speed_left, 100))
-    #     speed_right = max(-100, min(speed_right, 100))
-    #     return int(speed_left), int(speed_right)
+    @staticmethod
+    def _steering_hard(direction, speed):
+
+        s = (50 - abs(float(direction))) / 50
+
+        speed_left = speed_right = speed
+        if direction >= 0:
+            speed_right *= s
+            if direction > 100:
+                speed_right = - speed
+        else:
+            speed_left *= s
+            if direction < -100:
+                speed_left = - speed
+
+        speed_left = max(-100, min(speed_left, 100))
+        speed_right = max(-100, min(speed_right, 100))
+        return int(speed_left), int(speed_right)
 
     @staticmethod
     def _min_speed(speed, min_speed=20):
@@ -177,12 +182,16 @@ class Robot:
     def _deg_to_cm(self, deg):
         return deg * math.pi * self._tyre_size / 360
 
-    def drive(self, speed_start, speed, distance, direction=0, brake_action="run", kp=8, ki=0.05, kd=1):
-        self._rMot.position = self._lMot.position = 0
+    def drive(self, speed_start, speed, distance, direction=0, brake_action="run", kp=8, ki=0.1, kd=1):
+        # TODO: Change k
+        difference = self._rMot.position - self._lMot.position
+        self._rMot.position = 0
+        self._lMot.position = -difference
+        print("dif: " + str(difference))
         driven_distance = 0
         distance = self._cm_to_deg(distance)
 
-        min_speed = 20
+        min_speed = 30  # TODO: make min_speed static attribute of robot
         if speed_start is 0:
             speed_start = math.copysign(min_speed, speed)
 
@@ -201,20 +210,31 @@ class Robot:
             driven_distance = (abs(self._rMot.position) + abs(self._lMot.position)) / 2
 
             error = self._rMot.position * k_right_mot - self._lMot.position * k_left_mot
-            integral = float(0.5) * integral + error
+            integral = integral + error
             derivative = error - last_error
             last_error = error
             correction = error * kp + ki * integral + kd * derivative
+            # print("correction: " + str(correction) + "; integ: " + str(integral))
             if speed < 0 or speed_start < 0:
                 correction = -correction
 
             speed_accelerated = self._min_speed(speed_start + driven_distance / distance * (speed - speed_start),
                                                 min_speed)
 
+            if direction <= 0 and self._lMot.is_stalled:
+                self.beep()
+                min_speed += 5
+            if direction >= 0 and self._rMot.is_stalled:
+                self.beep()
+                min_speed += 5
+
             for (motor, power) in zip((self._lMot, self._rMot),
                                       self._steering(direction + correction, speed_accelerated)):
                 motor.duty_cycle_sp = power
         self.brake(brake_action)
+
+        if direction is not 0:  # TODO: calculate difference in curve driving
+            self.reset_motor_pos()
 
     def drive_triple(self,
                      speed_start, speed_max, speed_end,
@@ -225,6 +245,7 @@ class Robot:
         self.drive(speed_max, speed_end, distance_deceleration, direction, brake_action, kp, ki, kd)
 
     def move_to_line(self, speed, l_trigger_value=50, r_trigger_value=50, brake_action="run", kp=1, ki=0.05, kd=0.5):
+        # TODO: implement move to line in normal driving
         self._rMot.position = self._lMot.position = 0
 
         last_error = integral = 0
@@ -291,6 +312,7 @@ class Robot:
                     self.beep()
                     min_speed += 5
             self._lMot.stop(stop_action="hold")
+        self.reset_motor_pos()
 
     def align_driving(self, speed=60, end_speed=40, distance_from_line=7.5, brake_action="run"):
         # TODO: add constant deceleration path
@@ -303,6 +325,11 @@ class Robot:
         distance, turn = self.get_turn_correction_values(
             direction, distance_from_line - self.midpoint_distance_from_line(direction))
         self.drive(speed, end_speed, distance, turn, brake_action)
+        self.reset_motor_pos()
+
+    def reset_motor_pos(self):
+        self._lMot.position = 0
+        self._rMot.position = 0
 
     def align(self, k_dir=1, offset=50, tolerance=0):
         k_dir *= -0.5
