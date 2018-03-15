@@ -59,15 +59,26 @@ class MySlider(LargeMotor):
     def open_half_to_full(self, wait=True):
         self.open(wait, 100, 7)
 
+    def open_to_half(self):
+        self.run_to_rel_pos(position_sp=620, speed_sp=400, stop_action="hold")
+        self.wait_while('running')
+
+
+class RobotConstants:
+    def __init__(self):
+        self.tyre_size = 6.24                       # Durchmesser des Reifens in cm
+        self.motor_distance = 19.6  # 19.53         # Abstand der Rädermittelpunkte in cm
+        self.sensor_distance = 14.5
+        self.pivot_min_speed = 30
+        self.drive_min_speed = 20
+
 
 class Robot:
-    _tyre_size = 6.24                       # Durchmesser des Reifens in cm
-    _motor_distance = 19.6  # 19.53         # Abstand der Rädermittelpunkte in cm
-    _sensor_distance = 14.5
     container_colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]
 
     def __init__(self):
         os.system('setfont Lat15-TerminusBold14')
+        self._consts = RobotConstants()
         # TODO: 4th motor
         self._lMot = LargeMotor(OUTPUT_B)
         self._rMot = LargeMotor(OUTPUT_C)
@@ -105,6 +116,7 @@ class Robot:
     def reset(self):
         self._lMot.reset()
         self._rMot.reset()
+        self.slider.reset()
 
     @staticmethod
     def _steering(direction, speed):
@@ -139,8 +151,10 @@ class Robot:
         speed_right = max(-100, min(speed_right, 100))
         return int(speed_left), int(speed_right)
 
-    @staticmethod
-    def _min_speed(speed, min_speed=20):
+    def _min_speed(self, speed, min_speed=0):
+        if min_speed is 0:
+            min_speed = self._consts.drive_min_speed
+
         min_speed = abs(min_speed)
         if abs(speed) < min_speed:
             if speed > 0:
@@ -159,7 +173,7 @@ class Robot:
 
     def midpoint_distance_from_line(self, direction):
         direction = math.radians(abs(direction))
-        return math.sin(direction) * self._sensor_distance/2
+        return math.sin(direction) * self._consts.sensor_distance/2
 
     def get_turn_correction_values(self, direction, parallel_distance):
         if direction is 0:
@@ -167,8 +181,8 @@ class Robot:
 
         r = parallel_distance / math.sin(math.radians(abs(direction)))
         average_distance = math.pi * r * abs(direction) / 180
-        r1 = r + self._motor_distance/2
-        r2 = r - self._motor_distance/2
+        r1 = r + self._consts.motor_distance/2
+        r2 = r - self._consts.motor_distance/2
 
         turn = 100 * r2/r1 - 100
         if direction < 0:
@@ -177,10 +191,10 @@ class Robot:
         return average_distance, turn
 
     def _cm_to_deg(self, cm):
-        return 360 * cm / (math.pi * self._tyre_size)
+        return 360 * cm / (math.pi * self._consts.tyre_size)
 
     def _deg_to_cm(self, deg):
-        return deg * math.pi * self._tyre_size / 360
+        return deg * math.pi * self._consts.tyre_size / 360
 
     def drive(self, speed_start, speed, distance, direction=0, brake_action="run", kp=8, ki=0.1, kd=1):
         # TODO: Change k
@@ -191,7 +205,7 @@ class Robot:
         driven_distance = 0
         distance = self._cm_to_deg(distance)
 
-        min_speed = 30  # TODO: make min_speed static attribute of robot
+        min_speed = self._consts.drive_min_speed
         if speed_start is 0:
             speed_start = math.copysign(min_speed, speed)
 
@@ -271,6 +285,8 @@ class Robot:
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
+    # TODO: Implement Turning
+
     @staticmethod
     def _acceleration_speed_forward(driven_distance, distance, start_speed, max_speed, min_speed, k_acceleration):
         speed = k_acceleration * driven_distance + start_speed
@@ -278,12 +294,17 @@ class Robot:
         speed = max(speed, min_speed)
         return speed
 
-    def pivot(self, direction, forward=True, start_speed=0, min_speed=30, max_speed=80, k_acceleration=0.7):
-        distance_degree = self._cm_to_deg(math.pi / 180 * abs(direction) * self._motor_distance)
+    def pivot(self, direction, forward=True, start_speed=0, min_speed=0, max_speed=80, k_acceleration=0.7):
+        distance_degree = self._cm_to_deg(math.pi / 180 * abs(direction) * self._consts.motor_distance)
         driven_distance = self._rMot.position = self._lMot.position = 0
+
         start_speed = abs(start_speed)
         min_speed = abs(min_speed)
         max_speed = abs(max_speed)
+
+        if min_speed is 0:
+            min_speed = self._consts.pivot_min_speed
+
         if direction < 0:
             self._lMot.stop(stop_action="hold")
             self._rMot.run_direct()
@@ -294,6 +315,7 @@ class Robot:
                 if not forward:
                     speed *= -1
                 self._rMot.duty_cycle_sp = speed
+
                 if self._rMot.is_stalled:
                     self.beep()
                     min_speed += 5
@@ -308,24 +330,37 @@ class Robot:
                 if not forward:
                     speed *= -1
                 self._lMot.duty_cycle_sp = speed
+
                 if self._lMot.is_stalled:
                     self.beep()
                     min_speed += 5
             self._lMot.stop(stop_action="hold")
+
         self.reset_motor_pos()
 
-    def align_driving(self, speed=60, end_speed=40, distance_from_line=7.5, brake_action="run"):
-        # TODO: add constant deceleration path
+    def align_driving(self, speed=60, end_speed=40, distance_constant=2.5, distance_deceleration=5, brake_action="run"):
         end_speed = math.copysign(end_speed, speed)
-        direction = self.get_direction(speed)
+        distance_constant = abs(distance_constant)
+        distance_deceleration = abs(distance_deceleration)
+        distance_from_line = distance_constant + distance_deceleration
+
+        direction = self.get_direction(speed)       # Calculate error
+
         if speed < 0:
             direction *= -1
+
         if self.midpoint_distance_from_line(direction) > distance_from_line:
             self.speak("distance to short", False)
-        distance, turn = self.get_turn_correction_values(
-            direction, distance_from_line - self.midpoint_distance_from_line(direction))
-        self.drive(speed, end_speed, distance, turn, brake_action)
-        self.reset_motor_pos()
+            # TODO: Turn on spot
+        else:
+            distance, turn = self.get_turn_correction_values(
+                direction, distance_from_line - self.midpoint_distance_from_line(direction))
+
+            if distance < distance_deceleration:
+                self.drive(speed, end_speed, distance, turn, brake_action)
+            else:
+                self.drive(speed, speed, distance - distance_deceleration, turn)
+                self.drive(speed, end_speed, distance_deceleration, turn, brake_action)
 
     def reset_motor_pos(self):
         self._lMot.position = 0
@@ -386,7 +421,7 @@ class Robot:
         if s <= 0:
             direction = 0
         else:
-            direction = 90-math.degrees(math.atan(self._cm_to_deg(self._sensor_distance / s)))
+            direction = 90-math.degrees(math.atan(self._cm_to_deg(self._consts.sensor_distance / s)))
             if not l_distance < r_distance:
                 direction *= -1
             if speed < 0:

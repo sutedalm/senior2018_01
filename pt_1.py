@@ -9,16 +9,12 @@ from robot import MyColor
 import time
 
 
-def run(r):
+def run(r: Robot):
     r.beep(True)
     time.sleep(2)
 
     r.drive_triple(0, 100, 60, 15, 15, 10)
-    r.align_driving(60, 80, 10)
-
-    # r.drive_triple(0, 100, 100, 7, 26, 7)
-    # r.move_to_line(100)
-    # r.drive(100, 100, 13)
+    r.align_driving(60, 80, 3, 7)
 
     r.drive_triple(80, 40, 10, 9, 3, 3, 0, "hold")
 

@@ -15,63 +15,95 @@ def target_position(color):
     return False
 
 
-def pick_up(robot, i):
-    robot.drive(80, 0, 5, 0, "hold")
-    robot.speak(str(i))
+def pick_up(robot: Robot, i):
+    # robot.speak(str(i))
+
+    if i is 0:
+        robot.drive(80, 0, 5, 0, "hold")
+
+        robot.speak(str(i))
+        time.sleep(1)       # pick up temperature controller
+
+        robot.drive(0, -60, 3)
+        robot.move_to_line(-60)
+        robot.drive(-60, 0, 10, 0, "hold")
+        robot.drive_triple(0, 50, 0, 2.5, 0, 1, 0, "hold")
+
+        robot.slider.open()
+        robot.drive_triple(0, -30, 0, 8, 0, 2, 0, "hold")
+        robot.slider.close()
+    elif i is 1:
+        robot.drive(80, 0, 7, 0, "hold")
+
+        robot.speak(str(i))
+        time.sleep(1)
+
+        robot.drive_triple(0, -40, 0, 2, 3, 1, 0, "hold")
+
+        robot.slider.open_to_half()
+        robot.drive_triple(0, -50, 0, 4, 11, 3, 0, "hold")
+        robot.slider.close()
+    elif i is 2:
+        robot.drive(80, 0, 8, 0, "hold")
+
+        robot.speak(str(i))
+        time.sleep(1)
+
+        robot.drive_triple(0, -40, 0, 2, 4, 2, 0, "hold")
+
+        robot.slider.open_to_half()
+        robot.drive_triple(0, -50, 0, 3, 12, 3, 0, "hold")
+        robot.slider.close()
 
 
-def run(r):
-        colors = [MyColor.RED, MyColor.BLUE, MyColor.YELLOW, MyColor.GREEN]
+def run(r: Robot):
+        colors = [MyColor.YELLOW, MyColor.BLUE, MyColor.GREEN, MyColor.GREEN]
         # r.container_colors[0]
         position = True     # True = In front of line; False = behind line
         # TODO: Change Speed at start
         i = 0
-        while i < 4:    # TODO: Change to 3
+        while i < 3:
             color = colors[i]
             if position:
                 r.drive(0, -60, 5)
                 position = False
                 if target_position(color):
                     # r.speak("FAIL")
-                    r.align_driving(-60, -20, 7, "hold")
+                    r.align_driving(-60, -20, 2, 5, "hold")
                     i -= 1
                 else:
-                    r.align_driving(-60, -30, 23)
+                    r.align_driving(-60, -30, 12.5, 10, "hold")
                     if color is MyColor.GREEN:
                         r.pivot(-90, True, 30)
                         r.drive(0, 80, 5)
                         r.move_to_line(80)
                         pick_up(r, i)
-                        r.drive_triple(0, -80, -20, 6, 6, 6)
                         r.pivot(-90, False, -20, 50)
-                    else:   # -blue
+                    else:   # blue
                         r.pivot(90, True, 30)
                         r.drive(0, 80, 5)
                         r.move_to_line(80)
                         pick_up(r, i)
-                        r.drive_triple(0, -80, -20, 6, 6, 6)
                         r.pivot(90, False, -20, 50)
             else:
                 r.drive(20, 60, 3)
                 position = True
                 if not target_position(color):
-                    r.align_driving(60, 20, 7, "hold")
+                    r.align_driving(60, 20, 2, 5, "hold")
                     i -= 1
                 else:
-                    r.align_driving(60, 30, 7.5, "hold")
+                    r.align_driving(60, 30, 2, 5.5)
                     if color is MyColor.RED:
                         r.pivot(-90, True, 30)
                         r.drive(0, 80, 5)
                         r.move_to_line(80)
                         pick_up(r, i)
-                        r.drive_triple(0, -80, -20, 6, 6, 6)
                         r.pivot(-90, False, -20, 50)
                     else:   # Yellow
                         r.pivot(90, True, 30)
                         r.drive(0, 80, 5)
                         r.move_to_line(80)
                         pick_up(r, i)
-                        r.drive_triple(0, -80, -20, 6, 6, 6)
                         r.pivot(90, False, -20, 50)
             i += 1
 
