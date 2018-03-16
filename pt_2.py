@@ -17,6 +17,7 @@ def target_position(color):
 
 def pick_up(robot: Robot, i):
     # robot.speak(str(i))
+    robot.drive_triple(0, 80, 80, 6, 10, 10, 0, "run", 50, 50)  # move to line
 
     if i is 0:
         robot.drive(80, 0, 5, 0, "hold")
@@ -24,9 +25,9 @@ def pick_up(robot: Robot, i):
         robot.speak(str(i))
         time.sleep(1)       # pick up temperature controller
 
-        robot.drive(0, -60, 3)
-        robot.move_to_line(-60)
+        robot.drive_triple(0, -60, -60, 6, 10, 10, 0, "run", 50, 50)    # Move to line
         robot.drive(-60, 0, 10, 0, "hold")
+
         robot.drive_triple(0, 50, 0, 2.5, 0, 1, 0, "hold")
 
         robot.slider.open()
@@ -68,21 +69,16 @@ def run(r: Robot):
                 r.drive(0, -60, 5)
                 position = False
                 if target_position(color):
-                    # r.speak("FAIL")
                     r.align_driving(-60, -20, 2, 5, "hold")
                     i -= 1
                 else:
                     r.align_driving(-60, -30, 12.5, 10, "hold")
                     if color is MyColor.GREEN:
                         r.pivot(-90, True, 30)
-                        r.drive(0, 80, 5)
-                        r.move_to_line(80)
                         pick_up(r, i)
                         r.pivot(-90, False, -20, 50)
                     else:   # blue
                         r.pivot(90, True, 30)
-                        r.drive(0, 80, 5)
-                        r.move_to_line(80)
                         pick_up(r, i)
                         r.pivot(90, False, -20, 50)
             else:
@@ -95,14 +91,10 @@ def run(r: Robot):
                     r.align_driving(60, 30, 2, 5.5)
                     if color is MyColor.RED:
                         r.pivot(-90, True, 30)
-                        r.drive(0, 80, 5)
-                        r.move_to_line(80)
                         pick_up(r, i)
                         r.pivot(-90, False, -20, 50)
                     else:   # Yellow
                         r.pivot(90, True, 30)
-                        r.drive(0, 80, 5)
-                        r.move_to_line(80)
                         pick_up(r, i)
                         r.pivot(90, False, -20, 50)
             i += 1
