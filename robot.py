@@ -1,7 +1,7 @@
 from ev3dev.auto import *
 import os
 import math
-from enum import Enum
+from enum import IntEnum
 
 
 class MyColorSensorEV3(ColorSensor):
@@ -22,7 +22,7 @@ class MyColorSensorEV3(ColorSensor):
         return val
 
 
-class MyColor(Enum):
+class MyColor(IntEnum):
     NOCOLOR = 0
     BLUE = 2
     GREEN = 3
@@ -64,9 +64,18 @@ class MySlider(LargeMotor):
         self.wait_while('running')
 
 
+class MyLifterPosition(IntEnum):
+    FIRST = 1
+    SECOND = 2
+    THIRD = 3
+    TOP = 4
+
+
 class MyLifter(MediumMotor):
     def __init__(self, port=OUTPUT_D):
         MediumMotor.__init__(self, port)
+        self.lifter_position = MyLifterPosition.FIRST
+
     # TODO: Implementation
 
 
@@ -76,6 +85,12 @@ class RobotConstants:
     sensor_distance = 14.5
     pivot_min_speed = 30
     drive_min_speed = 20
+    col_trigger_val = 50
+
+    # TODO: tune
+    drive_kp = 6
+    drive_ki = 0.1
+    drive_kd = 1
 
 
 class Utils:
@@ -177,8 +192,6 @@ class Utils:
 
 
 class Robot:
-    container_colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]
-
     def __init__(self):
         os.system('setfont Lat15-TerminusBold14')
         self._consts = RobotConstants()
@@ -189,11 +202,20 @@ class Robot:
         self.slider = MySlider(OUTPUT_A)
         self.lifter = MyLifter(OUTPUT_D)
 
-        # TODO: Add connectivity check
+        assert self._lMot.connected
+        assert self._rMot.connected
+        assert self.slider.connected
+        assert self.lifter.connected
 
         self._col_l = MyColorSensorEV3(INPUT_1, 7, 73)
         self._col_r = MyColorSensorEV3(INPUT_2, 3, 51)
+
+        assert self._col_l.connected
+        assert self._col_r.connected
+
         self._btn = Button()
+
+        self.container_colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]
 
         self._lMot.reset()
         self._rMot.reset()
@@ -204,8 +226,8 @@ class Robot:
         # self.wait_until_button()
 
     def wait_until_button(self):
-        while not self._btn.any():  # While no button is pressed.
-            time.sleep(0.01)  # Wait 0.01 second
+        while not self._btn.any():
+            time.sleep(0.01)
 
     @staticmethod
     def speak(text, wait=True):
@@ -228,13 +250,12 @@ class Robot:
         self.lifter.reset()
 
     def drive(self, speed_start, speed, distance, direction=0, brake_action="run", l_col_trigger=-1, r_col_trigger=-1,
-              kp=8, ki=0.1, kd=1):
+              kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd):
         # TODO: add time trigger
 
-        difference = self._rMot.position - self._lMot.position
+        self._lMot.position = self._lMot.position - self._rMot.position
         self._rMot.position = 0
-        self._lMot.position = -difference
-        print("dif: " + str(difference))
+        print("dif: " + str(-self._lMot.position))
 
         driven_distance = 0
         distance = self._util.cm_to_deg(distance)
@@ -268,7 +289,6 @@ class Robot:
             speed_accelerated = self._util.min_speed(speed_start + driven_distance / distance * (speed - speed_start),
                                                      min_speed)
 
-            # TODO: revise stall detection
             if direction <= 0 and self._lMot.is_stalled:
                 self.beep()
                 min_speed += 5
@@ -281,16 +301,16 @@ class Robot:
                 motor.duty_cycle_sp = power
         self.brake(brake_action)
 
-        # TODO: calculate difference in curve driving
-        if direction is not 0:
-            self.reset_motor_pos()
+        # TODO: check algorithm
+        self._rMot.position = 0
+        self._lMot.position = last_error
 
     def drive_triple(self,
                      speed_start, speed_max, speed_end,
                      distance_acceleration, distance_middle, distance_deceleration,
                      direction=0, brake_action="run",
                      l_col_trigger=-1, r_col_trigger=-1,
-                     kp=1, ki=0.05, kd=0.5):
+                     kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd):
         self.drive(speed_start, speed_max, distance_acceleration, direction, "run",
                    l_col_trigger, r_col_trigger, kp, ki, kd)
         self.drive(speed_max, speed_max, distance_middle, direction, "run", l_col_trigger, r_col_trigger, kp, ki, kd)
@@ -390,12 +410,16 @@ class Robot:
             self._lMot.duty_cycle_sp = error_left * k_dir
             self._rMot.duty_cycle_sp = error_right * k_dir
         self.brake()
+        self.reset_motor_pos()
 
-    def get_direction(self, speed, brake_action="run", kp=1, ki=0.05, kd=0.5):
-        self._rMot.position = self._lMot.position = 0
+    def get_direction(self, speed, brake_action="run",
+                      kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd):
+        self._lMot.position = self._lMot.position - self._rMot.position
+        self._rMot.position = 0
+
         l_distance = r_distance = 0
         l_triggered = r_triggered = False
-        trigger_value = 50
+        trigger_value = self._consts.col_trigger_val
 
         last_error = integral = 0
 

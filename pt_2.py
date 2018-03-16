@@ -57,16 +57,16 @@ def pick_up(robot: Robot, i):
         robot.slider.close()
 
 
-def run(r: Robot):
+def run(r: Robot, speed_start=0):
         colors = [MyColor.YELLOW, MyColor.BLUE, MyColor.GREEN, MyColor.GREEN]
         # r.container_colors[0]
         position = True     # True = In front of line; False = behind line
-        # TODO: Change Speed at start
         i = 0
         while i < 3:
             color = colors[i]
             if position:
-                r.drive(0, -60, 5)
+                r.drive(speed_start, -60, 5, 0, "run", 50, 50)
+                speed_start = 0
                 position = False
                 if target_position(color):
                     r.align_driving(-60, -20, 2, 5, "hold")
@@ -82,7 +82,7 @@ def run(r: Robot):
                         pick_up(r, i)
                         r.pivot(90, False, -20, 50)
             else:
-                r.drive(20, 60, 3)
+                r.drive(20, 60, 3, 0, "run", 50, 50)
                 position = True
                 if not target_position(color):
                     r.align_driving(60, 20, 2, 5, "hold")
