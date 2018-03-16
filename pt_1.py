@@ -16,21 +16,21 @@ def run(r: Robot):
     r.drive_triple(0, 100, 60, 15, 15, 10)
     r.align_driving(60, 80, 3, 7)
 
-    r.drive_triple(80, 40, 10, 9, 3, 3, 0, "hold")
+    r.drive_triple(80, 40, 10, 9, 3, 3, 0, "brake")
 
     r.slider.open_half_to_full()
-    r.drive_triple(0, 40, 0, 7, 3, 7, 0, "hold")
+    r.drive_triple(0, 40, 0, 7, 3, 7, 0, "brake")
     r.slider.collect()
     # r.slider.close(True, 100, 15)
 
     r.slider.open_slow()
-    r.drive_triple(0, 30, 0, 3, 2, 2, 0, "hold")
+    r.drive_triple(0, 30, 0, 3, 2, 2, 0, "brake")
     r.slider.collect()
     # r.slider.close(True, 100, 15)
 
-    r.drive_triple(0, 50, 0, 7, 3, 7, 0, "hold")
+    r.drive_triple(0, 50, 0, 7, 3, 7, 0, "brake")
     r.slider.open()
-    # r.drive_triple(0, -100, 0, 7, 40, 7, 0, "hold")
+    # r.drive_triple(0, -100, 0, 7, 40, 7, 0, "brake")
 
 
 if __name__ == "__main__":

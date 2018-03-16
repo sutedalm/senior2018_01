@@ -60,7 +60,7 @@ class MySlider(LargeMotor):
         self.open(wait, 100, 7)
 
     def open_to_half(self):
-        self.run_to_rel_pos(position_sp=620, speed_sp=400, stop_action="hold")
+        self.run_to_rel_pos(position_sp=620, speed_sp=400, stop_action="brake")
         self.wait_while('running')
 
 
@@ -88,7 +88,7 @@ class RobotConstants:
     col_trigger_val = 50
 
     # TODO: tune
-    drive_kp = 6
+    drive_kp = 4
     drive_ki = 0.1
     drive_kd = 1
 
@@ -252,10 +252,13 @@ class Robot:
     def drive(self, speed_start, speed, distance, direction=0, brake_action="run", l_col_trigger=-1, r_col_trigger=-1,
               kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd):
         # TODO: add time trigger
-
-        self._lMot.position = self._lMot.position - self._rMot.position
-        self._rMot.position = 0
-        print("dif: " + str(-self._lMot.position))
+        # TODO: Fix Bug: correct distance
+        # print("DRIVING")
+        # print("l_pos: " + str(self._lMot.position) + "; r_pos: " + str(self._rMot.position))
+        dif = self._lMot.position - self._rMot.position
+        self.reset_motor_pos(dif)
+        # print("new l_pos: " + str(self._lMot.position) + "; r_pos: " + str(self._rMot.position))
+        # print("dif: " + str(-dif))
 
         driven_distance = 0
         distance = self._util.cm_to_deg(distance)
@@ -272,11 +275,14 @@ class Robot:
 
         last_error = integral = 0
 
+        line_detected = False
+
         self._rMot.run_direct()
         self._lMot.run_direct()
 
-        while driven_distance < distance and \
-                self._col_l.light_reflected() > l_col_trigger and self._col_r.light_reflected() > r_col_trigger:
+        while driven_distance < distance and not line_detected:
+            line_detected = self._col_l.light_reflected() <= l_col_trigger or \
+                            self._col_r.light_reflected() <= r_col_trigger
 
             driven_distance = (abs(self._rMot.position) + abs(self._lMot.position)) / 2
 
@@ -301,9 +307,10 @@ class Robot:
                 motor.duty_cycle_sp = power
         self.brake(brake_action)
 
-        # TODO: check algorithm
-        self._rMot.position = 0
-        self._lMot.position = last_error
+        dif = self._rMot.position * k_right_mot - self._lMot.position * k_left_mot
+        self.reset_motor_pos(dif)
+
+        return line_detected
 
     def drive_triple(self,
                      speed_start, speed_max, speed_end,
@@ -311,13 +318,19 @@ class Robot:
                      direction=0, brake_action="run",
                      l_col_trigger=-1, r_col_trigger=-1,
                      kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd):
-        self.drive(speed_start, speed_max, distance_acceleration, direction, "run",
-                   l_col_trigger, r_col_trigger, kp, ki, kd)
-        self.drive(speed_max, speed_max, distance_middle, direction, "run", l_col_trigger, r_col_trigger, kp, ki, kd)
-        self.drive(speed_max, speed_end, distance_deceleration, direction, brake_action,
-                   l_col_trigger, r_col_trigger, kp, ki, kd)
+        line_detected = False
+        if not line_detected:
+            line_detected = self.drive(speed_start, speed_max, distance_acceleration, direction, "run",
+                                       l_col_trigger, r_col_trigger, kp, ki, kd)
+        if not line_detected:
+            line_detected = self.drive(speed_max, speed_max, distance_middle, direction, "run",
+                                       l_col_trigger, r_col_trigger, kp, ki, kd)
+        if not line_detected:
+            line_detected = self.drive(speed_max, speed_end, distance_deceleration, direction, brake_action,
+                                       l_col_trigger, r_col_trigger, kp, ki, kd)
+        return line_detected
 
-    def brake(self, action="hold"):
+    def brake(self, action="brake"):
         if action is not "run":
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
@@ -325,8 +338,10 @@ class Robot:
     # TODO: Implement Turning
 
     def pivot(self, direction, forward=True, start_speed=0, min_speed=0, max_speed=80, k_acceleration=0.7):
+        print("PIVOTING")
         distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self._consts.motor_distance)
         driven_distance = self._rMot.position = self._lMot.position = 0
+        # TODO: calculate previous error
 
         start_speed = abs(start_speed)
         min_speed = abs(min_speed)
@@ -336,7 +351,7 @@ class Robot:
             min_speed = self._consts.pivot_min_speed
 
         if direction < 0:
-            self._lMot.stop(stop_action="hold")
+            self._lMot.stop(stop_action="brake")
             self._rMot.run_direct()
             while driven_distance < distance_degree:
                 driven_distance = abs(self._rMot.position)
@@ -349,9 +364,9 @@ class Robot:
                 if self._rMot.is_stalled:
                     self.beep()
                     min_speed += 5
-            self._rMot.stop(stop_action="hold")
+            self._rMot.stop(stop_action="brake")
         else:
-            self._rMot.stop(stop_action="hold")
+            self._rMot.stop(stop_action="brake")
             self._lMot.run_direct()
             while driven_distance < distance_degree:
                 driven_distance = abs(self._lMot.position)
@@ -364,9 +379,10 @@ class Robot:
                 if self._lMot.is_stalled:
                     self.beep()
                     min_speed += 5
-            self._lMot.stop(stop_action="hold")
+            self._lMot.stop(stop_action="brake")
 
         self.reset_motor_pos()
+        print("l_pos: " + str(self._lMot.position) + "r_pos: " + str(self._rMot.position))
 
     def align_driving(self, speed=60, end_speed=40, distance_constant=2.5, distance_deceleration=5, brake_action="run"):
         end_speed = math.copysign(end_speed, speed)
@@ -392,9 +408,13 @@ class Robot:
                 self.drive(speed, speed, distance - distance_deceleration, turn)
                 self.drive(speed, end_speed, distance_deceleration, turn, brake_action)
 
-    def reset_motor_pos(self):
-        self._lMot.position = 0
-        self._rMot.position = 0
+    def reset_motor_pos(self, dif=0):
+        if dif > 0:
+            self._lMot.position = dif
+            self._rMot.position = 0
+        else:
+            self._lMot.position = 0
+            self._rMot.position = -dif
 
     def align(self, k_dir=1, offset=50, tolerance=0):
         k_dir *= -0.5
@@ -414,8 +434,8 @@ class Robot:
 
     def get_direction(self, speed, brake_action="run",
                       kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd):
-        self._lMot.position = self._lMot.position - self._rMot.position
-        self._rMot.position = 0
+        dif = self._lMot.position - self._rMot.position
+        self.reset_motor_pos(dif)
 
         l_distance = r_distance = 0
         l_triggered = r_triggered = False

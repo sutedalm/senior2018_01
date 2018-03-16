@@ -17,43 +17,46 @@ def target_position(color):
 
 def pick_up(robot: Robot, i):
     # robot.speak(str(i))
+    time.sleep(1)
+    robot.beep(True)
+    time.sleep(1)
     robot.drive_triple(0, 80, 80, 6, 10, 10, 0, "run", 50, 50)  # move to line
 
     if i is 0:
-        robot.drive(80, 0, 5, 0, "hold")
+        robot.drive(80, 0, 5, 0, "brake")
 
         robot.speak(str(i))
         time.sleep(1)       # pick up temperature controller
 
         robot.drive_triple(0, -60, -60, 6, 10, 10, 0, "run", 50, 50)    # Move to line
-        robot.drive(-60, 0, 10, 0, "hold")
+        robot.drive(-60, 0, 10, 0, "brake")
 
-        robot.drive_triple(0, 50, 0, 2.5, 0, 1, 0, "hold")
+        robot.drive_triple(0, 50, 0, 2.5, 0, 1, 0, "brake")
 
         robot.slider.open()
-        robot.drive_triple(0, -30, 0, 8, 0, 2, 0, "hold")
+        robot.drive_triple(0, -30, 0, 8, 0, 2, 0, "brake")
         robot.slider.close()
     elif i is 1:
-        robot.drive(80, 0, 7, 0, "hold")
+        robot.drive(80, 0, 7, 0, "brake")
 
         robot.speak(str(i))
         time.sleep(1)
 
-        robot.drive_triple(0, -40, 0, 2, 3, 1, 0, "hold")
+        robot.drive_triple(0, -40, 0, 2, 3, 1, 0, "brake")
 
         robot.slider.open_to_half()
-        robot.drive_triple(0, -50, 0, 4, 11, 3, 0, "hold")
+        robot.drive_triple(0, -50, 0, 4, 11, 3, 0, "brake")
         robot.slider.close()
     elif i is 2:
-        robot.drive(80, 0, 8, 0, "hold")
+        robot.drive(80, 0, 8, 0, "brake")
 
         robot.speak(str(i))
         time.sleep(1)
 
-        robot.drive_triple(0, -40, 0, 2, 4, 2, 0, "hold")
+        robot.drive_triple(0, -40, 0, 2, 4, 2, 0, "brake")
 
         robot.slider.open_to_half()
-        robot.drive_triple(0, -50, 0, 3, 12, 3, 0, "hold")
+        robot.drive_triple(0, -50, 0, 3, 12, 3, 0, "brake")
         robot.slider.close()
 
 
@@ -69,10 +72,10 @@ def run(r: Robot, speed_start=0):
                 speed_start = 0
                 position = False
                 if target_position(color):
-                    r.align_driving(-60, -20, 2, 5, "hold")
+                    r.align_driving(-60, -20, 2, 5, "brake")
                     i -= 1
                 else:
-                    r.align_driving(-60, -30, 12.5, 10, "hold")
+                    r.align_driving(-60, -30, 12.5, 10, "brake")
                     if color is MyColor.GREEN:
                         r.pivot(-90, True, 30)
                         pick_up(r, i)
@@ -85,7 +88,7 @@ def run(r: Robot, speed_start=0):
                 r.drive(20, 60, 3, 0, "run", 50, 50)
                 position = True
                 if not target_position(color):
-                    r.align_driving(60, 20, 2, 5, "hold")
+                    r.align_driving(60, 20, 2, 5, "brake")
                     i -= 1
                 else:
                     r.align_driving(60, 30, 2, 5.5)

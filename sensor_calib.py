@@ -11,8 +11,8 @@ def main():
         time.sleep(1)
         l_min = r_min = 9999
         l_max = r_max = 0
-        r._lMot.run_to_rel_pos(speed_sp=150, position_sp=2*360, stop_action="hold")
-        r._rMot.run_to_rel_pos(speed_sp=150, position_sp=2*360, stop_action="hold")
+        r._lMot.run_to_rel_pos(speed_sp=150, position_sp=2*360, stop_action="brake")
+        r._rMot.run_to_rel_pos(speed_sp=150, position_sp=2*360, stop_action="brake")
         while r._rMot.is_running:  # While no button is pressed.
             l_val = r._col_l.value()
             r_val = r._col_r.value()
