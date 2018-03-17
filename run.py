@@ -23,6 +23,23 @@ def main():
     r = Robot()
     try:
         print("running")
+        r.beep(True)
+        time.sleep(2)
+
+        r.drive(30, 30, 4, 0, "brake")
+
+        r.lifter.move_up()
+        r.lifter.move_up()
+        r.lifter.move_up()
+
+        time.sleep(1)
+
+        r.drive(30, 30, 4, 0, "brake")
+
+        r.lifter.move_down()
+        r.lifter.move_down()
+        r.lifter.move_down()
+
         # r.drive(50, 0, 50, 0, "brake", 50, 50)
         # r.drive_triple(0, 80, 0, 10, 20, 20)
 
@@ -31,14 +48,14 @@ def main():
         # r.drive(0, 90, 90, 0, "brake")
         # r.drive_triple(0, 30, 0, 30, 50, 30, 0, "brake")
 
-        r.beep(True)
-        time.sleep(2)
+        # r.beep(True)
+        # time.sleep(2)
         # pt_1.run(r)
         # pt_2.run(r)
-        # r.drive(0, 100, 47/2)
-        # r.drive(100, 0, 47/2, 0, "brake")
-        # r.drive(30, 0, 66, 0, "brake")
-        r.drive_triple(0, 80, 0, 22, 3, 22, 0, "hold")
+        # r.pivot(-90, True)
+        # r.drive_triple(0, 100, 0, 10, 5, 10, 0, "brake")
+        # r.pivot(90, False)
+        # r.drive_triple(-20, -100, -20, 20, 5, 20, 0, "hold")
     finally:
         print("RESET")
         r.reset()

@@ -76,6 +76,15 @@ class MyLifter(MediumMotor):
         MediumMotor.__init__(self, port)
         self.lifter_position = MyLifterPosition.FIRST
 
+    def move_up(self, wait=True):
+        self.run_to_rel_pos(position_sp=-6*360, speed_sp=1000)
+        if wait:
+            self.wait_while('running')
+
+    def move_down(self, wait=True):
+        self.run_to_rel_pos(position_sp=6*360, speed_sp=1000)
+        if wait:
+            self.wait_while('running')
     # TODO: Implementation
 
 
@@ -251,17 +260,14 @@ class Robot:
 
     def drive(self, speed_start, speed, distance, direction=0, brake_action="run", l_col_trigger=-1, r_col_trigger=-1,
               kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd):
+
         # TODO: add time trigger
-        # TODO: Fix Bug: correct distance
-        # print("DRIVING")
-        # print("l_pos: " + str(self._lMot.position) + "; r_pos: " + str(self._rMot.position))
-        dif = self._lMot.position - self._rMot.position
-        self.reset_motor_pos(dif)
-        # print("new l_pos: " + str(self._lMot.position) + "; r_pos: " + str(self._rMot.position))
-        # print("dif: " + str(-dif))
+        # TODO: Bug fixing: initial speed?
+        print("DRIVING")
 
         driven_distance = 0
         distance = self._util.cm_to_deg(distance)
+        print("distance: " + str(distance))
 
         min_speed = self._consts.drive_min_speed
         if speed_start is 0:
@@ -272,6 +278,9 @@ class Robot:
             k_left_mot = 1 - direction/100
         else:
             k_right_mot = 1 + direction/100
+
+        print("l_pos: " + str(self._lMot.position) + "; r_pos: " + str(self._rMot.position))
+        # TODO: (Bug fixing): adapt previous error to curve constants
 
         last_error = integral = 0
 
@@ -284,9 +293,14 @@ class Robot:
             line_detected = self._col_l.light_reflected() <= l_col_trigger or \
                             self._col_r.light_reflected() <= r_col_trigger
 
-            driven_distance = (abs(self._rMot.position) + abs(self._lMot.position)) / 2
+            l_pos = self._lMot.position
+            r_pos = self._rMot.position
 
-            error = self._rMot.position * k_right_mot - self._lMot.position * k_left_mot
+            driven_distance = (abs(r_pos) + abs(l_pos)) / 2
+            if driven_distance >= distance or line_detected:        # only for faster brake response time
+                break
+
+            error = r_pos * k_right_mot - l_pos * k_left_mot
             integral, last_error, correction = self._util.pid(error, integral, last_error, kp, ki, kd)
 
             if speed < 0 or speed_start < 0:
@@ -305,11 +319,29 @@ class Robot:
             for (motor, power) in zip((self._lMot, self._rMot),
                                       self._util.steering(direction + correction, speed_accelerated)):
                 motor.duty_cycle_sp = power
+            # print("l_pos: " + str(self._lMot.position) + "; r_pos: " + str(self._rMot.position))
+
+        # print("end_l_pos: " + str(l_pos) + "; end_r_pos: " + str(r_pos))
+        if not line_detected:
+            distance = math.copysign(distance, speed_start)
+            if direction >= 0:
+                k = (100 - direction)/100
+                distance_l = distance * 2/(1+k)
+                distance_r = distance * 2/(1+k) * k
+            else:
+                k = (100 + direction)/100
+                distance_r = distance * 2/(1+k)
+                distance_l = distance * 2/(1+k) * k
+
+            self._rMot.position = self._rMot.position - distance_r
+            self._lMot.position = self._lMot.position - distance_l
+        else:
+            print("LINE DETECTED")
+            self.reset_motor_pos()
+        print("newl: " + str(self._lMot.position) + "; newr: " + str(self._rMot.position))
+        # dif = self._rMot.position * k_right_mot - self._lMot.position * k_left_mot
+        # self.reset_motor_pos(dif)
         self.brake(brake_action)
-
-        dif = self._rMot.position * k_right_mot - self._lMot.position * k_left_mot
-        self.reset_motor_pos(dif)
-
         return line_detected
 
     def drive_triple(self,
@@ -317,7 +349,7 @@ class Robot:
                      distance_acceleration, distance_middle, distance_deceleration,
                      direction=0, brake_action="run",
                      l_col_trigger=-1, r_col_trigger=-1,
-                     kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd):
+                     kp=RobotConstants. drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd):
         line_detected = False
         if not line_detected:
             line_detected = self.drive(speed_start, speed_max, distance_acceleration, direction, "run",
@@ -331,16 +363,18 @@ class Robot:
         return line_detected
 
     def brake(self, action="brake"):
+        # print("brake_l_pos: " + str(self._lMot.position) + "; brake_r_pos: " + str(self._rMot.position))
         if action is not "run":
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
     # TODO: Implement Turning
 
-    def pivot(self, direction, forward=True, start_speed=0, min_speed=0, max_speed=80, k_acceleration=0.7):
+    def pivot(self, direction, forward=True, start_speed=0, min_speed=0, max_speed=70, k_acceleration=0.7):
         print("PIVOTING")
         distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self._consts.motor_distance)
-        driven_distance = self._rMot.position = self._lMot.position = 0
+        driven_distance = 0
+        self._rMot.position = self._lMot.position = 0
         # TODO: calculate previous error
 
         start_speed = abs(start_speed)
@@ -351,7 +385,7 @@ class Robot:
             min_speed = self._consts.pivot_min_speed
 
         if direction < 0:
-            self._lMot.stop(stop_action="brake")
+            self._lMot.stop(stop_action="hold")
             self._rMot.run_direct()
             while driven_distance < distance_degree:
                 driven_distance = abs(self._rMot.position)
@@ -364,9 +398,11 @@ class Robot:
                 if self._rMot.is_stalled:
                     self.beep()
                     min_speed += 5
+
+            self._lMot.stop(stop_action="brake")
             self._rMot.stop(stop_action="brake")
         else:
-            self._rMot.stop(stop_action="brake")
+            self._rMot.stop(stop_action="hold")
             self._lMot.run_direct()
             while driven_distance < distance_degree:
                 driven_distance = abs(self._lMot.position)
@@ -379,10 +415,11 @@ class Robot:
                 if self._lMot.is_stalled:
                     self.beep()
                     min_speed += 5
-            self._lMot.stop(stop_action="brake")
 
+            self._rMot.stop(stop_action="brake")
+            self._lMot.stop(stop_action="brake")
+        # TODO: calculate position error
         self.reset_motor_pos()
-        print("l_pos: " + str(self._lMot.position) + "r_pos: " + str(self._rMot.position))
 
     def align_driving(self, speed=60, end_speed=40, distance_constant=2.5, distance_deceleration=5, brake_action="run"):
         end_speed = math.copysign(end_speed, speed)
@@ -434,6 +471,10 @@ class Robot:
 
     def get_direction(self, speed, brake_action="run",
                       kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd):
+
+        self._rMot.run_direct()
+        self._lMot.run_direct()
+
         dif = self._lMot.position - self._rMot.position
         self.reset_motor_pos(dif)
 
@@ -442,9 +483,6 @@ class Robot:
         trigger_value = self._consts.col_trigger_val
 
         last_error = integral = 0
-
-        self._rMot.run_direct()
-        self._lMot.run_direct()
 
         while not (l_triggered and r_triggered):
             driven_distance = (abs(self._rMot.position) + abs(self._lMot.position)) / 2
@@ -478,4 +516,6 @@ class Robot:
             if speed < 0:
                 direction *= -1
         print("measured angle: " + str(direction))
+
+        self.reset_motor_pos()  # TODO: Check for brake bug
         return direction
