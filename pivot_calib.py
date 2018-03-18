@@ -25,8 +25,8 @@ def main():
             time.sleep(0.1)
         while r._col_r.light_reflected() > 50:
             pass
-        r._rMot.stop(stop_action="hold")
         distance_right = r._util.deg_to_cm(r._rMot.position)
+        r._rMot.stop(stop_action="hold")
         motor_distance = distance_right / (2 * math.pi)
         print("distance driven: " + str(distance_right))
         print("motor distance: " + str(motor_distance))

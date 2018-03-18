@@ -16,13 +16,13 @@ def target_position(color):
 
 
 def pick_up(robot: Robot, i):
-    robot.drive_triple(0, 50, 50, 6, 10, 10, 0, "run", 50, 50)  # move to line
+    robot.drive_triple(0, 50, 50, 6, 20, 20, 0, "run", 50, 50)  # move to line
 
     if i is 0:
         robot.drive(50, 0, 5, 0, "brake")
 
         robot.speak(str(i))
-        time.sleep(1)       # pick up temperature controller
+        robot.lifter.move_up()
 
         robot.drive_triple(0, -60, -60, 6, 10, 10, 0, "run", 50, 50)    # Move to line
         robot.drive(-60, 0, 10, 0, "brake")
@@ -37,7 +37,7 @@ def pick_up(robot: Robot, i):
         robot.drive(50, 0, 7.5, 0, "brake")
 
         robot.speak(str(i))
-        time.sleep(1)
+        robot.lifter.move_up()
 
         robot.reset_motor_pos()
         robot.drive_triple(0, -40, 0, 2.5, 3, 1, 0, "brake")
@@ -50,7 +50,7 @@ def pick_up(robot: Robot, i):
 
         robot.slider.close(False, 20, 1)
         robot.speak(str(i))
-        time.sleep(1)
+        robot.lifter.move_up()
 
         robot.reset_motor_pos()
         robot.drive_triple(0, -40, 0, 2, 4, 2, 0, "brake")
@@ -61,7 +61,7 @@ def pick_up(robot: Robot, i):
 
 
 def run(r: Robot, speed_start=0):
-        colors = [MyColor.RED, MyColor.BLUE, MyColor.YELLOW, MyColor.GREEN]
+        colors = [MyColor.BLUE, MyColor.YELLOW, MyColor.RED, MyColor.GREEN]
         # r.container_colors[0]
         position = True     # True = In front of line; False = behind line
         i = 0
@@ -75,13 +75,13 @@ def run(r: Robot, speed_start=0):
                     r.align_driving(-60, -20, 2, 5, "brake")
                     i -= 1
                 else:
-                    r.align_driving(-60, -30, 12.5, 10, "brake")
+                    r.align_driving(-60, -20, 0, 3)
                     if color is MyColor.GREEN:
-                        r.pivot(-90, True, 30)
+                        r.pivot(90, False, 30)
                         pick_up(r, i)
                         r.pivot(-90, False, -20, 50)
                     else:   # blue
-                        r.pivot(90, True, 30)
+                        r.pivot(-90, False, 30)
                         pick_up(r, i)
                         r.pivot(90, False, -20, 50)
             else:
@@ -91,13 +91,13 @@ def run(r: Robot, speed_start=0):
                     r.align_driving(60, 20, 2, 5, "brake")
                     i -= 1
                 else:
-                    r.align_driving(60, 30, 2, 6)
+                    r.align_driving(60, 0, 18, 10, "brake")
                     if color is MyColor.RED:
-                        r.pivot(-90, True, 30)
+                        r.pivot(90, False, 30)
                         pick_up(r, i)
                         r.pivot(-90, False, -20, 50)
                     else:   # Yellow
-                        r.pivot(90, True, 30)
+                        r.pivot(-90, False, 30)
                         pick_up(r, i)
                         r.pivot(90, False, -20, 50)
             i += 1
