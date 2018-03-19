@@ -53,7 +53,13 @@ def testing(r: Robot):
     time.sleep(2)
     r.lifter.move_up()
     time.sleep(2)
-    r.lifter.move_to_first_position()
+    r.lifter.move_down()
+    time.sleep(2)
+    r.lifter.move_down()
+    time.sleep(2)
+    r.lifter.move_down()
+    time.sleep(2)
+
 
 def main():
     r = Robot()

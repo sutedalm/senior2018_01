@@ -72,18 +72,20 @@ class MyLifterPosition(IntEnum):
 
 
 class MyLifter(MediumMotor):
+    position_difference = 2200
+
     def __init__(self, port=OUTPUT_D):
         MediumMotor.__init__(self, port)
         self.lifter_position = MyLifterPosition.FIRST
 
     def move_up(self, wait=True):
-        self.run_to_abs_pos(position_sp=self.position - 6*360, speed_sp=1000, stop_action='hold')
+        self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=1000, stop_action='hold')
         if wait:
             self.wait_while('running')
         self.lifter_position += 1
 
     def move_down(self, wait=True):
-        self.run_to_abs_pos(position_sp=self.position + 6*360, speed_sp=1000, stop_action='hold')
+        self.run_to_abs_pos(position_sp=self.position + self.position_difference, speed_sp=1000, stop_action='hold')
         if wait:
             self.wait_while('running')
         self.lifter_position -= 1
@@ -95,8 +97,7 @@ class MyLifter(MediumMotor):
             self.wait_while('running')
 
     def move_to_top_position(self, wait=True):
-        i = MyLifterPosition.TOP - self.lifter_position
-        self.run_to_abs_pos(position_sp=-3*6*360, speed_sp=1000, stop_action='hold')
+        self.run_to_abs_pos(position_sp=-3*self.position_difference, speed_sp=1000, stop_action='hold')
         if wait:
             self.wait_while('running')
 
