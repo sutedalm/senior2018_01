@@ -6,20 +6,27 @@ from enum import IntEnum
 
 class MyColorSensorEV3(ColorSensor):
     def __init__(self, port=INPUT_1, min_val=0, max_val=100):
-        # self._col = ColorSensor(port)
         ColorSensor.__init__(self, port)
+        assert self.connected
         self._min_val = min_val
         self._max_val = max_val
         self.mode = 'COL-REFLECT'
-        # self._col.mode = 'COL-REFLECT'
 
     def light_reflected(self):
-        # if self.mode is not 'COL-REFLECT':
-        #    self.mode = 'COL-REFLECT'
         val = self.value()/(self._max_val-self._min_val) * 100
         val = min(100, val)
         val = max(0, val)
         return val
+
+
+class MyColorSensorHT(Sensor):
+    def __init__(self, port=INPUT_3, min_val=0, max_val=100):
+        Sensor.__init__(self, port)
+        assert self.connected
+
+        # self._min_val = min_val
+        # self._max_val = max_val
+        self.mode = 'NORM'
 
 
 class MyColor(IntEnum):
@@ -33,8 +40,9 @@ class MyColor(IntEnum):
 class MySlider(LargeMotor):
     def __init__(self, port=OUTPUT_A):
         LargeMotor.__init__(self, port)
+        assert self.connected
 
-    def open(self, wait=True, speed=100, duration=12):
+    def open(self, wait=True, speed=100, duration=13):
         speed *= 10
         duration *= 100
         self.run_timed(time_sp=duration, speed_sp=speed, ramp_up_sp=800, ramp_down_sp=700)
@@ -49,7 +57,7 @@ class MySlider(LargeMotor):
             self.wait_while('running')
 
     def collect(self):
-        self.run_timed(time_sp=5000, speed_sp=-300, ramp_up_sp=800)
+        self.run_timed(time_sp=2000, speed_sp=-500, ramp_up_sp=800)
         self.wait_while('running')
 
     def open_slow(self):
@@ -57,10 +65,10 @@ class MySlider(LargeMotor):
         self.wait_while('running')
 
     def open_half_to_full(self, wait=True):
-        self.open(wait, 100, 7)
+        self.open(wait, 100, 8)
 
     def open_to_half(self):
-        self.run_to_rel_pos(position_sp=620, speed_sp=400, stop_action="brake")
+        self.run_to_rel_pos(position_sp=610, speed_sp=400, stop_action="brake")
         self.wait_while('running')
 
 
@@ -76,6 +84,7 @@ class MyLifter(MediumMotor):
 
     def __init__(self, port=OUTPUT_D):
         MediumMotor.__init__(self, port)
+        assert self.connected
         self.lifter_position = MyLifterPosition.FIRST
 
     def move_up(self, wait=True):
@@ -238,31 +247,27 @@ class Robot:
         os.system('setfont Lat15-TerminusBold14')
         self._consts = RobotConstants()
         self._util = Utils(self._consts)
+        #
+        # self._lMot = LargeMotor(OUTPUT_B)
+        # self._rMot = LargeMotor(OUTPUT_C)
+        # self.slider = MySlider(OUTPUT_A)
+        # self.lifter = MyLifter(OUTPUT_D)
+        #
+        # assert self._lMot.connected
+        # assert self._rMot.connected
 
-        self._lMot = LargeMotor(OUTPUT_B)
-        self._rMot = LargeMotor(OUTPUT_C)
-        self.slider = MySlider(OUTPUT_A)
-        self.lifter = MyLifter(OUTPUT_D)
-
-        assert self._lMot.connected
-        assert self._rMot.connected
-        assert self.slider.connected
-        assert self.lifter.connected
-
-        self._col_l = MyColorSensorEV3(INPUT_1, 7, 69)
-        self._col_r = MyColorSensorEV3(INPUT_2, 3, 47)
-
-        assert self._col_l.connected
-        assert self._col_r.connected
+        # self._col_l = MyColorSensorEV3(INPUT_1, 7, 77)
+        # self._col_r = MyColorSensorEV3(INPUT_2, 3, 48)
+        self._ht_ship = MyColorSensorHT(INPUT_1)
 
         self._btn = Button()
 
         self.container_colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]
 
-        self._lMot.reset()
-        self._rMot.reset()
-        self._lMot.polarity = "inversed"
-        self._rMot.polarity = "inversed"
+        # self._lMot.reset()
+        # self._rMot.reset()
+        # self._lMot.polarity = "inversed"
+        # self._rMot.polarity = "inversed"
 
         print("press button to start")
         # self.wait_until_button()
@@ -469,7 +474,7 @@ class Robot:
                 self._lMot.position += distance_degree
 
     def align_driving(self, speed=60, end_speed=40, distance_constant=2.5, distance_deceleration=5, brake_action="run"):
-        # print("ALIGN DRIVING")
+        print("ALIGN DRIVING")
         end_speed = math.copysign(end_speed, speed)
         distance_constant = abs(distance_constant)
         distance_deceleration = abs(distance_deceleration)

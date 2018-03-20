@@ -61,7 +61,7 @@ def pick_up(robot: Robot, i):
 
 
 def run(r: Robot, speed_start=0):
-        colors = [MyColor.BLUE, MyColor.YELLOW, MyColor.RED, MyColor.GREEN]
+        colors = [MyColor.GREEN, MyColor.YELLOW, MyColor.RED, MyColor.GREEN]
         # r.container_colors[0]
         position = True     # True = In front of line; False = behind line
         i = 0
@@ -72,10 +72,10 @@ def run(r: Robot, speed_start=0):
                 speed_start = 0
                 position = False
                 if target_position(color):
-                    r.align_driving(-60, -20, 2, 5, "brake")
+                    r.align_driving(-60, -20, 3, 6, "brake")
                     i -= 1
                 else:
-                    r.align_driving(-60, -20, 0, 3)
+                    r.align_driving(-60, -20, 0, 5)
                     if color is MyColor.GREEN:
                         r.pivot(90, False, 30)
                         pick_up(r, i)
@@ -91,7 +91,7 @@ def run(r: Robot, speed_start=0):
                     r.align_driving(60, 20, 2, 5, "brake")
                     i -= 1
                 else:
-                    r.align_driving(60, 0, 18, 10, "brake")
+                    r.align_driving(60, 0, 18, 10.5, "brake")
                     if color is MyColor.RED:
                         r.pivot(90, False, 30)
                         pick_up(r, i)

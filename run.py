@@ -47,18 +47,26 @@ def testing(r: Robot):
     # r.pivot(90, True)
     # r.pivot(-90, False)
     # r.pivot(-90, False)
-    r.lifter.move_up()
-    time.sleep(2)
-    r.lifter.move_up()
-    time.sleep(2)
-    r.lifter.move_up()
-    time.sleep(2)
-    r.lifter.move_down()
-    time.sleep(2)
-    r.lifter.move_down()
-    time.sleep(2)
-    r.lifter.move_down()
-    time.sleep(2)
+
+    # r.lifter.move_up()
+    # time.sleep(2)
+    # r.lifter.move_up()
+    # time.sleep(2)
+    # r.lifter.move_up()
+    # time.sleep(2)
+    # r.lifter.move_down()
+    # time.sleep(2)
+    # r.lifter.move_down()
+    # time.sleep(2)
+    # r.lifter.move_down()
+    # time.sleep(2)
+    r._ht_ship.mode = 'WHITE'
+    while True:
+        a = r._ht_ship.value(0)
+        b = ''# r._ht_ship.value(1)
+        c = ''# r._ht_ship.value(2)
+        d = ''# r._ht_ship.value(3)
+        print(str(a) + ' ' + str(b) + ' ' + str(c) + ' ' + str(d))
 
 
 def main():
@@ -70,10 +78,10 @@ def main():
 
         testing(r)
         # pt_1.run(r)
-        # pt_2.run(r)
+        # r.drive_triple(0, -80, -60, 15, 50, 5)
+        # pt_2.run(r, -60)
     finally:
         print("RESET")
-        r.lifter.move_to_first_position()
         r.reset()
         time.sleep(0.5)
 
