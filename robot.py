@@ -26,15 +26,46 @@ class MyColorSensorHT(Sensor):
 
         # self._min_val = min_val
         # self._max_val = max_val
-        self.mode = 'NORM'
+        self.mode = 'ALL'
+
+    def get_color(self):
+        if self.mode is not 'COLOR':
+            self.mode = 'COLOR'
+        col = self.value()
+
+        if col is 2:
+            return MyColor.BLUE
+        if col is 4:
+            return MyColor.GREEN
+        if col is 6:
+            return MyColor.YELLOW
+        if col is 9:
+            return MyColor.RED
+        if col is 0:
+            return MyColor.NOCOLOR
+        return MyColor.ERROR
 
 
 class MyColor(IntEnum):
+    ERROR = -1
     NOCOLOR = 0
     BLUE = 2
     GREEN = 3
     YELLOW = 4
     RED = 5
+
+    def to_text(self):
+        if self is MyColor.NOCOLOR:
+            return 'no color'
+        if self is MyColor.BLUE:
+            return  'blue'
+        if self is MyColor.GREEN:
+            return  'green'
+        if self is MyColor.YELLOW:
+            return  'yellow'
+        if self is MyColor.RED:
+            return 'red'
+        return 'error'
 
 
 class MySlider(LargeMotor):
@@ -71,6 +102,10 @@ class MySlider(LargeMotor):
         self.run_to_rel_pos(position_sp=610, speed_sp=400, stop_action="brake")
         self.wait_while('running')
 
+    def open_for_lifter(self):
+        self.run_to_rel_pos(position_sp=200, speed_sp=400, stop_action="brake")
+        self.wait_while('running')
+
 
 class MyLifterPosition(IntEnum):
     FIRST = 1
@@ -80,7 +115,7 @@ class MyLifterPosition(IntEnum):
 
 
 class MyLifter(MediumMotor):
-    position_difference = 2200
+    position_difference = 6600
 
     def __init__(self, port=OUTPUT_D):
         MediumMotor.__init__(self, port)
@@ -111,9 +146,18 @@ class MyLifter(MediumMotor):
             self.wait_while('running')
 
 
+class MyDrivingMotor(LargeMotor):
+    def __init__(self, port=OUTPUT_B):
+        LargeMotor.__init__(self, port)
+        assert self.connected
+        self.reset()
+        self.polarity = "inversed"
+
+
 class RobotConstants:
     tyre_size = 6.24                        # Durchmesser des Reifens in cm
-    motor_distance = 19.38                   # Abstand der Rädermittelpunkte in cm
+    motor_distance = 19.38                  # Abstand der Rädermittelpunkte in cm
+    motor_distance_turn = 19.9
     sensor_distance = 14.5
     pivot_min_speed = 30
     drive_min_speed = 20
@@ -251,27 +295,19 @@ class Robot:
         os.system('setfont Lat15-TerminusBold14')
         self._consts = RobotConstants()
         self._util = Utils(self._consts)
-        #
-        # self._lMot = LargeMotor(OUTPUT_B)
-        # self._rMot = LargeMotor(OUTPUT_C)
-        # self.slider = MySlider(OUTPUT_A)
-        # self.lifter = MyLifter(OUTPUT_D)
-        #
-        # assert self._lMot.connected
-        # assert self._rMot.connected
 
-        # self._col_l = MyColorSensorEV3(INPUT_1, 7, 77)
-        # self._col_r = MyColorSensorEV3(INPUT_2, 3, 48)
-        self._ht_ship = MyColorSensorHT(INPUT_1)
+        self._lMot = MyDrivingMotor(OUTPUT_B)
+        self._rMot = MyDrivingMotor(OUTPUT_C)
+        self.slider = MySlider(OUTPUT_A)
+        self.lifter = MyLifter(OUTPUT_D)
+
+        self._col_l = MyColorSensorEV3(INPUT_1, 7, 77)
+        self._col_r = MyColorSensorEV3(INPUT_2, 3, 48)
+        self._ht_middle = MyColorSensorHT(INPUT_3)
 
         self._btn = Button()
 
         self.container_colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]
-
-        # self._lMot.reset()
-        # self._rMot.reset()
-        # self._lMot.polarity = "inversed"
-        # self._rMot.polarity = "inversed"
 
         print("press button to start")
         # self.wait_until_button()
@@ -404,10 +440,10 @@ class Robot:
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
-    def turn(self, direction, min_speed=0, max_speed=70, k_acceleration=0.7,
+    def turn(self, direction, min_speed=0, max_speed=70, k_acceleration=0.2,
              kp=RobotConstants.turn_kp, ki=RobotConstants.turn_ki, kd=RobotConstants.turn_kd):
         # print("TURNING")
-        distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self._consts.motor_distance)
+        distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self._consts.motor_distance_turn)
         driven_distance = 0
 
         min_speed = abs(min_speed)
@@ -433,13 +469,11 @@ class Robot:
             error = r_pos + l_pos
             integral, last_error, correction = self._util.pid(error, integral, last_error, kp, ki, kd)
 
-            speed += correction
+            if direction < 0:
+                speed *= -1
 
-            if direction > 0:
-                speed -= 1
-
-            self._rMot.duty_cycle_sp = speed
-            self._lMot.duty_cycle_sp = -speed
+            self._rMot.duty_cycle_sp = -speed - correction
+            self._lMot.duty_cycle_sp = speed - correction
 
             if self._rMot.is_stalled or self._lMot.is_stalled:
                 self.beep()
@@ -471,7 +505,6 @@ class Robot:
             r_pos *= -1
         self._lMot.position = l_pos
         self._rMot.position = r_pos
-        # print("l_pos: " + str(l_pos) + "; r_pos: " + str(r_pos))
 
         start_speed = abs(start_speed)
         min_speed = abs(min_speed)
