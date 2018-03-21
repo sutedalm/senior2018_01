@@ -400,17 +400,18 @@ class Robot:
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
-    def turn(self, direction, start_speed=0, min_speed=0, max_speed=70, k_acceleration=0.7):
+    def turn(self, direction, min_speed=0, max_speed=70, k_acceleration=0.7):
         # print("TURNING")
         distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self._consts.motor_distance)
         driven_distance = 0
 
-        start_speed = abs(start_speed)
         min_speed = abs(min_speed)
         max_speed = abs(max_speed)
 
         if min_speed is 0:
             min_speed = self._consts.pivot_min_speed
+
+        last_error = integral = 0
 
         self._lMot.duty_cycle_sp = self._rMot.duty_cycle_sp = 0
         self._lMot.run_direct()
@@ -418,11 +419,11 @@ class Robot:
 
         while not self._util.distance_reached_bool(driven_distance, distance_degree, True):
             driven_distance = abs(self._rMot.position) + abs(self._lMot.position)
-            speed = self._util.acceleration_speed_forward(driven_distance, distance_degree, start_speed, max_speed,
+            speed = self._util.acceleration_speed_forward(driven_distance, distance_degree, 0, max_speed,
                                                           min_speed, k_acceleration)
             if direction > 0:
                 speed -= 1
-
+            # TODO: implement PID
             self._rMot.duty_cycle_sp = speed
             self._lMot.duty_cycle_sp = -speed
 
