@@ -68,8 +68,8 @@ def pick_up(robot: Robot, i):
 
 
 def run(r: Robot, speed_start=0):
-        colors = [MyColor.GREEN, MyColor.YELLOW, MyColor.RED, MyColor.GREEN]
-        # r.container_colors[0]
+        colors = r.container_colors
+        colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]     # TODO: delete
         position = True     # True = In front of line; False = behind line
         i = 0
         while i < 3:
@@ -82,15 +82,15 @@ def run(r: Robot, speed_start=0):
                     r.align_driving(-60, -20, 3, 6, "brake")
                     i -= 1
                 else:
-                    r.align_driving(-60, -20, 0, 5)
+                    r.align_driving(-60, -20, 5, 9)
                     if color is MyColor.GREEN:
-                        r.pivot(90, False, 30)
+                        r.turn(-90)
                         pick_up(r, i)
-                        r.pivot(-90, False, -20, 50)
+                        r.turn(90)
                     else:   # blue
-                        r.pivot(-90, False, 30)
+                        r.turn(90)
                         pick_up(r, i)
-                        r.pivot(90, False, -20, 50)
+                        r.turn(-90)
             else:
                 r.drive(20, 60, 3, 0, "run", 50, 50)
                 position = True
@@ -98,15 +98,15 @@ def run(r: Robot, speed_start=0):
                     r.align_driving(60, 20, 2, 5, "brake")
                     i -= 1
                 else:
-                    r.align_driving(60, 0, 18, 10.5, "brake")
+                    r.align_driving(60, 0, 8, 10.5, "brake")
                     if color is MyColor.RED:
-                        r.pivot(90, False, 30)
+                        r.turn(-90)
                         pick_up(r, i)
-                        r.pivot(-90, False, -20, 50)
+                        r.turn(90)
                     else:   # Yellow
-                        r.pivot(-90, False, 30)
+                        r.turn(90)
                         pick_up(r, i)
-                        r.pivot(90, False, -20, 50)
+                        r.turn(-90)
             i += 1
 
 

@@ -11,7 +11,7 @@ def main():
         time.sleep(1)
         r.lifter.run_direct()
         r.slider.run_direct()
-        speed = 50
+        speed = 100
         while not r._btn.backspace:
             if r._btn.up:
                 r.lifter.duty_cycle_sp = speed

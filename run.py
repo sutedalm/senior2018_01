@@ -61,12 +61,12 @@ def testing(r: Robot):
     # r.lifter.move_down()
     # time.sleep(2)
 
-    # r._ht_middle.mode = 'ALL'
+    # r.ht_middle.mode = 'ALL'
     # while True:
-    #     a = r._ht_middle.value(0)
-    #     b = r._ht_middle.value(1)
-    #     c = r._ht_middle.value(2)
-    #     d = r._ht_middle.value(3)
+    #     a = r.ht_middle.value(0)
+    #     b = r.ht_middle.value(1)
+    #     c = r.ht_middle.value(2)
+    #     d = r.ht_middle.value(3)
     #     print(str(a) + ' ' + str(b) + ' ' + str(c) + ' ' + str(d))
 
     # r.turn(360)
@@ -74,7 +74,7 @@ def testing(r: Robot):
     # print("l: " + str(r._lMot.position) + "; r: " + str(r._rMot.position))
 
     while True:
-        color = r._ht_middle.get_color()
+        color = r.ht_middle.get_color()
         r.speak(color.to_text())
         r.wait_until_button()
 
@@ -86,12 +86,10 @@ def main():
         r.beep(True)
         time.sleep(2)
 
-        testing(r)
+        # testing(r)
 
         # pt_1.run(r)
-        # r.slider.open()
-        # r.drive_triple(0, -80, -60, 15, 50, 5)
-        # pt_2.run(r, -60)
+        pt_2.run(r, 0)  # change to -60
         # r.lifter.move_to_first_position()
     finally:
         print("RESET")
