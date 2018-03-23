@@ -28,10 +28,10 @@ def pick_up(robot: Robot, i):
         robot.slider.close()
 
         robot.drive_triple(0, -60, -60, 6, 10, 10, 0, "run", 50, 50)    # Move to line
-        robot.drive(-60, 0, 10, 0, "brake")
+        robot.drive(-60, 0, 11, 0, "brake")
 
-        robot.reset_motor_pos()
-        robot.drive_triple(0, 50, 0, 2, 0, 1, 0, "brake")
+        # robot.reset_motor_pos()
+        robot.drive_triple(0, 50, 0, 2, 1, 2, 0, "brake")
 
         robot.slider.open()
         robot.drive_triple(0, -50, 0, 7, 1, 2, 0, "brake")
@@ -44,8 +44,8 @@ def pick_up(robot: Robot, i):
 
         robot.slider.close()
 
-        robot.reset_motor_pos()
-        robot.drive_triple(0, -40, 0, 2.5, 3, 1, 0, "brake")
+        # robot.reset_motor_pos()
+        robot.drive_triple(0, -40, 0, 2, 3, 1, 0, "brake")
 
         robot.slider.open_to_half()
         robot.drive_triple(0, -50, 0, 4, 11, 3, 0, "brake")
@@ -59,100 +59,101 @@ def pick_up(robot: Robot, i):
 
         robot.slider.close()
 
-        robot.reset_motor_pos()
+        # robot.reset_motor_pos()
         robot.drive_triple(0, -40, 0, 2, 4, 2, 0, "brake")
 
         robot.slider.open_to_half()
         robot.drive_triple(0, -50, 0, 3, 12, 3, 0, "brake")
         robot.slider.close()
 
+    robot.drive_triple(0, -60, 0, 3, 0, 3, 0, "brake")
+
 
 def run(r: Robot, speed_start=0):
-        colors = r.container_colors
-        colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]     # TODO: delete
-        position = True     # True = In front of line; False = behind line
-        i = 0
-        while i < 3:
-            color = colors[i]
-            if position:
-                r.drive(speed_start, -60, 5, 0, "run", 50, 50)
-                speed_start = 0
-                position = False
-                if target_position(color):
-                    r.align_driving(-60, -20, 3, 6, "brake")
-                    i -= 1
-                else:
-                    direction = r.get_direction_drive(-60, -20, 5, 9, "brake")  # Calculate error
-                    turn = 90 - direction
-                    if color is MyColor.GREEN:
-                        r.turn(-turn)
-                        pick_up(r, i)
-                        r.turn(turn)
-                    else:   # blue
-                        r.turn(turn)
-                        pick_up(r, i)
-                        r.turn(-turn)
+    print("PART2")
+    colors = r.container_colors
+    colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]     # TODO: delete
+    position = True     # True = In front of line; False = behind line
+    i = 0
+    while i < 3:
+        color = colors[i]
+        if position:
+            r.drive(speed_start, -80, 5, 0, "run", 50, 50)
+            speed_start = 0
+            position = False
+            if target_position(color):
+                r.align_driving(-80, -20, 3, 6, "brake")
+                i -= 1
             else:
-                r.drive(20, 60, 3, 0, "run", 50, 50)
-                position = True
-                if not target_position(color):
-                    r.align_driving(60, 20, 2, 5, "brake")
-                    i -= 1
-                else:
-                    direction = r.get_direction_drive(60, 20, 8.5, 10, "brake")  # Calculate error
-                    turn = 90 - direction
-                    if color is MyColor.RED:
-                        r.turn(-turn)
-                        pick_up(r, i)
-                        r.turn(turn)
-                    else:   # Yellow
-                        r.turn(turn)
-                        pick_up(r, i)
-                        r.turn(-turn)
-            i += 1
+                direction = r.get_direction_drive(-80, -20, 5, 9, "brake")  # Calculate error
+                if color is MyColor.GREEN:
+                    r.turn(-90 - direction)
+                    pick_up(r, i)
+                    r.turn(90)
+                else:   # blue
+                    r.turn(90 - direction)
+                    pick_up(r, i)
+                    r.turn(-90)
+        else:
+            r.drive(20, 80, 3, 0, "run", 50, 50)
+            position = True
+            if not target_position(color):
+                r.align_driving(80, 20, 2, 5, "brake")
+                i -= 1
+            else:
+                direction = r.get_direction_drive(80, 20, 8.5, 10, "brake")  # Calculate error
+                if color is MyColor.RED:
+                    r.turn(-90 - direction)
+                    pick_up(r, i)
+                    r.turn(90)
+                else:   # Yellow
+                    r.turn(90 - direction)
+                    pick_up(r, i)
+                    r.turn(-90)
+        i += 1
 
 
 def run_align_turn(r: Robot, speed_start=0):
-        colors = r.container_colors
-        colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]     # TODO: delete
-        position = True     # True = In front of line; False = behind line
-        i = 0
-        while i < 3:
-            color = colors[i]
-            if position:
-                r.drive(speed_start, -60, 5, 0, "run", 50, 50)
-                speed_start = 0
-                position = False
-                if target_position(color):
-                    r.align_driving(-60, -20, 3, 6, "brake")
-                    i -= 1
-                else:
-                    r.align_driving(-60, -20, 5, 9)
-                    if color is MyColor.GREEN:
-                        r.turn(-90)
-                        pick_up(r, i)
-                        r.turn(90)
-                    else:   # blue
-                        r.turn(90)
-                        pick_up(r, i)
-                        r.turn(-90)
+    colors = r.container_colors
+    colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]     # TODO: delete
+    position = True     # True = In front of line; False = behind line
+    i = 0
+    while i < 3:
+        color = colors[i]
+        if position:
+            r.drive(speed_start, -60, 5, 0, "run", 50, 50)
+            speed_start = 0
+            position = False
+            if target_position(color):
+                r.align_driving(-60, -20, 3, 6, "brake")
+                i -= 1
             else:
-                r.drive(20, 60, 3, 0, "run", 50, 50)
-                position = True
-                if not target_position(color):
-                    r.align_driving(60, 20, 2, 5, "brake")
-                    i -= 1
-                else:
-                    r.align_driving(60, 0, 8, 10.5, "brake")
-                    if color is MyColor.RED:
-                        r.turn(-90)
-                        pick_up(r, i)
-                        r.turn(90)
-                    else:   # Yellow
-                        r.turn(90)
-                        pick_up(r, i)
-                        r.turn(-90)
-            i += 1
+                r.align_driving(-60, -20, 5, 9)
+                if color is MyColor.GREEN:
+                    r.turn(-90)
+                    pick_up(r, i)
+                    r.turn(90)
+                else:   # blue
+                    r.turn(90)
+                    pick_up(r, i)
+                    r.turn(-90)
+        else:
+            r.drive(20, 60, 3, 0, "run", 50, 50)
+            position = True
+            if not target_position(color):
+                r.align_driving(60, 20, 2, 5, "brake")
+                i -= 1
+            else:
+                r.align_driving(60, 0, 8, 10.5, "brake")
+                if color is MyColor.RED:
+                    r.turn(-90)
+                    pick_up(r, i)
+                    r.turn(90)
+                else:   # Yellow
+                    r.turn(90)
+                    pick_up(r, i)
+                    r.turn(-90)
+        i += 1
 
 
 def run_align_pivot(r: Robot, speed_start=0):       # Deprecated

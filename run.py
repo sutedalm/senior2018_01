@@ -85,11 +85,12 @@ def main():
         print("running")
         r.beep(True)
         time.sleep(2)
+        r.ht_middle.mode = 'COLOR'
 
         # testing(r)
 
-        # pt_1.run(r)
-        pt_2.run(r, 0)  # change to -60
+        pt_1.run(r)
+        pt_2.run(r, -60)  # change to -60
         # r.lifter.move_to_first_position()
     finally:
         print("RESET")

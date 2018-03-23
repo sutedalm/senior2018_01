@@ -9,66 +9,62 @@ from robot import MyColor
 import time
 
 
+def set_color(r: Robot, iterator):
+    color = r.ht_middle.get_color()
+    print(color.to_text())
+    if color is not MyColor.NOCOLOR and color is not MyColor.ERROR:
+        r.container_colors[iterator] = color
+        iterator -= 1
+    return iterator
+
+
 def run(r: Robot):
     iterator = 2
+    print("PART1")
 
+    # accelerate to first line
     r.slider.close(True, 100, 5)
-    r.drive_triple(0, 100, 60, 15, 15, 10)
+    r.drive_triple(20, 100, 80, 10, 25, 5)
 
-    r.align_driving(60, 80, 3, 7)
+    # align while driving over first line
+    r.align_driving(80, 100, 3, 7)
 
-    r.drive_triple(80, 60, 10, 6, 6, 3, 0, "brake")
+    # decelerate to first container
+    r.drive_triple(100, 80, 20, 6, 2, 7, 0, "brake")
 
     # first container
     r.slider.open()
-    r.drive_triple(0, 60, 0, 8, 3, 7, 0, "brake")
+    r.drive_triple(20, 80, 20, 8, 3, 7, 0, "brake")
     r.slider.collect()
 
-    color = r.ht_middle.get_color()
-    print(color.to_text())
-    if color is not MyColor.NOCOLOR and color is not MyColor.ERROR:
-        r.container_colors[iterator] = color
-        iterator -= 1
-
+    iterator = set_color(r, iterator)
 
     # second container
     r.slider.open()
-    r.drive_triple(0, 30, 0, 3, 0.5, 2, 0, "brake")
+    r.drive_triple(0, 30, 0, 3, 1, 2, 0, "brake")
     r.slider.collect()
 
-    color = r.ht_middle.get_color()
-    print(color.to_text())
-    if color is not MyColor.NOCOLOR and color is not MyColor.ERROR:
-        r.container_colors[iterator] = color
-        iterator -= 1
-    # r.slider.close(True, 100, 15)
+    iterator = set_color(r, iterator)
 
     # third container
-    r.drive_triple(0, 50, 0, 7, 3, 7, 0, "brake")
+    r.drive_triple(0, 50, 0, 7, 3, 6, 0, "brake")
     r.slider.open()
     r.drive_triple(0, 60, 0, 8, 3, 7, 0, "brake")
     r.slider.collect()
 
-    color = r.ht_middle.get_color()
-    print(color.to_text())
-    if color is not MyColor.NOCOLOR and color is not MyColor.ERROR:
-        r.container_colors[iterator] = color
-        iterator -= 1
+    iterator = set_color(r, iterator)
 
     if iterator >= 0:
+        # forth container
         r.slider.open()
         r.drive_triple(0, 30, 0, 3, 0.5, 2, 0, "brake")
         r.slider.collect()
 
-        color = r.ht_middle.get_color()
-        print(color.to_text())
-        if color is not MyColor.NOCOLOR and color is not MyColor.ERROR:
-            r.container_colors[iterator] = color
-            iterator -= 1
+        set_color(r, iterator)
 
-        r.drive_triple(0, -80, -60, 21, 50, 5)
+        r.drive_triple(0, -100, -60, 21, 50, 5)
     else:
-        r.drive_triple(0, -80, -60, 15, 50, 5)
+        r.drive_triple(0, -100, -60, 15, 50, 5)
 
 
 if __name__ == "__main__":

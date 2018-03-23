@@ -87,6 +87,7 @@ class MySlider(LargeMotor):
         self.run_timed(time_sp=duration, speed_sp=speed, ramp_up_sp=800, ramp_down_sp=700)
         if wait:
             self.wait_while('running')
+        self.run_forever(speed_sp=200)
 
     def close(self, wait=True, speed=100, duration=13):
         speed *= -10
@@ -96,8 +97,9 @@ class MySlider(LargeMotor):
             self.wait_while('running')
 
     def collect(self):
-        self.run_timed(time_sp=2000, speed_sp=-500, ramp_up_sp=800)
+        self.run_timed(time_sp=7000, speed_sp=-200, ramp_up_sp=800)
         self.wait_while('running')
+        self.run_forever(speed_sp=-200)
 
     def open_slow(self):
         self.run_timed(time_sp=4000, speed_sp=300, ramp_up_sp=800)
@@ -131,13 +133,13 @@ class MyLifter(MediumMotor):
         self.lifter_position = MyLifterPosition.FIRST
 
     def move_up(self, wait=True):
-        self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=1000, stop_action='hold')
+        self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=1300, stop_action='hold')
         if wait:
             self.wait_while('running')
         self.lifter_position += 1
 
     def move_down(self, wait=True):
-        self.run_to_abs_pos(position_sp=self.position + self.position_difference, speed_sp=1000, stop_action='hold')
+        self.run_to_abs_pos(position_sp=self.position + self.position_difference, speed_sp=1300, stop_action='hold')
         if wait:
             self.wait_while('running')
         self.lifter_position -= 1
@@ -168,7 +170,7 @@ class RobotConstants:
     motor_distance_turn = 19.9
     sensor_distance = 14.5
     pivot_min_speed = 30
-    drive_min_speed = 20
+    drive_min_speed = 30
     col_trigger_val = 50
 
     drive_kp = 4
@@ -277,9 +279,9 @@ class Utils:
     @staticmethod
     def distance_to_parallel_line(distance, direction=0):
         direction = abs(direction)
-        print("direction: " + str(direction))
+        # print("direction: " + str(direction))
         assert direction < 90
-        print("distance " + str(distance / math.sin(math.radians(90 - direction))))
+        # print("distance " + str(distance / math.sin(math.radians(90 - direction))))
         return distance / math.sin(math.radians(90 - direction))
 
     @staticmethod
@@ -452,9 +454,10 @@ class Robot:
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
-    def turn(self, direction, min_speed=0, max_speed=70, k_acceleration=0.2,
+    def turn(self, direction, min_speed=0, max_speed=80, k_acceleration=0.4,
              kp=RobotConstants.turn_kp, ki=RobotConstants.turn_ki, kd=RobotConstants.turn_kd):
         print("TURNING")
+        print("dir: " + str(direction))
         distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self._consts.motor_distance_turn)
         driven_distance = 0
 
@@ -465,8 +468,6 @@ class Robot:
             min_speed = self._consts.pivot_min_speed
 
         last_error = integral = 0
-
-        print("start_l: " + str(self._lMot.position) + "; start_r: " + str(self._rMot.position))
 
         self._lMot.duty_cycle_sp = self._rMot.duty_cycle_sp = 0
         self._lMot.run_direct()
@@ -479,14 +480,10 @@ class Robot:
             driven_distance = abs(l_pos) + abs(r_pos)
             speed = self._util.acceleration_speed_forward(driven_distance, distance_degree, 0, max_speed,
                                                           min_speed, k_acceleration)
-            print("speed: " + str(speed))
-
             error = abs(l_pos) - abs(r_pos)
             if direction < 0:
                 error *= -1
             integral, last_error, correction = self._util.pid(error, integral, last_error, kp, ki, kd)
-
-            print("err: " + str(error) + "; integ: " + str(integral) + "; correction: " + str(correction))
 
             if direction < 0:
                 speed *= -1
@@ -753,3 +750,5 @@ class Robot:
 
         self.drive(speed, speed, distance_constant)
         self.drive(speed, end_speed, distance_deceleration, 0, brake_action)
+
+        return direction
