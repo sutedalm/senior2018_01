@@ -236,6 +236,10 @@ class Utils:
         return deg * math.pi * self._consts.tyre_size / 360
 
     @staticmethod
+    def clamp_speed(speed, minimum=-100, maximum=100):
+        return max(minimum, min(maximum, speed))
+
+    @staticmethod
     def pid(error, integral, last_error, kp, ki, kd):
         integral = integral + error
         derivative = error - last_error
@@ -271,6 +275,14 @@ class Utils:
         return False
 
     @staticmethod
+    def distance_to_parallel_line(distance, direction=0):
+        direction = abs(direction)
+        print("direction: " + str(direction))
+        assert direction < 90
+        print("distance " + str(distance / math.sin(math.radians(90 - direction))))
+        return distance / math.sin(math.radians(90 - direction))
+
+    @staticmethod
     def steering_hard(direction, speed):                    # Deprecated
 
         s = (50 - abs(float(direction))) / 50
@@ -288,14 +300,6 @@ class Utils:
         speed_left = max(-100, min(speed_left, 100))
         speed_right = max(-100, min(speed_right, 100))
         return int(speed_left), int(speed_right)
-
-    @staticmethod
-    def distance_to_parallel_line(distance, direction=0):   # Deprecated
-        direction = abs(direction)
-        print("direction: " + str(direction))
-        assert direction < 90
-        print("distance " + str(distance / math.sin(math.radians(90 - direction))))
-        return distance / math.sin(math.radians(90 - direction))
 
 
 class Robot:
@@ -487,8 +491,8 @@ class Robot:
             if direction < 0:
                 speed *= -1
 
-            self._rMot.duty_cycle_sp = -speed - correction  # TODO: Clamp values
-            self._lMot.duty_cycle_sp = speed - correction
+            self._rMot.duty_cycle_sp = self._util.clamp_speed(-speed - correction)
+            self._lMot.duty_cycle_sp = self._util.clamp_speed(speed - correction)
 
             if self._rMot.is_stalled or self._lMot.is_stalled:
                 self.beep()
@@ -586,8 +590,8 @@ class Robot:
             direction *= -1
 
         if self._util.midpoint_distance_from_line(direction) > distance_from_line:
-            self.speak("distance to short", False)
-            # TODO: Turn on spot
+            print("distance to short")
+            self.turn(-direction)
         else:
             distance, turn = self._util.get_turn_correction_values(
                 direction, distance_from_line - self._util.midpoint_distance_from_line(direction))
@@ -733,3 +737,19 @@ class Robot:
 
         self.reset_motor_pos()
         return direction
+
+    def get_direction_drive(self, speed=60, end_speed=40,
+                            distance_constant=2.5, distance_deceleration=5, brake_action="run"):
+        print("GET_DIRECTION_DRIVE")
+
+        direction = self.get_direction(speed)       # Calculate error
+
+        end_speed = math.copysign(end_speed, speed)
+        distance_constant = self._util.distance_to_parallel_line(abs(distance_constant), direction)
+        distance_deceleration = self._util.distance_to_parallel_line(abs(distance_deceleration), direction)
+
+        # if speed < 0:           # TODO: check for deletion
+        #     direction *= -1
+
+        self.drive(speed, speed, distance_constant)
+        self.drive(speed, end_speed, distance_deceleration, 0, brake_action)

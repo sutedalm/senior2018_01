@@ -82,6 +82,51 @@ def run(r: Robot, speed_start=0):
                     r.align_driving(-60, -20, 3, 6, "brake")
                     i -= 1
                 else:
+                    direction = r.get_direction_drive(-60, -20, 5, 9, "brake")  # Calculate error
+                    turn = 90 - direction
+                    if color is MyColor.GREEN:
+                        r.turn(-turn)
+                        pick_up(r, i)
+                        r.turn(turn)
+                    else:   # blue
+                        r.turn(turn)
+                        pick_up(r, i)
+                        r.turn(-turn)
+            else:
+                r.drive(20, 60, 3, 0, "run", 50, 50)
+                position = True
+                if not target_position(color):
+                    r.align_driving(60, 20, 2, 5, "brake")
+                    i -= 1
+                else:
+                    direction = r.get_direction_drive(60, 20, 8.5, 10, "brake")  # Calculate error
+                    turn = 90 - direction
+                    if color is MyColor.RED:
+                        r.turn(-turn)
+                        pick_up(r, i)
+                        r.turn(turn)
+                    else:   # Yellow
+                        r.turn(turn)
+                        pick_up(r, i)
+                        r.turn(-turn)
+            i += 1
+
+
+def run_align_turn(r: Robot, speed_start=0):
+        colors = r.container_colors
+        colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]     # TODO: delete
+        position = True     # True = In front of line; False = behind line
+        i = 0
+        while i < 3:
+            color = colors[i]
+            if position:
+                r.drive(speed_start, -60, 5, 0, "run", 50, 50)
+                speed_start = 0
+                position = False
+                if target_position(color):
+                    r.align_driving(-60, -20, 3, 6, "brake")
+                    i -= 1
+                else:
                     r.align_driving(-60, -20, 5, 9)
                     if color is MyColor.GREEN:
                         r.turn(-90)
@@ -110,7 +155,7 @@ def run(r: Robot, speed_start=0):
             i += 1
 
 
-def run_old(r: Robot, speed_start=0):       # Deprecated
+def run_align_pivot(r: Robot, speed_start=0):       # Deprecated
     colors = [MyColor.GREEN, MyColor.YELLOW, MyColor.RED, MyColor.GREEN]
     # r.container_colors[0]
     position = True  # True = In front of line; False = behind line
