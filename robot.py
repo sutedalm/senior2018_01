@@ -97,9 +97,9 @@ class MySlider(LargeMotor):
             self.wait_while('running')
 
     def collect(self):
-        self.run_timed(time_sp=7000, speed_sp=-200, ramp_up_sp=800)
+        self.run_timed(time_sp=3000, speed_sp=-500, ramp_up_sp=800)
         self.wait_while('running')
-        self.run_forever(speed_sp=-200)
+        self.run_forever(speed_sp=-300)
 
     def open_slow(self):
         self.run_timed(time_sp=4000, speed_sp=300, ramp_up_sp=800)
@@ -454,7 +454,7 @@ class Robot:
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
-    def turn(self, direction, min_speed=0, max_speed=80, k_acceleration=0.4,
+    def turn(self, direction, min_speed=0, max_speed=70, k_acceleration=0.4,
              kp=RobotConstants.turn_kp, ki=RobotConstants.turn_ki, kd=RobotConstants.turn_kd):
         print("TURNING")
         print("dir: " + str(direction))

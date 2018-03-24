@@ -33,7 +33,7 @@ def pick_up(robot: Robot, i):
         # robot.reset_motor_pos()
         robot.drive_triple(0, 50, 0, 2, 1, 2, 0, "brake")
 
-        robot.slider.open()
+        robot.slider.open_to_half()
         robot.drive_triple(0, -50, 0, 7, 1, 2, 0, "brake")
         robot.slider.close()
     elif i is 1:
@@ -51,7 +51,7 @@ def pick_up(robot: Robot, i):
         robot.drive_triple(0, -50, 0, 4, 11, 3, 0, "brake")
         robot.slider.close()
     elif i is 2:
-        robot.drive(50, 0, 8, 0, "brake")
+        robot.drive(50, 0, 9, 0, "brake")
 
         robot.slider.close(False, 20, 1)
         robot.speak(str(i))
@@ -60,7 +60,7 @@ def pick_up(robot: Robot, i):
         robot.slider.close()
 
         # robot.reset_motor_pos()
-        robot.drive_triple(0, -40, 0, 2, 4, 2, 0, "brake")
+        robot.drive_triple(0, -40, 0, 2, 4.5, 2, 0, "brake")
 
         robot.slider.open_to_half()
         robot.drive_triple(0, -50, 0, 3, 12, 3, 0, "brake")
@@ -72,7 +72,7 @@ def pick_up(robot: Robot, i):
 def run(r: Robot, speed_start=0):
     print("PART2")
     colors = r.container_colors
-    colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]     # TODO: delete
+    # colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]     # TODO: delete
     position = True     # True = In front of line; False = behind line
     i = 0
     while i < 3:
@@ -85,7 +85,7 @@ def run(r: Robot, speed_start=0):
                 r.align_driving(-80, -20, 3, 6, "brake")
                 i -= 1
             else:
-                direction = r.get_direction_drive(-80, -20, 5, 9, "brake")  # Calculate error
+                direction = r.get_direction_drive(-80, -20, 4, 9, "brake")  # Calculate error
                 if color is MyColor.GREEN:
                     r.turn(-90 - direction)
                     pick_up(r, i)

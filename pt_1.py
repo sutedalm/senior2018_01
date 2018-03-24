@@ -27,10 +27,13 @@ def run(r: Robot):
     r.drive_triple(20, 100, 80, 10, 25, 5)
 
     # align while driving over first line
-    r.align_driving(80, 100, 3, 7)
+    # r.align_driving(80, 100, 3, 7)
+    direction = r.get_direction_drive(80, 100, 0, 10, "brake")  # Calculate error
 
     # decelerate to first container
     r.drive_triple(100, 80, 20, 6, 2, 7, 0, "brake")
+
+    r.turn(-direction)
 
     # first container
     r.slider.open()
@@ -46,8 +49,9 @@ def run(r: Robot):
 
     iterator = set_color(r, iterator)
 
+    r.drive_triple(0, 50, 0, 7, 1, 6, 0, "brake")
+
     # third container
-    r.drive_triple(0, 50, 0, 7, 3, 6, 0, "brake")
     r.slider.open()
     r.drive_triple(0, 60, 0, 8, 3, 7, 0, "brake")
     r.slider.collect()
@@ -56,6 +60,7 @@ def run(r: Robot):
 
     if iterator >= 0:
         # forth container
+        r.drive_triple(0, 60, 0, 8, 3, 7, 0, "brake")
         r.slider.open()
         r.drive_triple(0, 30, 0, 3, 0.5, 2, 0, "brake")
         r.slider.collect()
