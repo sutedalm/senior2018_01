@@ -7,6 +7,7 @@ https://github.com/Klabbedi/ev3
 from robot import Robot
 import pt_1
 import pt_2
+import pt_3
 import time
 
 
@@ -61,22 +62,36 @@ def testing(r: Robot):
     # r.lifter.move_down()
     # time.sleep(2)
 
-    # r.ht_middle.mode = 'ALL'
+    # r.ht_middle.mode = 'WHITE'
     # while True:
-    #     a = r.ht_middle.value(0)
-    #     b = r.ht_middle.value(1)
-    #     c = r.ht_middle.value(2)
-    #     d = r.ht_middle.value(3)
-    #     print(str(a) + ' ' + str(b) + ' ' + str(c) + ' ' + str(d))
+    #     print(str(r.ht_middle.light_reflected()))
+        # a = r.ht_middle.value(0)
+        # b = r.ht_middle.value(1)
+        # c = r.ht_middle.value(2)
+        # d = r.ht_middle.value(3)
+        # print(str(a) + ' ' + str(b) + ' ' + str(c) + ' ' + str(d))
 
     # r.turn(360)
     # r.turn(-90)
     # print("l: " + str(r._lMot.position) + "; r: " + str(r._rMot.position))
 
-    while True:
-        color = r.ht_middle.get_color()
-        r.speak(color.to_text())
-        r.wait_until_button()
+    # while True:
+    #     color = r.ht_middle.get_color()
+    #     r.speak(color.to_text())
+    #     r.wait_until_button()
+    # print(str(r.lifter.position))
+    #
+    # r.lifter.move_to_top_position(False)
+    # print(str(r.lifter.position))
+    # time.sleep(3)
+    # r.lifter.move_to_first_position(False)
+    # time.sleep(3)
+
+    # direction = r.get_direction_drive(80, 20, 8.5, 10, "brake")  # Calculate error
+    # r.turn(-90 - direction)
+
+    r.ht_middle.mode = 'WHITE'
+    r.line_follow(30, 30, 100, 50, "run")
 
 
 def main():
@@ -89,8 +104,9 @@ def main():
 
         # testing(r)
 
-        pt_1.run(r)
-        pt_2.run(r, -60)  # change to -60
+        # pt_1.run(r)
+        # pt_2.run(r, -60)  # change to -60
+        pt_3.run(r)
         # r.lifter.move_to_first_position()
     finally:
         print("RESET")

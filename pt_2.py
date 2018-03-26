@@ -72,7 +72,7 @@ def pick_up(robot: Robot, i):
 def run(r: Robot, speed_start=0):
     print("PART2")
     colors = r.container_colors
-    # colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]     # TODO: delete
+    # colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]
     position = True     # True = In front of line; False = behind line
     i = 0
     while i < 3:
@@ -82,7 +82,8 @@ def run(r: Robot, speed_start=0):
             speed_start = 0
             position = False
             if target_position(color):
-                r.align_driving(-80, -20, 3, 6, "brake")
+                direction = r.get_direction_drive(-80, -20, 3, 6, "brake")  # Calculate error
+                r.turn(-direction)
                 i -= 1
             else:
                 direction = r.get_direction_drive(-80, -20, 4, 9, "brake")  # Calculate error
@@ -98,7 +99,8 @@ def run(r: Robot, speed_start=0):
             r.drive(20, 80, 3, 0, "run", 50, 50)
             position = True
             if not target_position(color):
-                r.align_driving(80, 20, 2, 5, "brake")
+                direction = r.get_direction_drive(80, 20, 2, 5, "brake")  # Calculate error
+                r.turn(-direction)
                 i -= 1
             else:
                 direction = r.get_direction_drive(80, 20, 8.5, 10, "brake")  # Calculate error
@@ -115,7 +117,7 @@ def run(r: Robot, speed_start=0):
 
 def run_align_turn(r: Robot, speed_start=0):
     colors = r.container_colors
-    colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]     # TODO: delete
+    # colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]
     position = True     # True = In front of line; False = behind line
     i = 0
     while i < 3:

@@ -21,9 +21,10 @@ def set_color(r: Robot, iterator):
 def run(r: Robot):
     iterator = 2
     print("PART1")
+    r.lifter.move_to_top_position(False)
 
     # accelerate to first line
-    r.slider.close(True, 100, 5)
+    # r.slider.close(True, 100, 5)
     r.drive_triple(20, 100, 80, 10, 25, 5)
 
     # align while driving over first line
@@ -36,7 +37,7 @@ def run(r: Robot):
     r.turn(-direction)
 
     # first container
-    r.slider.open()
+    r.slider.open_half_to_full()
     r.drive_triple(20, 80, 20, 8, 3, 7, 0, "brake")
     r.slider.collect()
 
@@ -44,12 +45,12 @@ def run(r: Robot):
 
     # second container
     r.slider.open()
-    r.drive_triple(0, 30, 0, 3, 1, 2, 0, "brake")
+    r.drive_triple(0, 30, 0, 3, 1, 3, 0, "brake")
     r.slider.collect()
 
     iterator = set_color(r, iterator)
 
-    r.drive_triple(0, 50, 0, 7, 1, 6, 0, "brake")
+    r.drive_triple(0, 50, 0, 7, 0, 6, 0, "brake")
 
     # third container
     r.slider.open()
@@ -57,6 +58,8 @@ def run(r: Robot):
     r.slider.collect()
 
     iterator = set_color(r, iterator)
+
+    r.lifter.move_to_first_position(False)
 
     if iterator >= 0:
         # forth container

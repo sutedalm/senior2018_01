@@ -66,11 +66,11 @@ class MyColor(IntEnum):
         if self is MyColor.NOCOLOR:
             return 'no color'
         if self is MyColor.BLUE:
-            return  'blue'
+            return 'blue'
         if self is MyColor.GREEN:
-            return  'green'
+            return 'green'
         if self is MyColor.YELLOW:
-            return  'yellow'
+            return 'yellow'
         if self is MyColor.RED:
             return 'red'
         return 'error'
@@ -80,6 +80,7 @@ class MySlider(LargeMotor):
     def __init__(self, port=OUTPUT_A):
         LargeMotor.__init__(self, port)
         assert self.connected
+        self.reset()
 
     def open(self, wait=True, speed=100, duration=13):
         speed *= 10
@@ -97,13 +98,9 @@ class MySlider(LargeMotor):
             self.wait_while('running')
 
     def collect(self):
-        self.run_timed(time_sp=3000, speed_sp=-500, ramp_up_sp=800)
+        self.run_timed(time_sp=3000, speed_sp=-700, ramp_up_sp=2000)
         self.wait_while('running')
         self.run_forever(speed_sp=-300)
-
-    def open_slow(self):
-        self.run_timed(time_sp=4000, speed_sp=300, ramp_up_sp=800)
-        self.wait_while('running')
 
     def open_half_to_full(self, wait=True):
         self.open(wait, 100, 8)
@@ -125,15 +122,17 @@ class MyLifterPosition(IntEnum):
 
 
 class MyLifter(MediumMotor):
-    position_difference = 6600
+    position_difference = 270
 
     def __init__(self, port=OUTPUT_D):
         MediumMotor.__init__(self, port)
         assert self.connected
+        self.reset()
         self.lifter_position = MyLifterPosition.FIRST
 
     def move_up(self, wait=True):
-        self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=1300, stop_action='hold')
+        self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=300,
+                            ramp_up_sp=1000, ramp_down_sp=1000, stop_action='hold')
         if wait:
             self.wait_while('running')
         self.lifter_position += 1
@@ -180,6 +179,10 @@ class RobotConstants:
     turn_kp = 1
     turn_ki = 0.04
     turn_kd = 0.5
+
+    lflw_kp = 3
+    lflw_ki = 0.1
+    lflw_kd = 1
 
 
 class Utils:
@@ -253,8 +256,8 @@ class Utils:
     def acceleration_speed_forward(driven_distance, distance, start_speed, max_speed, min_speed, k_acceleration):
         driven_distance = abs(driven_distance)
         distance = abs(distance)
-        speed = k_acceleration * driven_distance + start_speed
-        speed = min(speed, k_acceleration * (distance - driven_distance), max_speed)
+        speed = k_acceleration * math.sqrt(max(0, driven_distance)) + start_speed
+        speed = min(speed, k_acceleration * math.sqrt(max(0, distance - driven_distance)), max_speed)
         speed = max(speed, min_speed)
         return speed
 
@@ -315,9 +318,10 @@ class Robot:
         self.slider = MySlider(OUTPUT_A)
         self.lifter = MyLifter(OUTPUT_D)
 
-        self._col_l = MyColorSensorEV3(INPUT_1, 7, 77)
-        self._col_r = MyColorSensorEV3(INPUT_2, 3, 48)
-        self.ht_middle = MyColorSensorHT(INPUT_3)
+        self._col_l = MyColorSensorEV3(INPUT_1, 7, 79)
+        self._col_r = MyColorSensorEV3(INPUT_2, 4, 60)
+        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 20)
+        self.ht_side = MyColorSensorHT(INPUT_4)
 
         self._btn = Button()
 
@@ -454,7 +458,7 @@ class Robot:
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
-    def turn(self, direction, min_speed=0, max_speed=70, k_acceleration=0.4,
+    def turn(self, direction, min_speed=0, max_speed=70, k_acceleration=5,
              kp=RobotConstants.turn_kp, ki=RobotConstants.turn_ki, kd=RobotConstants.turn_kd):
         print("TURNING")
         print("dir: " + str(direction))
@@ -480,6 +484,7 @@ class Robot:
             driven_distance = abs(l_pos) + abs(r_pos)
             speed = self._util.acceleration_speed_forward(driven_distance, distance_degree, 0, max_speed,
                                                           min_speed, k_acceleration)
+
             error = abs(l_pos) - abs(r_pos)
             if direction < 0:
                 error *= -1
@@ -600,7 +605,6 @@ class Robot:
                 self.drive(speed, end_speed, distance_deceleration, turn, brake_action)
 
     def reset_motor_pos(self, dif=0):
-        # TODO: simplify
         if dif > 0:
             self._lMot.position = dif
             self._rMot.position = 0
@@ -609,11 +613,11 @@ class Robot:
             self._rMot.position = -dif
 
     def line_follow(self, speed_start, speed, distance=30, offset=50, brake_action="run",
-                    side=True, l_col_trigger=-1, r_col_trigger=-1,
-                    kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd):
-
-        # TODO: test
+                    side=False, l_col_trigger=False, r_col_trigger=False,
+                    kp=RobotConstants.lflw_kp, ki=RobotConstants.lflw_ki, kd=RobotConstants.lflw_kd):
         # print("LINEFOLLOW")
+        self._col_r.mode = 'COL-COLOR'
+        self._col_l.mode = 'COL-COLOR'
 
         driven_distance = 0
         distance = abs(self._util.cm_to_deg(distance))
@@ -631,8 +635,8 @@ class Robot:
         self._lMot.run_direct()
 
         while not self._util.distance_reached_bool(driven_distance, distance, True) and not line_detected:
-            line_detected = self._col_l.light_reflected() <= l_col_trigger or \
-                            self._col_r.light_reflected() <= r_col_trigger
+            line_detected = (self._col_l.value() is 1 and l_col_trigger) or \
+                            (self._col_r.value() is 1 and r_col_trigger)
 
             l_pos = self._lMot.position
             r_pos = self._rMot.position
@@ -658,9 +662,6 @@ class Robot:
             for (motor, power) in zip((self._lMot, self._rMot),
                                       self._util.steering(correction, speed_accelerated)):
                 motor.duty_cycle_sp = power
-            # print("l_pos: " + str(self._lMot.position) + "; r_pos: " + str(self._rMot.position))
-
-        # print("end_l_pos: " + str(l_pos) + "; end_r_pos: " + str(r_pos))
         self.reset_motor_pos()
         self.brake(brake_action)
         return line_detected
@@ -744,9 +745,6 @@ class Robot:
         end_speed = math.copysign(end_speed, speed)
         distance_constant = self._util.distance_to_parallel_line(abs(distance_constant), direction)
         distance_deceleration = self._util.distance_to_parallel_line(abs(distance_deceleration), direction)
-
-        # if speed < 0:           # TODO: check for deletion
-        #     direction *= -1
 
         self.drive(speed, speed, distance_constant)
         self.drive(speed, end_speed, distance_deceleration, 0, brake_action)

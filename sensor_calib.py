@@ -34,7 +34,7 @@ def main():
             mid_max = max(mid_max, mid_val)
         print("left: (" + str(l_min) + "; " + str(l_max) + ")")
         print("right: (" + str(r_min) + "; " + str(r_max) + ")")
-        print("right: (" + str(mid_min) + "; " + str(mid_max) + ")")
+        print("middle: (" + str(mid_min) + "; " + str(mid_max) + ")")
         r.wait_until_button()
         time.sleep(0.01)  # Wait 0.01 second
 
