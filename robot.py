@@ -35,11 +35,11 @@ class MyColorSensorHT(Sensor):
 
         if col is 2:
             return MyColor.BLUE
-        if col is 4:
+        if col in {3, 4}:
             return MyColor.GREEN
-        if col is 6:
+        if col in {5, 6}:
             return MyColor.YELLOW
-        if col is 9:
+        if col in {7, 8, 9}:
             return MyColor.RED
         if col is 0:
             return MyColor.NOCOLOR
@@ -435,6 +435,91 @@ class Robot:
         self.brake(brake_action)
         return line_detected
 
+    def drive_color(self, speed_start, speed, distance, direction=0, brake_action="run",
+                    l_col_trigger=False, r_col_trigger=False,
+                    kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd):
+
+        # TODO: add time trigger
+        # print("DRIVING")
+        self._col_r.mode = 'COL-COLOR'
+        self._col_l.mode = 'COL-COLOR'
+
+        driven_distance = 0
+        distance = abs(self._util.cm_to_deg(distance))
+        # print("distance: " + str(distance))
+
+        min_speed = self._consts.drive_min_speed
+        if speed_start is 0:
+            speed_start = math.copysign(min_speed, speed)
+
+        k_left_mot = k_right_mot = 1
+        if direction >= 0:
+            k_left_mot = 1 - direction/100
+        else:
+            k_right_mot = 1 + direction/100
+
+        last_error = integral = 0
+
+        line_detected = False
+
+        self._rMot.run_direct()
+        self._lMot.run_direct()
+
+        while not self._util.distance_reached(driven_distance, distance, speed_start) and not line_detected:
+            line_detected = (self._col_l.value() is 1 and l_col_trigger) or \
+                            (self._col_r.value() is 1 and r_col_trigger)
+
+            l_pos = self._lMot.position
+            r_pos = self._rMot.position
+
+            driven_distance = (r_pos + l_pos) / 2
+            if self._util.distance_reached(driven_distance, distance, speed_start) or line_detected:
+                # only for faster brake response time
+                break
+
+            error = r_pos * k_right_mot - l_pos * k_left_mot
+            integral, last_error, correction = self._util.pid(error, integral, last_error, kp, ki, kd)
+
+            if speed < 0 or speed_start < 0:
+                correction = -correction
+
+            speed_accelerated = self._util.min_speed(speed_start + abs(driven_distance) /
+                                                     distance * (speed - speed_start), min_speed)
+
+            if direction <= 0 and self._lMot.is_stalled:
+                self.beep()
+                min_speed += 2
+            if direction >= 0 and self._rMot.is_stalled:
+                self.beep()
+                min_speed += 2
+
+            for (motor, power) in zip((self._lMot, self._rMot),
+                                      self._util.steering(direction + correction, speed_accelerated)):
+                motor.duty_cycle_sp = power
+            # print("l_pos: " + str(self._lMot.position) + "; r_pos: " + str(self._rMot.position))
+
+        # print("end_l_pos: " + str(l_pos) + "; end_r_pos: " + str(r_pos))
+        if not line_detected:
+            distance = math.copysign(distance, speed_start)
+            if direction >= 0:
+                k = (100 - direction)/100
+                distance_l = distance * 2/(1+k)
+                distance_r = distance * 2/(1+k) * k
+            else:
+                k = (100 + direction)/100
+                distance_r = distance * 2/(1+k)
+                distance_l = distance * 2/(1+k) * k
+
+            self._rMot.position = self._rMot.position - distance_r
+            self._lMot.position = self._lMot.position - distance_l
+        else:
+            # print("LINE DETECTED")
+            dif = self._rMot.position - self._lMot.position
+            self.reset_motor_pos(dif)
+        # print("newl: " + str(self._lMot.position) + "; newr: " + str(self._rMot.position))
+        self.brake(brake_action)
+        return line_detected
+
     def drive_triple(self,
                      speed_start, speed_max, speed_end,
                      distance_acceleration, distance_middle, distance_deceleration,
@@ -509,7 +594,7 @@ class Robot:
         self._rMot.position -= distance_degree / 2
         self._lMot.position += distance_degree / 2
 
-    def pivot(self, direction, forward=True, start_speed=0, min_speed=0, max_speed=70, k_acceleration=0.7):
+    def pivot(self, direction, forward=True, start_speed=0, min_speed=0, max_speed=70, k_acceleration=7):
         # print("PIVOTING")
         distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self._consts.motor_distance)
         driven_distance = 0
