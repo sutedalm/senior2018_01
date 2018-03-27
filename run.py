@@ -90,8 +90,12 @@ def testing(r: Robot):
     # direction = r.get_direction_drive(80, 20, 8.5, 10, "brake")  # Calculate error
     # r.turn(-90 - direction)
 
-    r.ht_middle.mode = 'WHITE'
-    r.line_follow(30, 30, 100, 50, "run")
+    # r.ht_middle.mode = 'WHITE'
+    # r.line_follow(30, 30, 100, 50, "run")
+    r.ht_side.mode = 'COLOR'
+    while True:
+        print(r.ht_side.get_color().to_text())
+        print(r.ht_side.value())
 
 
 def main():

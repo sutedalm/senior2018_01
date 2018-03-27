@@ -13,6 +13,8 @@ class MyColorSensorEV3(ColorSensor):
         self.mode = 'COL-REFLECT'
 
     def light_reflected(self):
+        # if self.mode is not 'COL-REFLECT':
+            # self.mode = 'COL-REFLECT'
         val = self.value()/(self._max_val-self._min_val) * 100
         val = min(100, val)
         val = max(0, val)
@@ -28,21 +30,22 @@ class MyColorSensorHT(Sensor):
         self._max_val = max_val
         self.mode = 'ALL'
 
-    def get_color(self):
+    def get_color(self, iterations=200):
         if self.mode is not 'COLOR':
             self.mode = 'COLOR'
-        col = self.value()
 
-        if col is 2:
-            return MyColor.BLUE
-        if col in {3, 4}:
-            return MyColor.GREEN
-        if col in {5, 6}:
-            return MyColor.YELLOW
-        if col in {7, 8, 9}:
-            return MyColor.RED
-        if col is 0:
-            return MyColor.NOCOLOR
+        for i in range(0, iterations):
+            col = self.value()
+            if col in {2, 3}:
+                return MyColor.BLUE
+            if col in {4, 13}:
+                return MyColor.GREEN
+            if col in {5, 6}:
+                return MyColor.YELLOW
+            if col in {7, 8, 9, 10}:
+                return MyColor.RED
+            if col is 0:
+                return MyColor.NOCOLOR
         return MyColor.ERROR
 
     def light_reflected(self):
@@ -594,7 +597,7 @@ class Robot:
         self._rMot.position -= distance_degree / 2
         self._lMot.position += distance_degree / 2
 
-    def pivot(self, direction, forward=True, start_speed=0, min_speed=0, max_speed=70, k_acceleration=7):
+    def pivot(self, direction, forward=True, start_speed=0, min_speed=0, max_speed=100, k_acceleration=9):
         # print("PIVOTING")
         distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self._consts.motor_distance)
         driven_distance = 0
