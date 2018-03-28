@@ -72,6 +72,8 @@ def get_positions(ships, container):
                     container_flags[container_iterator] = True
                     break
 
+    print("POSITIONS: " + str(positions[0]) + '; ' + str(positions[1]) + '; ' + str(positions[2]))
+
     return positions
 
 
@@ -142,20 +144,167 @@ def scan_ships(r: Robot):
     ships[5] = MyColor.NOCOLOR
 
     # Move to center
-    r.drive_triple(0, -100, 0, 5, 5, 5, 0, "brake")
-
-    r.col_l.mode = 'COL-REFLECT'
-    r.col_r.mode = 'COL-REFLECT'
+    r.drive(0, -100, 7, -20)
+    r.drive(-100, 0, 7, 15, "brake")
 
     r.pivot(-90)
+
+    return ships
+
+
+def drop_off(r: Robot, speed_start=0, speed_end=-80):
+    r.drive(speed_start, 80, 2)
+    r.slider.close(False)
+    r.drive_triple(80, 80, 0, 5, 8, 5, 0, "brake")
+    r.slider.open_for_ships()
+
+    # r.drive_triple(0, -60, 0, 1, 0, 1, 0, "brake")
+    r.lifter.move_down()
+
+    r.drive_triple(0, -80, speed_end, 5, 4, 5, 0, "run")
+
+
+def target_position(destination):
+    if destination in {3, 4, 5}:
+        return True
+    return False
+
+
+def drop_food(r: Robot, positions):
+    r.col_l.mode = 'COL-REFLECT'
+    r.col_r.mode = 'COL-REFLECT'
 
     r.drive(0, 60, 3, 0, "run", 50, 50)
     r.align()
     r.pivot(-90, False)
 
+    position = True     # True = In front of line; False = behind line
+    i = 0
+    while i < 3:
+        destination = positions[i]
+        if position:
+            r.drive(0, -80, 5, 0, "run", 50, 50)
+            position = False
+
+            if target_position(destination):
+                direction = r.get_direction_drive(-80, -20, 2, 5, "brake")  # Calculate error
+                r.turn(-direction)
+                i -= 1
+            else:
+                if destination is 2:
+                    direction = r.get_direction_drive(-80, -20, 1, 5, "brake")  # Calculate error
+                    r.turn(90 - direction)
+                    r.drive(0, 80, 10, 0, "run", -1, 50)
+
+                    drop_off(r, 80)
+
+                    r.col_r.set_inversed(True)
+                    r.drive(-80, -80, 7, 0, "run", -1, 50)
+                    r.col_r.set_inversed(False)
+                    r.drive(-80, 0, 10, 0, "brake")
+                    r.turn(-90)
+                elif destination is 1:
+                    direction = r.get_direction_drive(-80, -20, 19, 5, "brake")  # Calculate error
+                    r.turn(90 - direction)
+                    r.drive_triple(0, 80, 0, 5, 2, 3, 0, "brake", 50, 50)
+                    r.align()
+
+                    drop_off(r, 0, -60)
+
+                    r.col_r.set_inversed(True)
+                    r.col_l.set_inversed(True)
+                    r.drive(-60, 0, 7, 0, "brake", 50, 50)
+                    r.col_r.set_inversed(False)
+                    r.col_l.set_inversed(False)
+                    r.align()
+                    r.drive_triple(0, -80, 0, 5, 0, 5, 0, "brake")
+                    r.turn(-90)
+                    r.drive_triple(0, 80, 0, 5, 8, 5, 0, "brake")
+                else:   # destination is 0
+                    direction = r.get_direction_drive(-80, -20, 24, 5, "brake")  # Calculate error
+                    r.pivot(-90 + direction, False)
+
+                    time.sleep(5)
+
+                    r.drive(0, 40, 4, 55)
+                    r.drive(40, 40, 8)
+                    r.drive(40, 60, 4, -55, "run", 50, 50)
+                    r.drive(60, 80, 2, 0, "run", 50, 50)
+
+                    drop_off(r)
+
+                    time.sleep(2)
+
+                    r.drive(0, -40, 4, -55)
+                    r.drive(-40, -40, 5)
+                    r.drive(-40, -40, 4, 55)
+                    # r.drive(-40, 0, 1, 0, "brake")
+                    r.beep(True)
+                    r.pivot(-90, True)
+                    r.drive_triple(0, 80, 0, 5, 19, 5, 0, "brake")
+
+                    time.sleep(5)
+        else:
+            r.drive(0, 80, 3, 0, "run", 50, 50)
+            position = True
+
+            if not target_position(destination):
+                direction = r.get_direction_drive(80, 20, 2, 5, "brake")  # Calculate error
+                r.turn(-direction)
+                i -= 1
+            else:
+                if destination is 3:
+                    direction = r.get_direction_drive(80, 20, 6, 5, "brake")  # Calculate error
+                    r.turn(90 - direction)
+                    r.drive(0, 80, 10, 0, "run", 50, -1)
+
+                    drop_off(r, 80)
+
+                    r.col_l.set_inversed(True)
+                    r.drive(-80, -80, 7, 0, "run", 50, -1)
+                    r.col_l.set_inversed(False)
+                    r.drive(-80, 0, 10, 0, "brake")
+                    r.turn(-90)
+                elif destination is 4:
+                    direction = r.get_direction_drive(80, 20, 24, 5, "brake")  # Calculate error
+                    r.turn(90 - direction)
+                    r.drive_triple(0, 80, 0, 5, 2, 3, 0, "brake", 50, 50)
+                    r.align()
+
+                    drop_off(r)
+
+                    r.col_r.set_inversed(True)
+                    r.col_l.set_inversed(True)
+                    r.drive(-60, 0, 7, 0, "brake", 50, 50)
+                    r.col_r.set_inversed(False)
+                    r.col_l.set_inversed(False)
+                    r.align()
+                    r.drive_triple(0, -80, 0, 5, 0, 5, 0, "brake")
+                    r.turn(-90)
+                    r.drive_triple(0, -80, 0, 5, 8, 5, 0, "brake")
+                else:   # destination is 5
+                    pass
+        i += 1
+
 
 def run(r: Robot):
-    scan_ships(r)
+    # ships = scan_ships(r)
+    #
+    # container = r.container_colors
+    # container = [MyColor.BLUE, MyColor.GREEN, MyColor.RED]
+    #
+    # positions = get_positions(ships, container)
+
+    for i in range(0, 3):
+        r.beep(True)
+        r.wait_until_button()
+        r.lifter.move_up()
+
+    r.wait_until_button()
+    r.beep()
+    time.sleep(2)
+    drop_food(r, [4, 2, 3])    # Add positions
+    # drop_off(r)
 
 
 if __name__ == "__main__":

@@ -92,10 +92,16 @@ def testing(r: Robot):
 
     # r.ht_middle.mode = 'WHITE'
     # r.line_follow(30, 30, 100, 50, "run")
-    r.ht_side.mode = 'COLOR'
-    while True:
-        print(r.ht_side.get_color().to_text())
-        print(r.ht_side.value())
+    # r.ht_side.mode = 'COLOR'
+    # while True:
+    #     print(r.ht_side.get_color().to_text())
+    #     print(r.ht_side.value())
+
+    r.drive_triple(0, -100, 0, 5, 5, 5, 0, "brake")
+    time.sleep(2)
+    print(str(r._lMot.position) + ' ' + str(r._rMot.position))
+    r.reset_motor_pos()
+    r.turn(90)
 
 
 def main():

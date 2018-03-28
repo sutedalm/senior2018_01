@@ -11,6 +11,7 @@ class MyColorSensorEV3(ColorSensor):
         self._min_val = min_val
         self._max_val = max_val
         self.mode = 'COL-REFLECT'
+        self.inversed = False
 
     def light_reflected(self):
         # MODE HAS TO BE SET TO 'COL-REFLECT' !!!
@@ -18,7 +19,14 @@ class MyColorSensorEV3(ColorSensor):
         val = self.value()/(self._max_val-self._min_val) * 100
         val = min(100, val)
         val = max(0, val)
+
+        if self.inversed:
+            val = 100 - val
+
         return val
+
+    def set_inversed(self, inversed=True):
+        self.inversed = inversed
 
 
 class MyColorSensorHT(Sensor):
@@ -116,6 +124,10 @@ class MySlider(LargeMotor):
         self.run_to_rel_pos(position_sp=200, speed_sp=400, stop_action="brake")
         self.wait_while('running')
 
+    def open_for_ships(self):
+        self.run_to_rel_pos(position_sp=250, speed_sp=400, stop_action="brake")
+        self.wait_while('running')
+
 
 class MyLifterPosition(IntEnum):
     FIRST = 1
@@ -141,7 +153,7 @@ class MyLifter(MediumMotor):
         self.lifter_position += 1
 
     def move_down(self, wait=True):
-        self.run_to_abs_pos(position_sp=self.position + self.position_difference, speed_sp=1300, stop_action='hold')
+        self.run_to_abs_pos(position_sp=self.position + self.position_difference, speed_sp=300, stop_action='hold')
         if wait:
             self.wait_while('running')
         self.lifter_position -= 1

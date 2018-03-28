@@ -10,7 +10,7 @@ import time
 
 
 def target_position(color):
-    if color is MyColor.RED or color is MyColor.YELLOW:
+    if color in {MyColor.RED, MyColor.YELLOW}:
         return True
     return False
 
@@ -87,6 +87,7 @@ def run(r: Robot, speed_start=0):
                 r.turn(-direction)
                 i -= 1
             else:
+                # TODO: separate get_direction_drive in individual colors
                 direction = r.get_direction_drive(-80, -20, 4, 9, "brake")  # Calculate error
                 if color is MyColor.GREEN:
                     r.turn(-90 - direction)
