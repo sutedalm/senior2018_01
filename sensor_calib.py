@@ -10,8 +10,8 @@ def main():
         print("CALIB")
         time.sleep(1)
         r.ht_middle.mode = 'WHITE'
-        r._col_l.mode = 'COL-REFLECT'
-        r._col_r.mode = 'COL-REFLECT'
+        r.col_l.mode = 'COL-REFLECT'
+        r.col_r.mode = 'COL-REFLECT'
 
         l_min = r_min = mid_min = 9999
         l_max = r_max = mid_max = 0
@@ -20,8 +20,8 @@ def main():
         r._rMot.run_to_rel_pos(speed_sp=150, position_sp=2*360, stop_action="brake")
 
         while r._rMot.is_running:  # While no button is pressed.
-            l_val = r._col_l.value()
-            r_val = r._col_r.value()
+            l_val = r.col_l.value()
+            r_val = r.col_r.value()
             mid_val = r.ht_middle.value()
 
             l_min = min(l_min, l_val)

@@ -13,8 +13,8 @@ class MyColorSensorEV3(ColorSensor):
         self.mode = 'COL-REFLECT'
 
     def light_reflected(self):
-        # if self.mode is not 'COL-REFLECT':
-            # self.mode = 'COL-REFLECT'
+        # MODE HAS TO BE SET TO 'COL-REFLECT' !!!
+
         val = self.value()/(self._max_val-self._min_val) * 100
         val = min(100, val)
         val = max(0, val)
@@ -147,7 +147,6 @@ class MyLifter(MediumMotor):
         self.lifter_position -= 1
 
     def move_to_first_position(self, wait=True):
-        i = self.lifter_position - MyLifterPosition.FIRST
         self.run_to_abs_pos(position_sp=0, speed_sp=1000, stop_action='hold')
         if wait:
             self.wait_while('running')
@@ -321,8 +320,8 @@ class Robot:
         self.slider = MySlider(OUTPUT_A)
         self.lifter = MyLifter(OUTPUT_D)
 
-        self._col_l = MyColorSensorEV3(INPUT_1, 7, 79)
-        self._col_r = MyColorSensorEV3(INPUT_2, 4, 60)
+        self.col_l = MyColorSensorEV3(INPUT_1, 7, 79)
+        self.col_r = MyColorSensorEV3(INPUT_2, 4, 60)
         self.ht_middle = MyColorSensorHT(INPUT_3, 0, 20)
         self.ht_side = MyColorSensorHT(INPUT_4)
 
@@ -385,8 +384,8 @@ class Robot:
         self._lMot.run_direct()
 
         while not self._util.distance_reached(driven_distance, distance, speed_start) and not line_detected:
-            line_detected = self._col_l.light_reflected() <= l_col_trigger or \
-                            self._col_r.light_reflected() <= r_col_trigger
+            line_detected = self.col_l.light_reflected() <= l_col_trigger or \
+                            self.col_r.light_reflected() <= r_col_trigger
 
             l_pos = self._lMot.position
             r_pos = self._rMot.position
@@ -444,8 +443,8 @@ class Robot:
 
         # TODO: add time trigger
         # print("DRIVING")
-        self._col_r.mode = 'COL-COLOR'
-        self._col_l.mode = 'COL-COLOR'
+        self.col_r.mode = 'COL-COLOR'
+        self.col_l.mode = 'COL-COLOR'
 
         driven_distance = 0
         distance = abs(self._util.cm_to_deg(distance))
@@ -469,8 +468,8 @@ class Robot:
         self._lMot.run_direct()
 
         while not self._util.distance_reached(driven_distance, distance, speed_start) and not line_detected:
-            line_detected = (self._col_l.value() is 1 and l_col_trigger) or \
-                            (self._col_r.value() is 1 and r_col_trigger)
+            line_detected = (self.col_l.value() is 1 and l_col_trigger) or \
+                            (self.col_r.value() is 1 and r_col_trigger)
 
             l_pos = self._lMot.position
             r_pos = self._rMot.position
@@ -704,8 +703,8 @@ class Robot:
                     side=False, l_col_trigger=False, r_col_trigger=False,
                     kp=RobotConstants.lflw_kp, ki=RobotConstants.lflw_ki, kd=RobotConstants.lflw_kd):
         # print("LINEFOLLOW")
-        self._col_r.mode = 'COL-COLOR'
-        self._col_l.mode = 'COL-COLOR'
+        self.col_r.mode = 'COL-COLOR'
+        self.col_l.mode = 'COL-COLOR'
 
         driven_distance = 0
         distance = abs(self._util.cm_to_deg(distance))
@@ -723,8 +722,8 @@ class Robot:
         self._lMot.run_direct()
 
         while not self._util.distance_reached_bool(driven_distance, distance, True) and not line_detected:
-            line_detected = (self._col_l.value() is 1 and l_col_trigger) or \
-                            (self._col_r.value() is 1 and r_col_trigger)
+            line_detected = (self.col_l.value() is 1 and l_col_trigger) or \
+                            (self.col_r.value() is 1 and r_col_trigger)
 
             l_pos = self._lMot.position
             r_pos = self._rMot.position
@@ -755,16 +754,17 @@ class Robot:
         return line_detected
 
     def align(self, k_dir=1, offset=50, tolerance=0):
+        # TODO: revise (add time trigger, check tolerance)
         k_dir *= -0.5
         self._lMot.run_direct()
         self._rMot.run_direct()
         while not(
-                offset - tolerance <= self._col_l.light_reflected() is self._col_r.light_reflected()
+                offset - tolerance <= self.col_l.light_reflected() is self.col_r.light_reflected()
                 <= offset + tolerance
                 or (self._lMot.is_stalled and self._rMot.is_stalled)):
 
-            error_left = offset - self._col_l.light_reflected()
-            error_right = offset - self._col_r.light_reflected()
+            error_left = offset - self.col_l.light_reflected()
+            error_right = offset - self.col_r.light_reflected()
             self._lMot.duty_cycle_sp = error_left * k_dir
             self._rMot.duty_cycle_sp = error_right * k_dir
         self.brake()
@@ -788,8 +788,8 @@ class Robot:
 
         while not (l_triggered and r_triggered):
             driven_distance = (abs(self._rMot.position) + abs(self._lMot.position)) / 2
-            l_col = self._col_l.light_reflected()
-            r_col = self._col_r.light_reflected()
+            l_col = self.col_l.light_reflected()
+            r_col = self.col_r.light_reflected()
 
             if l_col < trigger_value and not l_triggered:
                 l_triggered = True

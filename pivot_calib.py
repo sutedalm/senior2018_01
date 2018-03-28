@@ -14,16 +14,16 @@ def main():
         r._lMot.position = r._rMot.position = 0
         r._lMot.stop(stop_action="hold")
         r._rMot.run_forever(speed_sp=150)
-        while r._col_r.light_reflected() > 50:
+        while r.col_r.light_reflected() > 50:
             pass
         r._rMot.position = 0
-        while r._col_r.light_reflected() <= 50:
+        while r.col_r.light_reflected() <= 50:
             time.sleep(0.1)
-        while r._col_r.light_reflected() > 50:
+        while r.col_r.light_reflected() > 50:
             time.sleep(0.1)
-        while r._col_r.light_reflected() <= 50:
+        while r.col_r.light_reflected() <= 50:
             time.sleep(0.1)
-        while r._col_r.light_reflected() > 50:
+        while r.col_r.light_reflected() > 50:
             pass
         distance_right = r._util.deg_to_cm(r._rMot.position)
         r._rMot.stop(stop_action="hold")

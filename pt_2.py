@@ -72,6 +72,7 @@ def pick_up(robot: Robot, i):
 def run(r: Robot, speed_start=0):
     print("PART2")
     colors = r.container_colors
+    # TODO: Color detection error correction
     # colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]
     position = True     # True = In front of line; False = behind line
     i = 0
