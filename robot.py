@@ -108,6 +108,9 @@ class MySlider(LargeMotor):
         if wait:
             self.wait_while('running')
 
+    def hold_closed(self):
+        self.run_direct(duty_cycle_sp=-40)
+
     def collect(self):
         self.run_timed(time_sp=3000, speed_sp=-700, ramp_up_sp=2000)
         self.wait_while('running')
@@ -125,7 +128,7 @@ class MySlider(LargeMotor):
         self.wait_while('running')
 
     def open_for_ships(self):
-        self.run_to_rel_pos(position_sp=250, speed_sp=400, stop_action="brake")
+        self.run_to_rel_pos(position_sp=290, speed_sp=400, stop_action="brake")
         self.wait_while('running')
 
 
