@@ -116,6 +116,16 @@ def run(r: Robot, speed_start=0):
                     r.turn(-90)
         i += 1
 
+    if position:
+        r.drive(speed_start, -80, 5, 0, "run", 50, 50)
+        direction = r.get_direction_drive(-80, -20, 3, 6, "brake")  # Calculate error
+        r.turn(-direction)
+
+    r.drive(20, 80, 3, 0, "run", 50, 50)
+    direction = r.get_direction_drive(80, 20, 2, 5, "brake")  # Calculate error
+    r.turn(-direction)
+    r.drive_triple(0, 100, 0, 5, 83, 5, 0, "brake")
+
 
 def run_align_turn(r: Robot, speed_start=0):
     colors = r.container_colors

@@ -97,11 +97,15 @@ def testing(r: Robot):
     #     print(r.ht_side.get_color().to_text())
     #     print(r.ht_side.value())
 
-    r.drive_triple(0, -100, 0, 5, 5, 5, 0, "brake")
-    time.sleep(2)
-    print(str(r._lMot.position) + ' ' + str(r._rMot.position))
-    r.reset_motor_pos()
-    r.turn(90)
+    # r.drive_triple(0, -100, 0, 5, 5, 5, 0, "brake")
+    # time.sleep(2)
+    # print(str(r._lMot.position) + ' ' + str(r._rMot.position))
+    # r.reset_motor_pos()
+    # r.turn(90)
+    #
+    # r.drive(0, 60, 5, 0, "run", 50, 50)
+    # r.align()
+    pt_3.drop_off(r, 0, 0)
 
 
 def main():
@@ -114,8 +118,8 @@ def main():
 
         # testing(r)
 
-        # pt_1.run(r)
-        # pt_2.run(r, -60)  # change to -60
+        pt_1.run(r)
+        pt_2.run(r, -60)  # change to -60
         pt_3.run(r)
         # r.lifter.move_to_first_position()
     finally:

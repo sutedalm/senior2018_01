@@ -128,7 +128,7 @@ class MySlider(LargeMotor):
         self.wait_while('running')
 
     def open_for_ships(self):
-        self.run_to_rel_pos(position_sp=290, speed_sp=400, stop_action="brake")
+        self.run_to_rel_pos(position_sp=270, speed_sp=400, stop_action="brake")
         self.wait_while('running')
 
 
@@ -768,9 +768,34 @@ class Robot:
         self.brake(brake_action)
         return line_detected
 
+    def align_new(self, k_dir=1, offset=50, tolerance=0):
+        # TODO: revise (add time trigger, check tolerance)
+        k_dir *= 0.5
+        k_move = 1
+        self._lMot.run_direct()
+        self._rMot.run_direct()
+
+        integral = last_error_turn = last_error_drive = 0
+        while not(
+                offset - tolerance <= self.col_l.light_reflected() is self.col_r.light_reflected()
+                <= offset + tolerance):
+                # or (self._lMot.is_stalled and self._rMot.is_stalled)):
+            l_val =  self.col_l.light_reflected()
+            r_val = self.col_r.light_reflected()
+            error_turn = r_val - l_val
+            error_move = (r_val + l_val)/2 - offset
+            integral, last_error_turn, correction = self._util.pid(error_turn, integral, last_error_turn, k_dir, 0, 1)
+            integral, last_error_drive, speed = self._util.pid(error_move, integral, last_error_drive, k_move, 0, 0)
+            self._lMot.duty_cycle_sp = self._util.clamp_speed(speed - correction)
+            self._rMot.duty_cycle_sp = self._util.clamp_speed(speed + correction)
+
+            print("err: " + str(error_turn) + "; cor: " + str(correction))
+        self.brake()
+        self.reset_motor_pos()
+
     def align(self, k_dir=1, offset=50, tolerance=0):
         # TODO: revise (add time trigger, check tolerance)
-        k_dir *= -0.5
+        k_dir *= -0.7
         self._lMot.run_direct()
         self._rMot.run_direct()
         while not(
@@ -780,8 +805,11 @@ class Robot:
 
             error_left = offset - self.col_l.light_reflected()
             error_right = offset - self.col_r.light_reflected()
-            self._lMot.duty_cycle_sp = error_left * k_dir
-            self._rMot.duty_cycle_sp = error_right * k_dir
+            speed_left = error_left * k_dir
+            speed_right = error_right * k_dir
+            self._lMot.duty_cycle_sp = self._util.clamp_speed(speed_left)
+            self._rMot.duty_cycle_sp = self._util.clamp_speed(speed_right)
+
         self.brake()
         self.reset_motor_pos()
 

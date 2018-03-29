@@ -94,8 +94,9 @@ def scan_ships(r: Robot):
     # Move to ship line
     r.slider.close(False)
     r.drive(0, 60, 5, 0, "run", 50, 50)
+
     r.align()
-    r.drive_triple(0, 100, 0, 5, 6, 5, 0, "brake")
+    r.drive_triple(0, 100, 0, 5, 5, 5, 0, "brake")
     r.turn(-90)
 
     r.slider.hold_closed()
@@ -103,10 +104,9 @@ def scan_ships(r: Robot):
     r.drive_triple(0, 100, 0, 5, 0, 5, 0, "brake")
     r.drive(0, -80, 5, 0, "run", 50, 50)
     direction = r.get_direction_drive(-80, 0, 0, 5, "brake")
-    r.turn(-direction)
+    r.turn(-20 - direction)
 
-    r.drive_triple(0, -80, -80, 5, 10, 5, 30)
-    r.drive_triple(-80, -80, -20, 5, 5, 10, -30, "brake")
+    r.drive_triple(0, -80, 0, 5, 25, 5, -20, "brake")
 
     # Align to ship line
     offset = 70
@@ -147,8 +147,8 @@ def scan_ships(r: Robot):
     ships[5] = MyColor.NOCOLOR
 
     # Move to center
-    r.drive(0, -100, 7, -20)
-    r.drive(-100, 0, 7, 15, "brake")
+    r.drive(0, -100, 8, -20)
+    r.drive(-100, 0, 8, 20, "brake")
 
     r.pivot(-90)
     r.slider.open_for_ships()
@@ -157,8 +157,9 @@ def scan_ships(r: Robot):
 
 def drop_off(r: Robot, speed_start=0, speed_end=-80):
     r.drive(speed_start, 80, 2)
-    r.slider.close(False)
+    r.slider.close(False, 100)
     r.drive_triple(80, 80, 0, 5, 8, 5, 0, "brake")
+    time.sleep(1)
     r.slider.open_for_ships()
 
     # r.drive_triple(0, -60, 0, 1, 0, 1, 0, "brake")
@@ -178,9 +179,12 @@ def drop_food(r: Robot, positions):
     r.col_r.mode = 'COL-REFLECT'
 
     r.drive(0, 60, 3, 0, "run", 50, 50)
-    direction = r.get_direction_drive(60, 0, 0, 1, "brake")
+    direction = r.get_direction_drive(60, 0, 0, 4, "brake")
+    r.turn(-direction)
+    r.drive(0, -60, 2, 0, "run", 50, 50)
+    direction = r.get_direction_drive(-60, 0, 5, 5, "brake")
 
-    r.pivot(-90 + direction, False)
+    r.turn(90 - direction)
 
     position = True     # True = In front of line; False = behind line
     i = 0
@@ -296,19 +300,19 @@ def drop_food(r: Robot, positions):
 
 
 def run(r: Robot):
-    for i in range(0, 3):
-        r.beep(True)
-        r.wait_until_button()
-        r.lifter.move_up()
-
-    r.wait_until_button()
-    r.beep()
-    time.sleep(2)
+    # for i in range(0, 3):
+    #     r.beep(True)
+    #     r.wait_until_button()
+    #     r.lifter.move_up()
+    #
+    # r.wait_until_button()
+    # r.beep()
+    # time.sleep(2)
 
     ships = scan_ships(r)
 
     container = r.container_colors
-    container = [MyColor.BLUE, MyColor.GREEN, MyColor.YELLOW]
+    # container = [MyColor.BLUE, MyColor.GREEN, MyColor.YELLOW]
 
     positions = get_positions(ships, container)
 
