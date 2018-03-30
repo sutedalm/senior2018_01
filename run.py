@@ -105,7 +105,11 @@ def testing(r: Robot):
     #
     # r.drive(0, 60, 5, 0, "run", 50, 50)
     # r.align()
-    pt_3.drop_off(r, 0, 0)
+    # pt_3.drop_off(r, 0, 0)
+
+    r.ht_middle.mode = 'WHITE'
+    while True:
+        print(str(r.ht_middle.value()) + ' ' + str(r.ht_middle.light_reflected()))
 
 
 def main():
@@ -116,11 +120,11 @@ def main():
         time.sleep(2)
         r.ht_middle.mode = 'COLOR'
 
-        # testing(r)
+        testing(r)
 
-        pt_1.run(r)
-        pt_2.run(r, -60)  # change to -60
-        pt_3.run(r)
+        # pt_1.run(r)
+        # pt_2.run(r, -60)  # change to -60
+        # pt_3.run(r)
         # r.lifter.move_to_first_position()
     finally:
         print("RESET")

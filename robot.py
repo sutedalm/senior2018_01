@@ -127,9 +127,10 @@ class MySlider(LargeMotor):
         self.run_to_rel_pos(position_sp=200, speed_sp=400, stop_action="brake")
         self.wait_while('running')
 
-    def open_for_ships(self):
-        self.run_to_rel_pos(position_sp=270, speed_sp=400, stop_action="brake")
-        self.wait_while('running')
+    def open_for_ships(self, wait=True):
+        self.run_to_rel_pos(position_sp=260, speed_sp=400, stop_action="brake")
+        if wait:
+            self.wait_while('running')
 
 
 class MyLifterPosition(IntEnum):
@@ -242,8 +243,8 @@ class Utils:
 
         r = parallel_distance / math.sin(math.radians(abs(direction)))
         average_distance = math.pi * r * abs(direction) / 180
-        r1 = r + self._consts.motor_distance/2
-        r2 = r - self._consts.motor_distance/2
+        r1 = r + self._consts.motor_distance_turn/2
+        r2 = r - self._consts.motor_distance_turn/2
 
         turn = 100 * r2/r1 - 100
         if direction < 0:
@@ -335,14 +336,14 @@ class Robot:
         self.slider = MySlider(OUTPUT_A)
         self.lifter = MyLifter(OUTPUT_D)
 
-        self.col_l = MyColorSensorEV3(INPUT_1, 7, 79)
-        self.col_r = MyColorSensorEV3(INPUT_2, 4, 60)
-        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 20)
+        self.col_l = MyColorSensorEV3(INPUT_1, 9, 87)
+        self.col_r = MyColorSensorEV3(INPUT_2, 4, 53)
+        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 32)
         self.ht_side = MyColorSensorHT(INPUT_4)
 
         self._btn = Button()
 
-        self.container_colors = [MyColor.BLUE, MyColor.RED, MyColor.GREEN]
+        self.container_colors = [MyColor.BLUE, MyColor.GREEN, MyColor.YELLOW]
 
         print("press button to start")
         # self.wait_until_button()
@@ -446,7 +447,7 @@ class Robot:
             self._rMot.position = self._rMot.position - distance_r
             self._lMot.position = self._lMot.position - distance_l
         else:
-            # print("LINE DETECTED")
+            print("LINE DETECTED")
             self.reset_motor_pos()
         # print("newl: " + str(self._lMot.position) + "; newr: " + str(self._rMot.position))
         self.brake(brake_action)
