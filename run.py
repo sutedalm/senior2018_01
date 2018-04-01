@@ -120,11 +120,11 @@ def main():
         time.sleep(2)
         r.ht_middle.mode = 'COLOR'
 
-        testing(r)
+        # testing(r)
 
-        # pt_1.run(r)
-        # pt_2.run(r, -60)  # change to -60
-        # pt_3.run(r)
+        pt_1.run(r)
+        pt_2.run(r, -60)  # change to -60
+        pt_3.run(r)
         # r.lifter.move_to_first_position()
     finally:
         print("RESET")

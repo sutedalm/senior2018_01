@@ -112,23 +112,24 @@ class MySlider(LargeMotor):
         self.run_direct(duty_cycle_sp=-40)
 
     def collect(self):
-        self.run_timed(time_sp=3000, speed_sp=-700, ramp_up_sp=2000)
+        self.run_timed(time_sp=3000, speed_sp=-500, ramp_down_sp=2500)
         self.wait_while('running')
-        self.run_forever(speed_sp=-300)
+        self.hold_closed()
 
     def open_half_to_full(self, wait=True):
-        self.open(wait, 100, 8)
+        self.open(wait, 100, 9)
 
     def open_to_half(self):
         self.run_to_rel_pos(position_sp=610, speed_sp=400, stop_action="brake")
         self.wait_while('running')
 
-    def open_for_lifter(self):
-        self.run_to_rel_pos(position_sp=200, speed_sp=400, stop_action="brake")
-        self.wait_while('running')
+    def open_for_lifter(self, wait=True):
+        self.run_to_rel_pos(position_sp=250, speed_sp=1000, stop_action="brake")
+        if wait:
+            self.wait_while('running')
 
     def open_for_ships(self, wait=True):
-        self.run_to_rel_pos(position_sp=260, speed_sp=400, stop_action="brake")
+        self.run_to_rel_pos(position_sp=250, speed_sp=400, stop_action="brake")
         if wait:
             self.wait_while('running')
 
@@ -187,7 +188,8 @@ class RobotConstants:
     motor_distance_turn = 19.9
     sensor_distance = 14.5
     pivot_min_speed = 30
-    drive_min_speed = 30
+    turn_min_speed = 50
+    drive_min_speed = 50
     col_trigger_val = 50
 
     drive_kp = 4
@@ -561,7 +563,7 @@ class Robot:
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
-    def turn(self, direction, min_speed=0, max_speed=70, k_acceleration=5,
+    def turn(self, direction, min_speed=0, max_speed=100, k_acceleration=6,
              kp=RobotConstants.turn_kp, ki=RobotConstants.turn_ki, kd=RobotConstants.turn_kd):
         print("TURNING")
         print("dir: " + str(direction))
@@ -572,7 +574,7 @@ class Robot:
         max_speed = abs(max_speed)
 
         if min_speed is 0:
-            min_speed = self._consts.pivot_min_speed
+            min_speed = self._consts.turn_min_speed
 
         last_error = integral = 0
 
