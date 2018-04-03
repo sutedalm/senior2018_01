@@ -103,15 +103,16 @@ def scan_ships(r: Robot):
 
     # r.drive_triple(0, 100, 0, 5, 0, 5, 0, "brake")
     r.drive(0, -80, 5, 0, "run", 50, 50)
+
     direction = r.get_direction_drive(-80, 0, 0, 5, "brake")
-    r.turn(-20 - direction)
+    r.turn(-23 - direction)
 
     r.drive_triple(0, -80, 0, 5, 25, 5, -20, "brake")
 
     # Align to ship line
     offset = 50
-    speed_measure = 35
-    speed_maximum = 80
+    speed_measure = 40
+    speed_maximum = 70
 
     r.line_follow(40, 70, 4, offset, "run")
     r.line_follow(70,  70, 15, offset, "brake", False, False, True)
@@ -355,9 +356,21 @@ def drop_food(r: Robot, positions):
     direction = r.get_direction_drive(60, 20, 0, 2, "brake")  # Calculate error
     r.turn(90 - direction)
 
+
+def go_home_bitch(r: Robot):
+    # goHome
     r.drive(0, -80, 3, 0, "run", 50, 50)
     direction = r.get_direction_drive(-80, 0, 0, 5, "brake")  # Calculate error
     r.turn(-direction)
+
+    r.drive_triple(0, -100, 0, 8, 75, 5, 0, "brake")
+
+    r.drive(0, -80, 3, 0, "run", 50, 50)
+    direction = r.get_direction_drive(-80, 0, 0, 5, "brake")  # Calculate error
+    r.turn(-direction)
+
+    r.drive_triple(0, -100, 0, 8, 35, 5, 0, "brake")
+
 
 
 def run(r: Robot):

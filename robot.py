@@ -112,7 +112,7 @@ class MySlider(LargeMotor):
         self.run_direct(duty_cycle_sp=-40)
 
     def collect(self):
-        self.run_timed(time_sp=3000, speed_sp=-500, ramp_down_sp=2500)
+        self.run_timed(time_sp=2000, speed_sp=-500, ramp_down_sp=1000)
         self.wait_while('running')
         self.hold_closed()
 
@@ -120,7 +120,7 @@ class MySlider(LargeMotor):
         self.open(wait, 100, 9)
 
     def open_to_half(self):
-        self.run_to_rel_pos(position_sp=610, speed_sp=400, stop_action="brake")
+        self.run_to_rel_pos(position_sp=600, speed_sp=800, stop_action="brake")
         self.wait_while('running')
 
     def open_for_lifter(self, wait=True):
@@ -129,7 +129,7 @@ class MySlider(LargeMotor):
             self.wait_while('running')
 
     def open_for_ships(self, wait=True):
-        self.run_to_rel_pos(position_sp=250, speed_sp=400, stop_action="brake")
+        self.run_to_rel_pos(position_sp=250, speed_sp=1000, stop_action="brake")
         if wait:
             self.wait_while('running')
 
@@ -193,7 +193,7 @@ class RobotConstants:
     col_trigger_val = 50
 
     drive_kp = 4
-    drive_ki = 0.1
+    drive_ki = 0.05
     drive_kd = 1
 
     turn_kp = 1
@@ -201,7 +201,7 @@ class RobotConstants:
     turn_kd = 0.5
 
     lflw_kp = 3
-    lflw_ki = 0.1
+    lflw_ki = 0
     lflw_kd = 1
 
 
