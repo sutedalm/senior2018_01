@@ -18,7 +18,7 @@ def target_position(color):
 def pick_up(robot: Robot, i):
     robot.drive_triple(0, 50, 50, 1, 0, 0, 0, "run", 50, 50)  # move to line
     robot.slider.open_for_lifter(False)
-    robot.drive_triple(50, 80, 80, 40, 20, 20, 0, "run", 50, 50)  # move to line
+    robot.drive_triple(50, 70, 80, 40, 20, 20, 0, "run", 50, 50)  # move to line
 
     if i is 0:
         robot.lifter.move_up(False)

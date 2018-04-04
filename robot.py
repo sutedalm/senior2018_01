@@ -133,6 +133,11 @@ class MySlider(LargeMotor):
         if wait:
             self.wait_while('running')
 
+    def open_for_base(self, wait=True):
+        self.run_to_rel_pos(position_sp=250, speed_sp=1000, stop_action="brake")
+        if wait:
+            self.wait_while('running')
+
 
 class MyLifterPosition(IntEnum):
     FIRST = 1
@@ -158,7 +163,7 @@ class MyLifter(MediumMotor):
         self.lifter_position += 1
 
     def move_down(self, wait=True):
-        self.run_to_abs_pos(position_sp=self.position + self.position_difference, speed_sp=300, stop_action='hold')
+        self.run_to_abs_pos(position_sp=self.position + self.position_difference, speed_sp=200, stop_action='hold')
         if wait:
             self.wait_while('running')
         self.lifter_position -= 1
@@ -192,12 +197,12 @@ class RobotConstants:
     drive_min_speed = 50
     col_trigger_val = 50
 
-    drive_kp = 4
-    drive_ki = 0.05
+    drive_kp = 3
+    drive_ki = 0.01
     drive_kd = 1
 
     turn_kp = 1
-    turn_ki = 0.04
+    turn_ki = 0
     turn_kd = 0.5
 
     lflw_kp = 3
