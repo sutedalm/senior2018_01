@@ -359,7 +359,6 @@ def drop_food(r: Robot, positions):
 
 
 def go_home_bitch(r: Robot):
-    # Homerun
     r.slider.open_for_base(False)
     r.drive(0, -80, 3, 0, "run", 50, 50)
     direction = r.get_direction_drive(-80, 0, 0, 5, "brake")  # Calculate error
@@ -375,15 +374,6 @@ def go_home_bitch(r: Robot):
 
 
 def run(r: Robot, speed_start=0):
-    # for i in range(0, 3):
-    #     r.beep(True)
-    #     r.wait_until_button()
-    #     r.lifter.move_up()
-    #
-    # r.wait_until_button()
-    # r.beep()
-    # time.sleep(2)
-
     r.lifter.move_to_top_position()
 
     ships = scan_ships(r, speed_start)

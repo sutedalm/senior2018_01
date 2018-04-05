@@ -31,13 +31,13 @@ def run(r: Robot):
 
     # align while driving over first line
     # r.align_driving(80, 100, 3, 7)
-    r.slider.run_to_rel_pos(position_sp=250, speed_sp=1000, stop_action="brake")
-    direction = r.get_direction_drive(80, 70, 0, 3)  # Calculate error
+    r.slider.run_to_rel_pos(position_sp=210, speed_sp=1000, stop_action="brake")
+    direction = r.get_direction_drive(80, 70, 0, 8)  # Calculate error
 
     # decelerate to first container
     r.slider.open_half_to_full(False)
     # r.drive_triple(80, 100, 100, 10, 5, 13)
-    r.drive(70, 100, 25)
+    r.drive(70, 100, 20)
     # r.drive_triple(100, 80, 20, 9, 2, 4, 0)
 
     # first container
@@ -54,7 +54,7 @@ def run(r: Robot):
 
     iterator = set_color(r, iterator)
 
-    r.drive_triple(0, 100, 0, 6, 0, 6, 0, "brake")
+    r.drive_triple(0, 100, 0, 4, 0, 4, 0, "brake")
 
     # third container
     r.slider.open()
