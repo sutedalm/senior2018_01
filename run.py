@@ -20,8 +20,8 @@ def main():
         r.ht_middle.mode = 'COLOR'
 
         pt_1.run(r)
-        pt_2.run(r, -60)  # change to -60
-        pt_3.run(r)
+        pt_2.run(r, -80)
+        pt_3.run(r, 100)
         # r.lifter.move_to_first_position()
     finally:
         print("RESET")

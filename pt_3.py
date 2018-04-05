@@ -88,37 +88,37 @@ def next_ship(r: Robot, offset, speed_measure, speed_maximum):
     return color
 
 
-def scan_ships(r: Robot):
+def scan_ships(r: Robot, speed_start=0):
     r.ht_side.mode = 'COLOR'
     ships = [MyColor.NOCOLOR, MyColor.NOCOLOR, MyColor.NOCOLOR, MyColor.NOCOLOR, MyColor.NOCOLOR, MyColor.NOCOLOR]
 
     # Move to ship line
     r.slider.close(False)
-    r.drive(0, 60, 5, 0, "run", 50, 50)
+    r.drive(speed_start, 80, 5, 0, "run", 50, 50)
 
-    direction = r.get_direction_drive(60, 0, 11, 5, "brake")
+    direction = r.get_direction_drive(80, 0, 11, 5, "brake")
     r.turn(-90 - direction)
 
     r.slider.hold_closed()
 
     # r.drive_triple(0, 100, 0, 5, 0, 5, 0, "brake")
-    r.drive(0, -80, 5, 0, "run", 50, 50)
+    r.drive(0, -100, 5, 0, "run", 50, 50)
 
-    direction = r.get_direction_drive(-80, 0, 0, 5, "brake")
+    direction = r.get_direction_drive(-100, 0, 0, 5, "brake")
     r.turn(-23 - direction)
 
-    r.drive_triple(0, -80, 0, 5, 25, 5, -20, "brake")
+    r.drive_triple(0, -100, 0, 5, 25, 5, -20, "brake")
 
     # Align to ship line
     offset = 50
-    speed_measure = 40
-    speed_maximum = 70
+    speed_measure = 50
+    speed_maximum = 100
 
-    r.line_follow(40, 70, 4, offset, "run")
+    r.line_follow(50, 70, 4, offset, "run")
     r.line_follow(70,  70, 15, offset, "brake", False, False, True)
     r.line_follow(70, 20, 9, offset, "brake")
-    r.drive(0, -80, 13)
-    r.drive_color(-80, -20, 15, 0, "brake", False, True)
+    r.drive(0, -90, 13)
+    r.drive_color(-90, -20, 15, 0, "brake", False, True)
 
     # Start ship scanning
 
@@ -374,7 +374,7 @@ def go_home_bitch(r: Robot):
     r.drive_triple(0, -100, 0, 8, 35, 5, 0, "brake")
 
 
-def run(r: Robot):
+def run(r: Robot, speed_start=0):
     # for i in range(0, 3):
     #     r.beep(True)
     #     r.wait_until_button()
@@ -386,7 +386,7 @@ def run(r: Robot):
 
     r.lifter.move_to_top_position()
 
-    ships = scan_ships(r)
+    ships = scan_ships(r, speed_start)
 
     container = r.container_colors
     # container = [MyColor.BLUE, MyColor.GREEN, MyColor.YELLOW]

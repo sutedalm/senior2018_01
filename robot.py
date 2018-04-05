@@ -99,7 +99,7 @@ class MySlider(LargeMotor):
         self.run_timed(time_sp=duration, speed_sp=speed, ramp_up_sp=800, ramp_down_sp=700)
         if wait:
             self.wait_while('running')
-        self.run_forever(speed_sp=200)
+            self.run_forever(speed_sp=200)
 
     def close(self, wait=True, speed=100, duration=13):
         speed *= -10
@@ -112,7 +112,7 @@ class MySlider(LargeMotor):
         self.run_direct(duty_cycle_sp=-40)
 
     def collect(self):
-        self.run_timed(time_sp=2000, speed_sp=-500, ramp_down_sp=1000)
+        self.run_timed(time_sp=2000, speed_sp=-700, ramp_down_sp=1000)
         self.wait_while('running')
         self.hold_closed()
 
@@ -124,7 +124,7 @@ class MySlider(LargeMotor):
         self.wait_while('running')
 
     def open_for_lifter(self, wait=True):
-        self.run_to_rel_pos(position_sp=250, speed_sp=1000, stop_action="brake")
+        self.run_to_rel_pos(position_sp=260, speed_sp=1000, stop_action="brake")
         if wait:
             self.wait_while('running')
 
@@ -134,7 +134,7 @@ class MySlider(LargeMotor):
             self.wait_while('running')
 
     def open_for_base(self, wait=True):
-        self.run_to_rel_pos(position_sp=250, speed_sp=1000, stop_action="brake")
+        self.run_to_rel_pos(position_sp=230, speed_sp=1000, stop_action="brake")
         if wait:
             self.wait_while('running')
 
@@ -197,7 +197,7 @@ class RobotConstants:
     drive_min_speed = 50
     col_trigger_val = 50
 
-    drive_kp = 3
+    drive_kp = 2.5
     drive_ki = 0.01
     drive_kd = 1
 
@@ -205,7 +205,7 @@ class RobotConstants:
     turn_ki = 0
     turn_kd = 0.5
 
-    lflw_kp = 3
+    lflw_kp = 1
     lflw_ki = 0
     lflw_kd = 1
 

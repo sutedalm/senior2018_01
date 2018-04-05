@@ -27,55 +27,57 @@ def run(r: Robot):
 
     # accelerate to first line
     # r.slider.close(True, 100, 5)
-    r.drive_triple(0, 100, 80, 5, 30, 5)
+    r.drive_triple(0, 100, 80, 5, 25, 5)
 
     # align while driving over first line
     # r.align_driving(80, 100, 3, 7)
-    direction = r.get_direction_drive(80, 100, 0, 10, "brake")  # Calculate error
+    r.slider.run_to_rel_pos(position_sp=250, speed_sp=1000, stop_action="brake")
+    direction = r.get_direction_drive(80, 70, 0, 3)  # Calculate error
 
     # decelerate to first container
-    r.drive_triple(100, 80, 20, 9, 2, 4, 0, "brake")
-
-    r.turn(-direction)
+    r.slider.open_half_to_full(False)
+    # r.drive_triple(80, 100, 100, 10, 5, 13)
+    r.drive(70, 100, 25)
+    # r.drive_triple(100, 80, 20, 9, 2, 4, 0)
 
     # first container
-    r.slider.open_half_to_full()
-    r.drive_triple(0, 100, 40, 8, 3, 7, 0, "brake")
+    r.drive_triple(100, 100, 40, 8, 3, 7, 0, "brake")
+    r.turn(-direction)
     r.slider.collect()
 
     iterator = set_color(r, iterator)
 
     # second container
     r.slider.open()
-    r.drive_triple(0, 80, 0, 4, 0, 3, 0, "brake")
+    r.drive_triple(0, 70, 0, 4, 0, 3, 0, "brake")
     r.slider.collect()
 
     iterator = set_color(r, iterator)
 
-    r.drive_triple(0, 100, 0, 7, 0, 6, 0, "brake")
+    r.drive_triple(0, 100, 0, 6, 0, 6, 0, "brake")
 
     # third container
     r.slider.open()
-    r.drive_triple(0, 100, 60, 8, 2, 3, 0)
-    r.drive(60, 0, 5, 0, "brake")
+    r.drive_triple(0, 100, 60, 6, 0, 4, 0)
+    r.drive(60, 0, 6, 0, "brake")
     r.slider.collect()
 
     iterator = set_color(r, iterator)
 
     if iterator <= 2:
         # forth container
-        r.drive_triple(0, 60, 0, 8, 3, 7, 0, "brake")
+        r.drive_triple(0, 80, 0, 8, 3, 7, 0, "brake")
         r.slider.open()
-        r.drive_triple(0, 30, 0, 3, 0.5, 2, 0, "brake")
+        r.drive_triple(0, 60, 0, 3.5, 0, 2, 0, "brake")
         r.slider.collect()
 
         set_color(r, iterator)
 
         r.lifter.move_to_first_position(False)
-        r.drive_triple(0, -100, -60, 21, 50, 5)
+        r.drive_triple(0, -100, -80, 21, 50, 5)
     else:
         r.lifter.move_to_first_position(False)
-        r.drive_triple(0, -100, -60, 15, 50, 5)
+        r.drive_triple(0, -100, -80, 15, 50, 5)
 
 
 if __name__ == "__main__":
