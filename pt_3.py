@@ -96,7 +96,7 @@ def scan_ships(r: Robot, speed_start=0):
     r.slider.close(False)
     r.drive(speed_start, 80, 5, 0, "run", 50, 50)
 
-    direction = r.get_direction_drive(80, 0, 11, 5, "brake")
+    direction = r.get_direction_drive(80, 0, 10, 5, "brake")
     r.turn(-90 - direction)
 
     r.slider.hold_closed()
@@ -111,13 +111,13 @@ def scan_ships(r: Robot, speed_start=0):
 
     # Align to ship line
     offset = 50
-    speed_measure = 50
+    speed_measure = 60
     speed_maximum = 100
 
-    r.line_follow(50, 70, 4, offset, "run")
-    r.line_follow(70,  70, 15, offset, "brake", False, False, True)
-    r.line_follow(70, 20, 9, offset, "brake")
-    r.drive(0, -90, 13)
+    r.line_follow(50, 80, 4, offset, "run", False, False, False, 2)
+    r.line_follow(80,  80, 15, offset, "brake", False, False, True, 2)
+    r.line_follow(80, 20, 11, offset, "brake")
+    r.drive(0, -90, 15)
     r.drive_color(-90, -20, 15, 0, "brake", False, True)
 
     # Start ship scanning
@@ -162,7 +162,7 @@ def drop_off(r: Robot, speed_end=-80):
     r.slider.stop(stop_action='brake')
     r.slider.close(False)
     r.drive_triple(80, 80, 0, 5, 8, 5, 0, "brake")
-    # time.sleep(1)
+    time.sleep(0.5)
     r.slider.open_for_ships()
 
     # r.drive_triple(0, -60, 0, 1, 0, 1, 0, "brake")

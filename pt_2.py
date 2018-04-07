@@ -16,9 +16,9 @@ def target_position(color):
 
 
 def pick_up(robot: Robot, i):
-    robot.drive_triple(0, 50, 50, 1, 0, 0, 0, "run", 50, 50)  # move to line
-    robot.slider.open_for_lifter(False)
-    robot.drive_triple(50, 60, 80, 40, 20, 20, 0, "run", 50, 50)  # move to line
+    robot.drive_triple(0, 50, 50, 4, 0, 0, 0, "brake", 50, 50)  # move to line
+    robot.slider.open_for_lifter(True)
+    robot.drive_triple(0, 60, 80, 40, 20, 20, 0, "run", 50, 50)  # move to line
 
     if i is 0:
         robot.lifter.move_up(False)
@@ -121,16 +121,16 @@ def run(r: Robot, speed_start=0):
         direction = r.get_direction_drive(-80, -20, 3, 6, "brake")  # Calculate error
         r.turn(-direction)
 
-    r.drive(20, 80, 3, 0, "run", 50, 50)
-    r.align_driving(80, 100, 0, 7)
-    r.drive(100, 100, 9, -25)
+    r.drive_triple(0, 100, 100, 5, 10, 10, 0, "run", 50, 50)
+    # r.align_driving(80, 100, 0, 7)
+    r.drive(100, 100, 9, -20)
     # direction = r.get_direction_drive(80, 20, 2, 5, "brake")  # Calculate error
     # r.turn(-direction)
 
     # r.drive_triple(0, 100, 100, 5, 2, 2, -20)
-    r.drive(100, 100, 70)
+    r.drive(100, 100, 77)
     # r.drive_triple(100, 100, 0, 2, 2, 5, 20, "brake")
-    r.drive(100, 100, 9, 25)
+    r.drive(100, 100, 9, 20)
 
 
 if __name__ == "__main__":

@@ -197,7 +197,7 @@ class RobotConstants:
     drive_min_speed = 50
     col_trigger_val = 50
 
-    drive_kp = 2.5
+    drive_kp = 3
     drive_ki = 0.01
     drive_kd = 1
 
@@ -344,7 +344,7 @@ class Robot:
         self.lifter = MyLifter(OUTPUT_D)
 
         self.col_l = MyColorSensorEV3(INPUT_1, 9, 87)
-        self.col_r = MyColorSensorEV3(INPUT_2, 4, 53)
+        self.col_r = MyColorSensorEV3(INPUT_2, 4, 58)
         self.ht_middle = MyColorSensorHT(INPUT_3, 0, 32)
         self.ht_side = MyColorSensorHT(INPUT_4)
 
@@ -822,7 +822,8 @@ class Robot:
         self.reset_motor_pos()
 
     def get_direction(self, speed, brake_action="run",
-                      kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd):
+                      kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd,
+                      max_direction=3):
 
         self._rMot.run_direct()
         self._lMot.run_direct()
@@ -873,7 +874,7 @@ class Robot:
         print("measured angle: " + str(direction))
 
         self.reset_motor_pos()
-        return direction
+        return min(max_direction, max(-max_direction, direction))
 
     def get_direction_drive(self, speed=60, end_speed=40,
                             distance_constant=2.5, distance_deceleration=5, brake_action="run"):
