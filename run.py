@@ -16,8 +16,9 @@ def main():
     try:
         print("running")
         r.beep(True)
-        time.sleep(2)
         r.ht_middle.mode = 'COLOR'
+        r.wait_until_button()
+        r.reset()
 
         pt_1.run(r)
         pt_2.run(r, -80)

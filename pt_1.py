@@ -27,7 +27,7 @@ def run(r: Robot):
 
     # accelerate to first line
     # r.slider.close(True, 100, 5)
-    r.drive_triple(0, 100, 80, 5, 25, 5)
+    r.drive_triple(0, 100, 80, 10, 20, 5)
 
     # align while driving over first line
     # r.align_driving(80, 100, 3, 7)

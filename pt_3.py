@@ -183,11 +183,11 @@ def drop_food(r: Robot, positions):
     r.col_l.mode = 'COL-REFLECT'
     r.col_r.mode = 'COL-REFLECT'
 
-    r.drive(0, 60, 3, 0, "run", 50, 50)
-    direction = r.get_direction_drive(60, 0, 0, 4, "brake")
+    r.drive(0, 80, 3, 0, "run", 50, 50)
+    direction = r.get_direction_drive(80, 0, 0, 4, "brake")
     r.turn(-direction)
-    r.drive(0, -60, 2, 0, "run", 50, 50)
-    direction = r.get_direction_drive(-60, 0, 4, 5, "brake")
+    r.drive(0, -80, 2, 0, "run", 50, 50)
+    direction = r.get_direction_drive(-80, 0, 4, 5, "brake")
 
     r.turn(90 - direction)
 

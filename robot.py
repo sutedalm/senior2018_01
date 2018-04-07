@@ -186,6 +186,10 @@ class MyDrivingMotor(LargeMotor):
         self.reset()
         self.polarity = "inversed"
 
+    def init_reset(self):
+        self.reset()
+        self.polarity = "inversed"
+
 
 class RobotConstants:
     tyre_size = 6.24                        # Durchmesser des Reifens in cm
@@ -197,9 +201,9 @@ class RobotConstants:
     drive_min_speed = 50
     col_trigger_val = 50
 
-    drive_kp = 3
+    drive_kp = 4
     drive_ki = 0.01
-    drive_kd = 1
+    drive_kd = 1.5
 
     turn_kp = 1
     turn_ki = 0
@@ -374,8 +378,8 @@ class Robot:
             Sound.beep()
 
     def reset(self):
-        self._lMot.reset()
-        self._rMot.reset()
+        self._lMot.init_reset()
+        self._rMot.init_reset()
         self.slider.reset()
         self.lifter.reset()
 
@@ -823,7 +827,7 @@ class Robot:
 
     def get_direction(self, speed, brake_action="run",
                       kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd,
-                      max_direction=3):
+                      max_direction=5):
 
         self._rMot.run_direct()
         self._lMot.run_direct()
