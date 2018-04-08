@@ -114,9 +114,9 @@ def scan_ships(r: Robot, speed_start=0):
     speed_measure = 60
     speed_maximum = 100
 
-    r.line_follow(50, 80, 4, offset, "run", False, False, False, 2)
-    r.line_follow(80,  80, 15, offset, "brake", False, False, True, 2)
-    r.line_follow(80, 20, 11, offset, "brake")
+    r.line_follow(50, 60, 4, offset, "run", False, False, False, 2)
+    r.line_follow(60,  80, 15, offset, "brake", False, False, True, 2)
+    r.line_follow(80, 30, 11, offset, "brake", False, False, False, 2)
     r.drive(0, -90, 15)
     r.drive_color(-90, -20, 15, 0, "brake", False, True)
 

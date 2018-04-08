@@ -123,14 +123,14 @@ def run(r: Robot, speed_start=0):
 
     r.drive_triple(0, 100, 100, 5, 10, 10, 0, "run", 50, 50)
     # r.align_driving(80, 100, 0, 7)
-    r.drive(100, 100, 15, -20)
+    r.drive(100, 100, 45, -15)
     # direction = r.get_direction_drive(80, 20, 2, 5, "brake")  # Calculate error
     # r.turn(-direction)
 
     # r.drive_triple(0, 100, 100, 5, 2, 2, -20)
-    r.drive(100, 100, 65)
+    r.drive(100, 100, 5)
     # r.drive_triple(100, 100, 0, 2, 2, 5, 20, "brake")
-    r.drive(100, 100, 15, 20)
+    r.drive(100, 100, 45, 15)
 
 
 if __name__ == "__main__":

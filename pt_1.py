@@ -32,7 +32,7 @@ def run(r: Robot):
     # align while driving over first line
     # r.align_driving(80, 100, 3, 7)
     r.slider.run_to_rel_pos(position_sp=210, speed_sp=1000, stop_action="brake")
-    direction = r.get_direction_drive(80, 70, 0, 8)  # Calculate error
+    direction = r.get_direction_drive(80, 70, 0, 8, "run", 3)  # Calculate error
 
     # decelerate to first container
     r.slider.open_half_to_full(False)
@@ -66,7 +66,7 @@ def run(r: Robot):
 
     if iterator <= 2:
         # forth container
-        r.drive_triple(0, 80, 0, 8, 3, 7, 0, "brake")
+        r.drive_triple(0, 60, 0, 3.5, 0, 2, 0, "brake")
         r.slider.open()
         r.drive_triple(0, 60, 0, 3.5, 0, 2, 0, "brake")
         r.slider.collect()

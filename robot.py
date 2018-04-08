@@ -120,7 +120,7 @@ class MySlider(LargeMotor):
         self.open(wait, 100, 9)
 
     def open_to_half(self):
-        self.run_to_rel_pos(position_sp=600, speed_sp=800, stop_action="brake")
+        self.run_to_rel_pos(position_sp=570, speed_sp=800, stop_action="brake")
         self.wait_while('running')
 
     def open_for_lifter(self, wait=True):
@@ -134,7 +134,7 @@ class MySlider(LargeMotor):
             self.wait_while('running')
 
     def open_for_base(self, wait=True):
-        self.run_to_rel_pos(position_sp=230, speed_sp=1000, stop_action="brake")
+        self.run_to_rel_pos(position_sp=190, speed_sp=1000, stop_action="brake")
         if wait:
             self.wait_while('running')
 
@@ -203,13 +203,13 @@ class RobotConstants:
 
     drive_kp = 4
     drive_ki = 0.01
-    drive_kd = 1.5
+    drive_kd = 2
 
     turn_kp = 1
     turn_ki = 0
     turn_kd = 0.5
 
-    lflw_kp = 1
+    lflw_kp = 1.5
     lflw_ki = 0
     lflw_kd = 1
 
@@ -347,9 +347,9 @@ class Robot:
         self.slider = MySlider(OUTPUT_A)
         self.lifter = MyLifter(OUTPUT_D)
 
-        self.col_l = MyColorSensorEV3(INPUT_1, 9, 87)
+        self.col_l = MyColorSensorEV3(INPUT_1, 7, 85)
         self.col_r = MyColorSensorEV3(INPUT_2, 4, 58)
-        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 32)
+        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 24)
         self.ht_side = MyColorSensorHT(INPUT_4)
 
         self._btn = Button()
@@ -416,6 +416,8 @@ class Robot:
 
             l_pos = self._lMot.position
             r_pos = self._rMot.position
+            r_pos = (self._rMot.position+r_pos)/2
+            l_pos = (self._lMot.position+l_pos)/2
 
             driven_distance = (r_pos + l_pos) / 2
             if self._util.distance_reached(driven_distance, distance, speed_start) or line_detected:
@@ -827,7 +829,7 @@ class Robot:
 
     def get_direction(self, speed, brake_action="run",
                       kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd,
-                      max_direction=5):
+                      max_direction=10):
 
         self._rMot.run_direct()
         self._lMot.run_direct()
@@ -881,10 +883,13 @@ class Robot:
         return min(max_direction, max(-max_direction, direction))
 
     def get_direction_drive(self, speed=60, end_speed=40,
-                            distance_constant=2.5, distance_deceleration=5, brake_action="run"):
+                            distance_constant=2.5, distance_deceleration=5, brake_action="run",
+                            max_direction=10):
         print("GET_DIRECTION_DRIVE")
 
-        direction = self.get_direction(speed)       # Calculate error
+        direction = self.get_direction(speed, "run",
+                                       RobotConstants.drive_kp, RobotConstants.drive_ki, RobotConstants.drive_kd,
+                                       max_direction)
 
         end_speed = math.copysign(end_speed, speed)
         distance_constant = self._util.distance_to_parallel_line(abs(distance_constant), direction)
