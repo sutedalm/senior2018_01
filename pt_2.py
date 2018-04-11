@@ -79,16 +79,16 @@ def run(r: Robot, speed_start=0):
         color = colors[2-i]     # LIFO
         r.slider.hold_closed()
         if position:
-            r.drive(speed_start, -80, 5, 0, "run", 50, 50)
+            r.drive(speed_start, -70, 5, 0, "run", 50, 50)
             speed_start = 0
             position = False
             if target_position(color):
-                direction = r.get_direction_drive(-80, -20, 3, 6, "brake")  # Calculate error
+                direction = r.get_direction_drive(-70, -20, 3, 6, "brake")  # Calculate error
                 r.turn(-direction)
                 i -= 1
             else:
                 # TODO: separate get_direction_drive in individual colors
-                direction = r.get_direction_drive(-80, -20, 4, 9, "brake")  # Calculate error
+                direction = r.get_direction_drive(-70, -20, 4, 9, "brake")  # Calculate error
                 if color is MyColor.GREEN:
                     r.turn(-90 - direction)
                     pick_up(r, i)
@@ -98,14 +98,14 @@ def run(r: Robot, speed_start=0):
                     pick_up(r, i)
                     r.turn(-90)
         else:
-            r.drive(0, 80, 3, 0, "run", 50, 50)
+            r.drive(0, 70, 3, 0, "run", 50, 50)
             position = True
             if not target_position(color):
-                direction = r.get_direction_drive(80, 20, 2, 5, "brake")  # Calculate error
+                direction = r.get_direction_drive(70, 20, 3, 6, "brake")  # Calculate error
                 r.turn(-direction)
                 i -= 1
             else:
-                direction = r.get_direction_drive(80, 20, 8.5, 10, "brake")  # Calculate error
+                direction = r.get_direction_drive(70, 20, 8.5, 10, "brake")  # Calculate error
                 if color is MyColor.RED:
                     r.turn(-90 - direction)
                     pick_up(r, i)
@@ -117,8 +117,8 @@ def run(r: Robot, speed_start=0):
         i += 1
 
     if position:
-        r.drive(speed_start, -80, 5, 0, "run", 50, 50)
-        direction = r.get_direction_drive(-80, -20, 3, 6, "brake")  # Calculate error
+        r.drive(speed_start, -70, 5, 0, "run", 50, 50)
+        direction = r.get_direction_drive(-70, -20, 3, 6, "brake")  # Calculate error
         r.turn(-direction)
 
     r.drive_triple(0, 100, 100, 5, 10, 10, 0, "run", 50, 50)

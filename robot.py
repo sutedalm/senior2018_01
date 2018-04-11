@@ -209,9 +209,9 @@ class RobotConstants:
     turn_ki = 0
     turn_kd = 0.5
 
-    lflw_kp = 1.5
+    lflw_kp = 1
     lflw_ki = 0
-    lflw_kd = 1
+    lflw_kd = 1.2
 
 
 class Utils:
@@ -282,11 +282,12 @@ class Utils:
         return integral, last_error, correction
 
     @staticmethod
-    def acceleration_speed_forward(driven_distance, distance, start_speed, max_speed, min_speed, k_acceleration):
+    def acceleration_speed_forward(driven_distance, distance, start_speed, max_speed, min_speed,
+                                   k_acceleration, k_deceleration=6):
         driven_distance = abs(driven_distance)
         distance = abs(distance)
         speed = k_acceleration * math.sqrt(max(0, driven_distance)) + start_speed
-        speed = min(speed, k_acceleration * math.sqrt(max(0, distance - driven_distance)), max_speed)
+        speed = min(speed, k_deceleration * math.sqrt(max(0, distance - driven_distance)), max_speed)
         speed = max(speed, min_speed)
         return speed
 
@@ -574,7 +575,7 @@ class Robot:
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
-    def turn(self, direction, min_speed=0, max_speed=100, k_acceleration=6,
+    def turn(self, direction, min_speed=0, max_speed=100, k_acceleration=6, k_deceleration=5,
              kp=RobotConstants.turn_kp, ki=RobotConstants.turn_ki, kd=RobotConstants.turn_kd):
         print("TURNING")
         print("dir: " + str(direction))
@@ -599,7 +600,7 @@ class Robot:
 
             driven_distance = abs(l_pos) + abs(r_pos)
             speed = self._util.acceleration_speed_forward(driven_distance, distance_degree, 0, max_speed,
-                                                          min_speed, k_acceleration)
+                                                          min_speed, k_acceleration, k_deceleration)
 
             error = abs(l_pos) - abs(r_pos)
             if direction < 0:
