@@ -38,7 +38,7 @@ class MyColorSensorHT(Sensor):
         self._max_val = max_val
         self.mode = 'ALL'
 
-    def get_color(self, iterations=200):
+    def get_color(self, iterations=10):
         if self.mode is not 'COLOR':
             self.mode = 'COLOR'
 
@@ -52,8 +52,8 @@ class MyColorSensorHT(Sensor):
                 return MyColor.YELLOW
             if col in {7, 8, 9, 10}:
                 return MyColor.RED
-            if col is 0:
-                return MyColor.NOCOLOR
+        if col is 0:
+            return MyColor.NOCOLOR
         return MyColor.ERROR
 
     def light_reflected(self):
@@ -111,10 +111,11 @@ class MySlider(LargeMotor):
     def hold_closed(self):
         self.run_direct(duty_cycle_sp=-40)
 
-    def collect(self):
+    def collect(self, wait=True):
         self.run_timed(time_sp=2000, speed_sp=-700, ramp_down_sp=1000)
-        self.wait_while('running')
-        self.hold_closed()
+        if wait:
+            self.wait_while('running')
+            self.hold_closed()
 
     def open_half_to_full(self, wait=True):
         self.open(wait, 100, 9)
@@ -211,7 +212,7 @@ class RobotConstants:
 
     lflw_kp = 1
     lflw_ki = 0
-    lflw_kd = 1.2
+    lflw_kd = 1
 
 
 class Utils:
@@ -575,7 +576,7 @@ class Robot:
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
-    def turn(self, direction, min_speed=0, max_speed=100, k_acceleration=6, k_deceleration=5,
+    def turn(self, direction, min_speed=0, max_speed=100, k_acceleration=5, k_deceleration=4,
              kp=RobotConstants.turn_kp, ki=RobotConstants.turn_ki, kd=RobotConstants.turn_kd):
         print("TURNING")
         print("dir: " + str(direction))
@@ -626,7 +627,7 @@ class Robot:
         self._rMot.position -= distance_degree / 2
         self._lMot.position += distance_degree / 2
 
-    def pivot(self, direction, forward=True, start_speed=0, min_speed=0, max_speed=100, k_acceleration=9):
+    def pivot(self, direction, forward=True, start_speed=0, min_speed=0, max_speed=100, k_acceleration=13):
         # print("PIVOTING")
         distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self._consts.motor_distance)
         driven_distance = 0
@@ -657,7 +658,7 @@ class Robot:
             while not self._util.distance_reached_bool(driven_distance, distance_degree, forward):
                 driven_distance = self._rMot.position
                 speed = self._util.acceleration_speed_forward(driven_distance, distance_degree, start_speed, max_speed,
-                                                              min_speed, k_acceleration)
+                                                              min_speed, k_acceleration, k_acceleration)
                 if not forward:
                     speed *= -1
                 self._rMot.duty_cycle_sp = speed

@@ -58,15 +58,14 @@ def run(r: Robot):
 
     # third container
     r.slider.open()
-    r.drive_triple(0, 100, 60, 6, 0, 4, 0)
-    r.drive(60, 0, 6, 0, "brake")
-    r.slider.collect()
-
+    r.drive_triple(0, 100, 60, 6, 3, 5, 0)
+    r.drive(60, 50, 6, 0, "brake")
+    r.slider.collect(True)
     iterator = set_color(r, iterator)
 
     if iterator <= 2:
         # forth container
-        r.drive_triple(0, 60, 0, 3.5, 0, 2, 0, "brake")
+        r.drive_triple(50, 50, 0, 3.5, 0, 2, 0, "brake")
         r.slider.open()
         r.drive_triple(0, 60, 0, 3.5, 0, 2, 0, "brake")
         r.slider.collect()

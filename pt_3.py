@@ -94,24 +94,24 @@ def scan_ships(r: Robot, speed_start=0):
 
     # Move to ship line
     r.slider.close(False)
-    r.drive(speed_start, 80, 5, 0, "run", 50, 50)
+    r.drive(speed_start, 60, 5, 0, "run", 50, 50)
 
-    direction = r.get_direction_drive(80, 0, 10, 5, "brake")
+    direction = r.get_direction_drive(60, 0, 10, 5, "brake")
     r.turn(-90 - direction)
 
     r.slider.hold_closed()
 
     # r.drive_triple(0, 100, 0, 5, 0, 5, 0, "brake")
-    r.drive(0, -100, 5, 0, "run", 50, 50)
+    r.drive(0, -70, 5, 0, "run", 50, 50)
 
-    direction = r.get_direction_drive(-100, 0, 0, 5, "brake")
+    direction = r.get_direction_drive(-70, 0, 0, 5, "brake")
     r.turn(-23 - direction)
 
     r.drive_triple(0, -100, 0, 5, 25, 5, -20, "brake")
 
     # Align to ship line
     offset = 50
-    speed_measure = 40
+    speed_measure = 100
     speed_maximum = 100
 
     r.line_follow(50, 60, 4, offset, "run", False, False, False, 2)
@@ -242,34 +242,31 @@ def drop_food(r: Robot, positions):
                     r.turn(-90 - direction)
                     r.drive_triple(0, 80, 0, 5, 8, 5, 0, "brake")
                 else:   # destination is 0
-                    direction = r.get_direction_drive(-80, -20, 14.5, 5, "brake")  # Calculate error
-                    r.pivot(-125 + direction, False)
-
-                    r.drive(0, 60, 7, -40)
+                    direction = r.get_direction_drive(-80, -20, 33.5, 5, "brake")  # Calculate error
+                    r.turn(105 - direction)
 
                     r.slider.open_for_ships(True)
-                    r.drive(60, 60, 20, -20, "run", 50, 50)
+                    r.drive_triple(0, 60, 60, 5, 5, 5, -30, "run", 50, 50)
 
-                    r.drive(60, 80, 2, -20)
+                    r.drive(60, 80, 2, -15)
                     r.slider.close(False)
-                    r.drive_triple(80, 80, 0, 5, 10, 5, -20, "brake")
+                    r.drive_triple(80, 80, 0, 5, 10, 5, 0, "brake")
                     r.slider.open_for_ships()
 
                     r.lifter.move_down()
 
-                    r.drive_triple(0, -80, -60, 5, 0, 4, -30, "run")
+                    r.drive_triple(0, -80, -60, 5, 0, 4, -20, "run")
 
                     r.slider.close(False)
 
                     r.col_l.set_inversed(True)
                     r.col_r.set_inversed(True)
-                    direction = r.get_direction_drive(-60, 0, 14, 5, "brake")
+                    direction = r.get_direction_drive(-60, 0, 2, 5, "brake")
                     r.col_l.set_inversed(False)
                     r.col_r.set_inversed(False)
 
-                    r.pivot(-90 - direction, True)
-                    r.drive_triple(0, 80, 0, 5, 11, 5, 0, "brake")
-
+                    r.turn(-90 - direction)
+                    r.drive_triple(0, 80, 0, 5, 20, 5, 0, "brake")
         else:
             r.drive(0, 80, 3, 0, "run", 50, 50)
             position = True
@@ -384,7 +381,7 @@ def run(r: Robot, speed_start=0):
     positions = get_positions(ships, container)
     # positions = [5, 0, 4]
     drop_food(r, positions)    # Add positions
-    go_home_bitch(r)
+    # go_home_bitch(r)
     # drop_off(r)
 
 
