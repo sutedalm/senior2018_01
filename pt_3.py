@@ -107,18 +107,18 @@ def scan_ships(r: Robot, speed_start=0):
     direction = r.get_direction_drive(-70, 0, 0, 5, "brake")
     r.turn(-23 - direction)
 
-    r.drive_triple(0, -100, 0, 5, 25, 5, -20, "brake")
+    r.drive_triple(0, -100, 0, 10, 20, 5, -20, "brake")
 
     # Align to ship line
-    offset = 50
+    offset = 60
     speed_measure = 100
     speed_maximum = 100
 
     r.line_follow(50, 60, 4, offset, "run", False, False, False, 2)
     r.line_follow(60,  70, 15, offset, "brake", False, False, True, 2)
     r.line_follow(70, 30, 11, offset, "brake", False, False, False, 2)
-    r.drive(0, -90, 15)
-    r.drive_color(-90, -20, 15, 0, "brake", False, True)
+    r.drive(0, -80, 15, -5)
+    r.drive_color(-80, -20, 15, -1, "brake", False, True)
 
     # Start ship scanning
 
@@ -146,7 +146,7 @@ def scan_ships(r: Robot, speed_start=0):
     # forth ship
     ships[3] = next_ship(r, offset, speed_measure, speed_maximum)
     # fifth ship
-    ships[4] = next_ship(r, offset, speed_measure, speed_maximum)
+    ships[4] = next_ship(r, offset, r.consts.drive_min_speed, speed_maximum)
     ships[5] = MyColor.NOCOLOR
 
     # Move to center
@@ -161,7 +161,7 @@ def scan_ships(r: Robot, speed_start=0):
 def drop_off(r: Robot, speed_end=-80):
     r.slider.stop(stop_action='brake')
     r.slider.close(False)
-    r.drive_triple(80, 80, 0, 5, 8, 5, 0, "brake")
+    r.drive_triple(80, 80, 0, 5, 7, 5, 0, "brake")
     time.sleep(0.5)
     r.slider.open_for_ships()
 
@@ -250,7 +250,7 @@ def drop_food(r: Robot, positions):
 
                     r.drive(60, 80, 2, -15)
                     r.slider.close(False)
-                    r.drive_triple(80, 80, 0, 5, 10, 5, 0, "brake")
+                    r.drive_triple(80, 80, 0, 5, 9, 5, 0, "brake")
                     r.slider.open_for_ships()
 
                     r.lifter.move_down()
@@ -326,7 +326,7 @@ def drop_food(r: Robot, positions):
 
                     r.drive(60, 80, 2, 25)
                     r.slider.close(False)
-                    r.drive_triple(80, 80, 0, 5, 10, 5, 20, "brake")
+                    r.drive_triple(80, 80, 0, 5, 9, 5, 20, "brake")
                     r.slider.open_for_ships()
 
                     r.lifter.move_down()
@@ -371,7 +371,7 @@ def go_home_bitch(r: Robot):
 
 
 def run(r: Robot, speed_start=0):
-    r.lifter.move_to_top_position()
+    r.lifter.move_to_top_position(False)
 
     ships = scan_ships(r, speed_start)
 

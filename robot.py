@@ -130,7 +130,7 @@ class MySlider(LargeMotor):
             self.wait_while('running')
 
     def open_for_ships(self, wait=True):
-        self.run_to_rel_pos(position_sp=250, speed_sp=1000, stop_action="brake")
+        self.run_to_rel_pos(position_sp=230, speed_sp=1000, stop_action="brake")
         if wait:
             self.wait_while('running')
 
@@ -341,8 +341,8 @@ class Utils:
 class Robot:
     def __init__(self):
         os.system('setfont Lat15-TerminusBold14')
-        self._consts = RobotConstants()
-        self._util = Utils(self._consts)
+        self.consts = RobotConstants()
+        self._util = Utils(self.consts)
 
         self._lMot = MyDrivingMotor(OUTPUT_B)
         self._rMot = MyDrivingMotor(OUTPUT_C)
@@ -351,7 +351,7 @@ class Robot:
 
         self.col_l = MyColorSensorEV3(INPUT_1, 7, 85)
         self.col_r = MyColorSensorEV3(INPUT_2, 4, 58)
-        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 24)
+        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 40)
         self.ht_side = MyColorSensorHT(INPUT_4)
 
         self._btn = Button()
@@ -395,7 +395,7 @@ class Robot:
         distance = abs(self._util.cm_to_deg(distance))
         # print("distance: " + str(distance))
 
-        min_speed = self._consts.drive_min_speed
+        min_speed = self.consts.drive_min_speed
         if speed_start is 0:
             speed_start = math.copysign(min_speed, speed)
 
@@ -481,7 +481,7 @@ class Robot:
         distance = abs(self._util.cm_to_deg(distance))
         # print("distance: " + str(distance))
 
-        min_speed = self._consts.drive_min_speed
+        min_speed = self.consts.drive_min_speed
         if speed_start is 0:
             speed_start = math.copysign(min_speed, speed)
 
@@ -580,14 +580,14 @@ class Robot:
              kp=RobotConstants.turn_kp, ki=RobotConstants.turn_ki, kd=RobotConstants.turn_kd):
         print("TURNING")
         print("dir: " + str(direction))
-        distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self._consts.motor_distance_turn)
+        distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self.consts.motor_distance_turn)
         driven_distance = 0
 
         min_speed = abs(min_speed)
         max_speed = abs(max_speed)
 
         if min_speed is 0:
-            min_speed = self._consts.turn_min_speed
+            min_speed = self.consts.turn_min_speed
 
         last_error = integral = 0
 
@@ -629,7 +629,7 @@ class Robot:
 
     def pivot(self, direction, forward=True, start_speed=0, min_speed=0, max_speed=100, k_acceleration=13):
         # print("PIVOTING")
-        distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self._consts.motor_distance)
+        distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self.consts.motor_distance)
         driven_distance = 0
 
         # calculate previous error
@@ -650,7 +650,7 @@ class Robot:
         max_speed = abs(max_speed)
 
         if min_speed is 0:
-            min_speed = self._consts.pivot_min_speed
+            min_speed = self.consts.pivot_min_speed
 
         if direction < 0:
             self._lMot.stop(stop_action="hold")
@@ -741,7 +741,7 @@ class Robot:
         distance = abs(self._util.cm_to_deg(distance))
         # print("distance: " + str(distance))
 
-        min_speed = self._consts.drive_min_speed
+        min_speed = self.consts.drive_min_speed
         if speed_start is 0:
             speed_start = math.copysign(min_speed, speed)
 
@@ -842,7 +842,7 @@ class Robot:
 
         l_distance = r_distance = 0
         l_triggered = r_triggered = False
-        trigger_value = self._consts.col_trigger_val
+        trigger_value = self.consts.col_trigger_val
 
         last_error = integral = 0
 
@@ -874,7 +874,7 @@ class Robot:
         if s <= 0:
             direction = 0
         else:
-            direction = 90-math.degrees(math.atan(self._util.cm_to_deg(self._consts.sensor_distance / s)))
+            direction = 90-math.degrees(math.atan(self._util.cm_to_deg(self.consts.sensor_distance / s)))
             if not l_distance < r_distance:
                 direction *= -1
             if speed < 0:
