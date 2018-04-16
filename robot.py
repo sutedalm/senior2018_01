@@ -351,7 +351,7 @@ class Robot:
 
         self.col_l = MyColorSensorEV3(INPUT_1, 7, 85)
         self.col_r = MyColorSensorEV3(INPUT_2, 4, 58)
-        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 40)
+        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 30)
         self.ht_side = MyColorSensorHT(INPUT_4)
 
         self._btn = Button()
@@ -796,7 +796,7 @@ class Robot:
                 offset - tolerance <= self.col_l.light_reflected() is self.col_r.light_reflected()
                 <= offset + tolerance):
                 # or (self._lMot.is_stalled and self._rMot.is_stalled)):
-            l_val =  self.col_l.light_reflected()
+            l_val = self.col_l.light_reflected()
             r_val = self.col_r.light_reflected()
             error_turn = r_val - l_val
             error_move = (r_val + l_val)/2 - offset
