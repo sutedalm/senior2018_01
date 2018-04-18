@@ -83,7 +83,7 @@ def next_ship(r: Robot, offset, speed_measure, speed_maximum):
     r.line_follow(speed_maximum, speed_measure, 6.8, offset, "run")
 
     color = r.ht_side.get_color()
-    print(color.to_text())
+    print(color.name)
     print(r.ht_side.value())
     return color
 
@@ -110,7 +110,7 @@ def scan_ships(r: Robot, speed_start=0):
     r.drive_triple(0, -100, 0, 10, 20, 5, -20, "brake")
 
     # Align to ship line
-    offset = 60
+    offset = 50
     speed_measure = 100
     speed_maximum = 100
 
@@ -126,7 +126,7 @@ def scan_ships(r: Robot, speed_start=0):
     r.line_follow(40, speed_measure, 5, offset, "run")
 
     color = r.ht_side.get_color()
-    print(color.to_text())
+    print(color.name)
     print(r.ht_side.value())
     ships[0] = color
 
@@ -139,7 +139,7 @@ def scan_ships(r: Robot, speed_start=0):
     # time.sleep(5)
 
     color = r.ht_side.get_color()
-    print(color.to_text())
+    print(color.name)
     print(r.ht_side.value())
     ships[2] = color
 

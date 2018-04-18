@@ -74,17 +74,7 @@ class MyColor(IntEnum):
     RED = 5
 
     def to_text(self):
-        if self is MyColor.NOCOLOR:
-            return 'no color'
-        if self is MyColor.BLUE:
-            return 'blue'
-        if self is MyColor.GREEN:
-            return 'green'
-        if self is MyColor.YELLOW:
-            return 'yellow'
-        if self is MyColor.RED:
-            return 'red'
-        return 'error'
+        return self.name
 
 
 class MySlider(LargeMotor):
@@ -121,7 +111,7 @@ class MySlider(LargeMotor):
         self.open(wait, 100, 9)
 
     def open_to_half(self):
-        self.run_to_rel_pos(position_sp=570, speed_sp=800, stop_action="brake")
+        self.run_to_rel_pos(position_sp=580, speed_sp=800, stop_action="brake")
         self.wait_while('running')
 
     def open_for_lifter(self, wait=True):
@@ -210,7 +200,7 @@ class RobotConstants:
     turn_ki = 0
     turn_kd = 0.5
 
-    lflw_kp = 1
+    lflw_kp = 1.1
     lflw_ki = 0
     lflw_kd = 1
 
@@ -351,7 +341,7 @@ class Robot:
 
         self.col_l = MyColorSensorEV3(INPUT_1, 7, 85)
         self.col_r = MyColorSensorEV3(INPUT_2, 4, 58)
-        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 30)
+        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 25)
         self.ht_side = MyColorSensorHT(INPUT_4)
 
         self._btn = Button()

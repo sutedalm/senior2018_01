@@ -11,7 +11,7 @@ import time
 
 def set_color(r: Robot, iterator):
     color = r.ht_middle.get_color()
-    print(color.to_text())
+    print(color.name)
     if color is not MyColor.NOCOLOR and color is not MyColor.ERROR:
         r.container_colors[iterator] = color
         iterator += 1
@@ -26,22 +26,20 @@ def run(r: Robot):
     r.lifter.move_to_top_position(False)
 
     # accelerate to first line
-    # r.slider.close(True, 100, 5)
     r.drive_triple(0, 100, 80, 10, 20, 5)
 
     # align while driving over first line
-    # r.align_driving(80, 100, 3, 7)
     r.slider.run_to_rel_pos(position_sp=200, speed_sp=1000, stop_action="brake")
     direction = r.get_direction_drive(80, 70, 0, 8, "run", 3)  # Calculate error
 
     # decelerate to first container
     r.slider.open_half_to_full(False)
     # r.drive_triple(80, 100, 100, 10, 5, 13)
-    r.drive(70, 100, 20)
+    r.drive(70, 100, 28)
     # r.drive_triple(100, 80, 20, 9, 2, 4, 0)
 
     # first container
-    r.drive_triple(100, 100, 40, 8, 3, 7, 0, "brake")
+    r.drive_triple(100, 100, 40, 0, 3, 7, 0, "brake")
     r.turn(-direction)
     r.slider.collect()
 

@@ -18,7 +18,7 @@ def target_position(color):
 def pick_up(robot: Robot, i):
     # robot.drive_triple(0, 50, 50, 4, 0, 0, 0, "brake", 50, 50)  # move to line
     robot.slider.open_for_lifter(False)
-    time.sleep(0.5)
+    time.sleep(0.3)
     robot.drive_triple(0, 60, 80, 40, 20, 20, 0, "run", 50, 50)  # move to line
 
     if i is 0:
@@ -84,12 +84,12 @@ def run(r: Robot, speed_start=0):
             speed_start = 0
             position = False
             if target_position(color):
-                direction = r.get_direction_drive(-70, -20, 3, 6, "brake")  # Calculate error
+                direction = r.get_direction_drive(-70, -50, 3, 6, "brake")  # Calculate error
                 r.turn(-direction)
                 i -= 1
             else:
                 # TODO: separate get_direction_drive in individual colors
-                direction = r.get_direction_drive(-70, -20, 4, 9, "brake")  # Calculate error
+                direction = r.get_direction_drive(-70, -50, 4, 9, "brake")  # Calculate error
                 if color is MyColor.GREEN:
                     r.turn(-90 - direction)
                     pick_up(r, i)
@@ -102,11 +102,11 @@ def run(r: Robot, speed_start=0):
             r.drive(0, 70, 3, 0, "run", 50, 50)
             position = True
             if not target_position(color):
-                direction = r.get_direction_drive(70, 20, 3, 6, "brake")  # Calculate error
+                direction = r.get_direction_drive(70, 50, 3, 6, "brake")  # Calculate error
                 r.turn(-direction)
                 i -= 1
             else:
-                direction = r.get_direction_drive(70, 20, 8.5, 10, "brake")  # Calculate error
+                direction = r.get_direction_drive(70, 50, 8.5, 10, "brake")  # Calculate error
                 if color is MyColor.RED:
                     r.turn(-90 - direction)
                     pick_up(r, i)
