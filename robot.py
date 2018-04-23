@@ -185,10 +185,9 @@ class MyDrivingMotor(LargeMotor):
 class RobotConstants:
     tyre_size = 6.24                        # Durchmesser des Reifens in cm
     motor_distance = 19.38                  # Abstand der Rädermittelpunkte in cm
-    motor_distance_turn = 19.9
+    motor_distance_turn = 19.75
     sensor_distance = 14.5
     pivot_min_speed = 30
-    turn_min_speed = 50
     drive_min_speed = 50
     col_trigger_val = 50
 
@@ -566,18 +565,15 @@ class Robot:
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
-    def turn(self, direction, min_speed=0, max_speed=100, k_acceleration=5, k_deceleration=4,
+    def turn(self, direction, start_speed=50, end_speed=30, max_speed=100, k_acceleration=5, k_deceleration=3.5,
              kp=RobotConstants.turn_kp, ki=RobotConstants.turn_ki, kd=RobotConstants.turn_kd):
         print("TURNING")
         print("dir: " + str(direction))
         distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self.consts.motor_distance_turn)
         driven_distance = 0
 
-        min_speed = abs(min_speed)
+        end_speed = abs(end_speed)
         max_speed = abs(max_speed)
-
-        if min_speed is 0:
-            min_speed = self.consts.turn_min_speed
 
         last_error = integral = 0
 
@@ -590,8 +586,8 @@ class Robot:
             r_pos = self._rMot.position
 
             driven_distance = abs(l_pos) + abs(r_pos)
-            speed = self._util.acceleration_speed_forward(driven_distance, distance_degree, 0, max_speed,
-                                                          min_speed, k_acceleration, k_deceleration)
+            speed = self._util.acceleration_speed_forward(driven_distance, distance_degree, start_speed, max_speed,
+                                                          end_speed, k_acceleration, k_deceleration)
 
             error = abs(l_pos) - abs(r_pos)
             if direction < 0:
@@ -606,7 +602,7 @@ class Robot:
 
             if self._rMot.is_stalled or self._lMot.is_stalled:
                 self.beep()
-                min_speed += 5
+                end_speed += 5
 
         self._lMot.stop(stop_action="brake")
         self._rMot.stop(stop_action="brake")

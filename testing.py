@@ -18,7 +18,8 @@ def main():
     try:
         print("TESTING")
         r.beep(True)
-        time.sleep(2)
+        r.slider.run_to_rel_pos(position_sp=200, speed_sp=1000, stop_action="brake")
+        # time.sleep(2)
 
         # r.drive_triple(0, 50, 0, 10, 10, 10, 0, "brake")
         # r.drive_triple(0, 50, 0, 10, 10, 10, 0, "brake")
@@ -109,11 +110,11 @@ def main():
         # r.ht_middle.mode = 'WHITE'
         # while True:
         #     print(str(r.ht_middle.value()) + ' ' + str(r.ht_middle.light_reflected()))
-        while True:
-            r.beep(True)
-            r.wait_until_button()
-            r.slider.close(True, 100, 5)
-            r.slider.open_for_ships()
+        # while True:
+        #     r.beep(True)
+        #     r.wait_until_button()
+        #     r.slider.close(True, 100, 5)
+        #     r.slider.open_for_ships()
     finally:
         print("RESET")
         r.reset()
