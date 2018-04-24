@@ -111,7 +111,7 @@ class MySlider(LargeMotor):
         self.open(wait, 100, 9)
 
     def open_to_half(self):
-        self.run_to_rel_pos(position_sp=580, speed_sp=800, stop_action="brake")
+        self.run_to_rel_pos(position_sp=620, speed_sp=800, stop_action="brake")
         self.wait_while('running')
 
     def open_for_lifter(self, wait=True):
@@ -147,7 +147,7 @@ class MyLifter(MediumMotor):
         self.lifter_position = MyLifterPosition.FIRST
 
     def move_up(self, wait=True):
-        self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=300,
+        self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=250,
                             ramp_up_sp=1000, ramp_down_sp=1000, stop_action='hold')
         if wait:
             self.wait_while('running')
@@ -565,7 +565,7 @@ class Robot:
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
-    def turn(self, direction, start_speed=50, end_speed=30, max_speed=100, k_acceleration=5, k_deceleration=3.5,
+    def turn(self, direction, start_speed=40, end_speed=40, max_speed=100, k_acceleration=5, k_deceleration=4,
              kp=RobotConstants.turn_kp, ki=RobotConstants.turn_ki, kd=RobotConstants.turn_kd):
         print("TURNING")
         print("dir: " + str(direction))

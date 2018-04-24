@@ -47,12 +47,13 @@ def run(r: Robot):
 
     # second container
     r.slider.open()
-    r.drive_triple(0, 70, 0, 4, 1, 4, 0, "brake")
+    r.drive_triple(0, 80, 0, 4.5, 0, 4.5, 0, "brake")
     r.slider.collect()
 
     iterator = set_color(r, iterator)
 
-    r.drive_triple(0, 100, 0, 4, 0, 4, 0, "brake")
+    # move to third container
+    r.drive_triple(0, 100, 0, 3.5, 0, 3.5, 0, "brake")
 
     # third container
     r.slider.open()
@@ -65,7 +66,7 @@ def run(r: Robot):
         # forth container
         r.drive_triple(50, 50, 0, 3.5, 0, 2, 0, "brake")
         r.slider.open()
-        r.drive_triple(0, 60, 0, 4, 0, 3, 0, "brake")
+        r.drive_triple(0, 60, 0, 4, 0, 4, 0, "brake")
         r.slider.collect()
 
         set_color(r, iterator)

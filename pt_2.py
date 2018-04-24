@@ -19,54 +19,56 @@ def pick_up(robot: Robot, i):
     # robot.drive_triple(0, 50, 50, 4, 0, 0, 0, "brake", 50, 50)  # move to line
     robot.slider.open_for_lifter(False)
     time.sleep(0.3)
-    robot.drive_triple(0, 60, 80, 40, 20, 20, 0, "run", 50, 50)  # move to line
+    robot.drive(0, 80, 10, 0, "run", 50, 50)
+    robot.lifter.move_up(False)
+    robot.drive(80, 80, 40, 0, "run", 50, 50)
+    # robot.drive_triple(0, 60, 80, 40, 20, 20, 0, "run", 50, 50)  # move to line
 
     if i is 0:
-        robot.lifter.move_up(False)
+        robot.slider.close(False)
+
         robot.drive(80, 0, 5, 0, "brake")
 
         # time.sleep(0.5)
+        robot.slider.wait_while('running')
+        robot.slider.hold_closed()
 
-        robot.slider.close()
-
-        robot.drive_triple(0, -80, -100, 5, 10, 10, 0, "run", 50, 50)    # Move to line
+        robot.drive_triple(0, -100, -100, 5, 10, 10, 0, "run", 50, 50)    # Move to line
         robot.drive(-100, 0, 11, 0, "brake")
 
-        # robot.reset_motor_pos()
         robot.drive_triple(0, 70, 0, 3, 0, 2, 0, "brake")
 
         robot.slider.open_to_half()
-        robot.drive_triple(0, -80, 0, 7, 7, 2, 0, "brake")
+        robot.drive_triple(0, -100, 0, 7, 7, 2, 0, "brake")
     elif i is 1:
-        robot.lifter.move_up(False)
+        robot.slider.close(False)
+
         robot.drive(80, 0, 7.5, 0, "brake")
+
+        robot.slider.wait_while('running')
+        robot.slider.hold_closed()
 
         # time.sleep(0.5)
 
-        robot.slider.close()
-
-        # robot.reset_motor_pos()
         robot.drive_triple(0, -80, 0, 3.5, 0, 2, 0, "brake", 50, 50)
 
         robot.slider.open_to_half()
-        robot.drive_triple(0, -80, 0, 5, 14, 5, 0, "brake")
+        robot.drive_triple(0, -100, 0, 5, 14, 5, 0, "brake")
     elif i is 2:
-        # robot.slider.close(False, 20, 1)
+        robot.slider.close(False)
 
-        robot.lifter.move_up(False)
         robot.drive(80, 0, 9, 0, "brake")
         # time.sleep(0.5)
+        robot.slider.wait_while('running')
+        robot.slider.hold_closed()
 
-        robot.slider.close()
-
-        # robot.reset_motor_pos()
         robot.drive_triple(0, -80, 0, 4, 0, 3, 0, "brake")
 
         robot.slider.open_to_half()
-        robot.drive_triple(0, -80, 0, 5, 14, 5, 0, "brake")
+        robot.drive_triple(0, -100, 0, 5, 14, 5, 0, "brake")
 
     robot.slider.close(False)
-    time.sleep(0.5)
+    time.sleep(0.6)
 
 
 def run(r: Robot, speed_start=0):
