@@ -16,7 +16,11 @@ class MyColorSensorEV3(ColorSensor):
     def light_reflected(self):
         # MODE HAS TO BE SET TO 'COL-REFLECT' !!!
 
-        val = self.value()/(self._max_val-self._min_val) * 100
+        value = self.value()
+        self._min_val = min(self._min_val, value)
+        self._max_val = max(self._max_val, value)
+
+        val = value/(self._max_val-self._min_val) * 100
         val = min(100, val)
         val = max(0, val)
 
@@ -59,7 +63,12 @@ class MyColorSensorHT(Sensor):
     def light_reflected(self):
         if self.mode is not 'WHITE':
             self.mode = 'WHITE'
-        val = self.value()/(self._max_val-self._min_val) * 100
+
+        value = self.value()
+        self._min_val = min(self._min_val, value)
+        self._max_val = max(self._max_val, value)
+
+        val = value/(self._max_val-self._min_val) * 100
         val = min(100, val)
         val = max(0, val)
         return val
@@ -147,7 +156,7 @@ class MyLifter(MediumMotor):
         self.lifter_position = MyLifterPosition.FIRST
 
     def move_up(self, wait=True):
-        self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=250,
+        self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=230,
                             ramp_up_sp=1000, ramp_down_sp=1000, stop_action='hold')
         if wait:
             self.wait_while('running')
@@ -338,9 +347,12 @@ class Robot:
         self.slider = MySlider(OUTPUT_A)
         self.lifter = MyLifter(OUTPUT_D)
 
-        self.col_l = MyColorSensorEV3(INPUT_1, 7, 85)
-        self.col_r = MyColorSensorEV3(INPUT_2, 4, 58)
-        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 25)
+        self.col_l = MyColorSensorEV3(INPUT_1, 8, 75)
+        self.col_r = MyColorSensorEV3(INPUT_2, 3, 45)
+        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 30)
+        # self.col_l = MyColorSensorEV3(INPUT_1, 7, 85)
+        # self.col_r = MyColorSensorEV3(INPUT_2, 4, 58)
+        # self.ht_middle = MyColorSensorHT(INPUT_3, 0, 25)
         self.ht_side = MyColorSensorHT(INPUT_4)
 
         self._btn = Button()
@@ -565,7 +577,7 @@ class Robot:
             self._lMot.stop(stop_action=action)
             self._rMot.stop(stop_action=action)
 
-    def turn(self, direction, start_speed=40, end_speed=40, max_speed=100, k_acceleration=5, k_deceleration=4,
+    def turn(self, direction, start_speed=40, end_speed=40, max_speed=100, k_acceleration=5, k_deceleration=5,
              kp=RobotConstants.turn_kp, ki=RobotConstants.turn_ki, kd=RobotConstants.turn_kd):
         print("TURNING")
         print("dir: " + str(direction))

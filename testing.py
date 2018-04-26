@@ -18,7 +18,9 @@ def main():
     try:
         print("TESTING")
         r.beep(True)
-        r.slider.run_to_rel_pos(position_sp=200, speed_sp=1000, stop_action="brake")
+        while True:
+            print("left: " + str(r.col_l.light_reflected()) + "right: " + str(r.col_r.light_reflected()))
+
         # time.sleep(2)
 
         # r.drive_triple(0, 50, 0, 10, 10, 10, 0, "brake")
