@@ -96,7 +96,7 @@ def scan_ships(r: Robot, speed_start=0):
     r.slider.close(False)
     r.drive(speed_start, 60, 5, 0, "run", 50, 50)
 
-    direction = r.get_direction_drive(60, 0, 10, 5, "brake")
+    direction = r.get_direction_drive(60, 0, 11, 5, "brake")
     r.turn(-90 - direction)
 
     r.slider.hold_closed()

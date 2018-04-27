@@ -19,11 +19,14 @@ def pick_up(robot: Robot, i):
     # robot.drive_triple(0, 50, 50, 4, 0, 0, 0, "brake", 50, 50)  # move to line
     robot.slider.open_for_lifter(False)
     time.sleep(0.3)
-    line_detected = robot.drive(0, 80, 5, 0, "run", 50, 50)
+    line_detected = robot.drive(0, 80, 8, 0, "run", 50, 50)
     robot.lifter.move_up(False)
+
     if not line_detected:
-        line_detected = robot.drive(80, 80, 3, 0, "run", 50, 50)
+        line_detected = robot.drive(80, 80, 1, 0, "run", 50, 50)
+
     robot.slider.close(False, 100, 11)
+
     if not line_detected:
         robot.drive(80, 80, 40, 0, "run", 50, 50)
 
@@ -49,7 +52,7 @@ def pick_up(robot: Robot, i):
 
         # time.sleep(0.5)
 
-        robot.drive_triple(0, -80, 0, 3.5, 0, 2, 0, "brake", 50, 50)
+        robot.drive_triple(0, -80, 0, 3, 0, 3, 0, "brake", 50, 50)
 
         robot.slider.open_to_half()
         robot.drive_triple(0, -100, 0, 5, 14, 5, 0, "brake")
@@ -59,7 +62,7 @@ def pick_up(robot: Robot, i):
         robot.slider.wait_while('running')
         robot.slider.hold_closed()
 
-        robot.drive_triple(0, -80, 0, 4, 0, 3, 0, "brake")
+        robot.drive_triple(0, -80, 0, 4, 0, 3.5, 0, "brake")
 
         robot.slider.open_to_half()
         robot.drive_triple(0, -100, 0, 5, 14, 5, 0, "brake")
@@ -83,12 +86,14 @@ def run(r: Robot, speed_start=0):
             speed_start = 0
             position = False
             if target_position(color):
-                direction = r.get_direction_drive(-70, -50, 3, 6, "brake")  # Calculate error
+                direction = r.get_direction_drive(-70, -50, 3, 4, "brake")  # Calculate error
                 r.turn(-direction)
                 i -= 1
             else:
                 # TODO: separate get_direction_drive in individual colors
-                direction = r.get_direction_drive(-70, -50, 4, 9, "brake")  # Calculate error
+                # direction = r.get_direction_drive(-70, -50, 4, 9, "brake")  # Calculate error
+                direction = r.get_direction_drive(-70, -100, 0, 4)  # Calculate error
+                r.drive_triple(-100, -100, -50, 2, 0, 7, 0, "brake")
                 if color is MyColor.GREEN:
                     r.turn(-90 - direction)
                     pick_up(r, i)
@@ -105,7 +110,9 @@ def run(r: Robot, speed_start=0):
                 r.turn(-direction)
                 i -= 1
             else:
-                direction = r.get_direction_drive(70, 50, 8.5, 10, "brake")  # Calculate error
+                # direction = r.get_direction_drive(70, 50, 8.5, 10, "brake")  # Calculate error
+                direction = r.get_direction_drive(70, 100, 0, 4, "brake")  # Calculate error
+                r.drive_triple(100, 100, 50, 2, 5.5, 7, 0, "brake")
                 if color is MyColor.RED:
                     r.turn(-90 - direction)
                     pick_up(r, i)
@@ -121,6 +128,8 @@ def run(r: Robot, speed_start=0):
         direction = r.get_direction_drive(-70, -20, 3, 6, "brake")  # Calculate error
         r.turn(-direction)
 
+
+def transition(r: Robot):
     r.drive_triple(0, 100, 100, 5, 10, 10, 0, "run", 50, 50)
     # r.align_driving(80, 100, 0, 7)
     r.drive(100, 100, 45, -15)

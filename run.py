@@ -21,7 +21,10 @@ def main():
         r.reset()
 
         pt_1.run(r)
+
         pt_2.run(r, -80)
+        pt_2.transition(r)
+
         pt_3.run(r, 100)
     finally:
         print("RESET")

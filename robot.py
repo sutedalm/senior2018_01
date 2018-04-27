@@ -200,15 +200,15 @@ class RobotConstants:
     drive_min_speed = 50
     col_trigger_val = 50
 
-    drive_kp = 4
-    drive_ki = 0.01
+    drive_kp = 5
+    drive_ki = 0.02
     drive_kd = 2
 
     turn_kp = 1
     turn_ki = 0
     turn_kd = 0.5
 
-    lflw_kp = 1.1
+    lflw_kp = 1
     lflw_ki = 0
     lflw_kd = 1
 
