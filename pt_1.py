@@ -77,10 +77,10 @@ def run(r: Robot):
 
         set_color(r, iterator)
 
-        r.lifter.move_to_first_position(False)
+        r.lifter.move_to_bottom_position(False)
         r.drive_triple(0, -100, -80, 21, 50, 5)
     else:
-        r.lifter.move_to_first_position(False)
+        r.lifter.move_to_bottom_position(False)
         r.drive_triple(0, -100, -80, 15, 50, 5)
 
 

@@ -17,15 +17,19 @@ def target_position(color):
 
 def pick_up(robot: Robot, i):
     # robot.drive_triple(0, 50, 50, 4, 0, 0, 0, "brake", 50, 50)  # move to line
-    robot.slider.open_for_lifter(False)
-    time.sleep(0.3)
+    robot.slider.run_to_abs_pos(position_sp=260, speed_sp=1000, stop_action="brake")
+
+    while robot.slider.position < 10:
+        time.sleep(0.01)
+    # time.sleep(0.3)
     line_detected = robot.drive(0, 80, 8, 0, "run", 50, 50)
     robot.lifter.move_up(False)
 
     if not line_detected:
         line_detected = robot.drive(80, 80, 1, 0, "run", 50, 50)
 
-    robot.slider.close(False, 100, 11)
+    robot.slider.run_to_abs_pos(position_sp=0, speed_sp=1000, stop_action="brake")
+    # robot.slider.close(False, 100, 11)
 
     if not line_detected:
         robot.drive(80, 80, 40, 0, "run", 50, 50)
@@ -34,20 +38,20 @@ def pick_up(robot: Robot, i):
         robot.drive(80, 0, 5, 0, "brake")
 
         # time.sleep(0.5)
-        robot.slider.wait_while('running')
+        robot.slider.wait_while('running', 6000)
         robot.slider.hold_closed()
 
         robot.drive_triple(0, -100, -100, 5, 10, 10, 0, "run", 50, 50)    # Move to line
         robot.drive(-100, 0, 11, 0, "brake")
 
-        robot.drive_triple(0, 70, 0, 3, 0, 2, 0, "brake")
+        robot.drive_triple(0, 70, 0, 3, 0, 2.5, 0, "brake")
 
         robot.slider.open_to_half()
         robot.drive_triple(0, -100, 0, 7, 7, 2, 0, "brake")
     elif i is 1:
         robot.drive(80, 0, 7.5, 0, "brake")
 
-        robot.slider.wait_while('running')
+        robot.slider.wait_while('running', 6000)
         robot.slider.hold_closed()
 
         # time.sleep(0.5)
@@ -58,8 +62,8 @@ def pick_up(robot: Robot, i):
         robot.drive_triple(0, -100, 0, 5, 14, 5, 0, "brake")
     elif i is 2:
         robot.drive(80, 0, 9, 0, "brake")
-        # time.sleep(0.5)
-        robot.slider.wait_while('running')
+
+        robot.slider.wait_while('running', 6000)
         robot.slider.hold_closed()
 
         robot.drive_triple(0, -80, 0, 4, 0, 3.5, 0, "brake")
@@ -67,7 +71,7 @@ def pick_up(robot: Robot, i):
         robot.slider.open_to_half()
         robot.drive_triple(0, -100, 0, 5, 14, 5, 0, "brake")
 
-    robot.slider.close(False)
+    robot.slider.run_timed(time_sp=1300, speed_sp=-1000)
     time.sleep(0.6)
 
 
@@ -90,10 +94,13 @@ def run(r: Robot, speed_start=0):
                 r.turn(-direction)
                 i -= 1
             else:
-                # TODO: separate get_direction_drive in individual colors
                 # direction = r.get_direction_drive(-70, -50, 4, 9, "brake")  # Calculate error
                 direction = r.get_direction_drive(-70, -100, 0, 4)  # Calculate error
                 r.drive_triple(-100, -100, -50, 2, 0, 7, 0, "brake")
+
+                r.slider.position = 0
+                r.slider.run_forever(speed_sp=100)
+
                 if color is MyColor.GREEN:
                     r.turn(-90 - direction)
                     pick_up(r, i)
@@ -113,6 +120,10 @@ def run(r: Robot, speed_start=0):
                 # direction = r.get_direction_drive(70, 50, 8.5, 10, "brake")  # Calculate error
                 direction = r.get_direction_drive(70, 100, 0, 4, "brake")  # Calculate error
                 r.drive_triple(100, 100, 50, 2, 5.5, 7, 0, "brake")
+
+                r.slider.position = 0
+                r.slider.run_forever(speed_sp=100)
+
                 if color is MyColor.RED:
                     r.turn(-90 - direction)
                     pick_up(r, i)

@@ -120,13 +120,8 @@ class MySlider(LargeMotor):
         self.open(wait, 100, 9)
 
     def open_to_half(self):
-        self.run_to_rel_pos(position_sp=620, speed_sp=800, stop_action="brake")
+        self.run_to_rel_pos(position_sp=620, speed_sp=1000, stop_action="brake")
         self.wait_while('running')
-
-    def open_for_lifter(self, wait=True):
-        self.run_to_rel_pos(position_sp=260, speed_sp=1000, stop_action="brake")
-        if wait:
-            self.wait_while('running')
 
     def open_for_ships(self, wait=True):
         self.run_to_rel_pos(position_sp=230, speed_sp=1000, stop_action="brake")
@@ -140,10 +135,10 @@ class MySlider(LargeMotor):
 
 
 class MyLifterPosition(IntEnum):
+    BOTTOM = 0
     FIRST = 1
     SECOND = 2
     THIRD = 3
-    TOP = 4
 
 
 class MyLifter(MediumMotor):
@@ -153,27 +148,35 @@ class MyLifter(MediumMotor):
         MediumMotor.__init__(self, port)
         assert self.connected
         self.reset()
-        self.lifter_position = MyLifterPosition.FIRST
+        self.lifter_position = MyLifterPosition.BOTTOM
 
     def move_up(self, wait=True):
-        self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=230,
-                            ramp_up_sp=1000, ramp_down_sp=1000, stop_action='hold')
+        # self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=250,
+        #                     ramp_up_sp=1000, ramp_down_sp=1000, stop_action='hold')
+        self.lifter_position += 1
+        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=350,
+                            stop_action='hold')
         if wait:
             self.wait_while('running')
-        self.lifter_position += 1
+        # self.lifter_position += 1
 
     def move_down(self, wait=True):
-        self.run_to_abs_pos(position_sp=self.position + self.position_difference, speed_sp=200, stop_action='hold')
+        # self.run_to_abs_pos(position_sp=self.position + self.position_difference, speed_sp=200, stop_action='hold')
+        self.lifter_position -= 1
+        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=200,
+                            stop_action='hold')
         if wait:
             self.wait_while('running')
-        self.lifter_position -= 1
+        # self.lifter_position -= 1
 
-    def move_to_first_position(self, wait=True):
+    def move_to_bottom_position(self, wait=True):
+        self.lifter_position = MyLifterPosition.BOTTOM
         self.run_to_abs_pos(position_sp=0, speed_sp=1000, stop_action='hold')
         if wait:
             self.wait_while('running')
 
     def move_to_top_position(self, wait=True):
+        self.lifter_position = MyLifterPosition.THIRD
         self.run_to_abs_pos(position_sp=-3*self.position_difference, speed_sp=1000, stop_action='hold')
         if wait:
             self.wait_while('running')
