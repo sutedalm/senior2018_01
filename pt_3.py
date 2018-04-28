@@ -218,7 +218,7 @@ def drop_food(r: Robot, positions):
                     r.col_r.set_inversed(True)
                     r.drive(-80, -80, 7, 0, "run", -1, 50)
                     r.col_r.set_inversed(False)
-                    r.drive(-80, 0, 8, 0, "brake")
+                    r.drive(-80, 0, 7, 0, "brake")
                     r.turn(-90)
                 elif destination is 1:
                     direction = r.get_direction_drive(-80, -20, 19, 5, "brake")  # Calculate error
@@ -291,7 +291,7 @@ def drop_food(r: Robot, positions):
                     r.col_l.set_inversed(True)
                     r.drive(-80, -80, 7, 0, "run", 50, -1)
                     r.col_l.set_inversed(False)
-                    r.drive(-80, 0, 8, 0, "brake")
+                    r.drive(-80, 0, 7, 0, "brake")
                     r.turn(-90)
                 elif destination is 4:
                     direction = r.get_direction_drive(80, 20, 24, 5, "brake")  # Calculate error
