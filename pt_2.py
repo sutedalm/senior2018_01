@@ -26,7 +26,7 @@ def pick_up(robot: Robot, i):
     robot.lifter.move_up(False)
 
     if not line_detected:
-        line_detected = robot.drive(80, 80, 1, 0, "run", 50, 50)
+        line_detected = robot.drive(80, 80, 4, 0, "run", 50, 50)
 
     robot.slider.run_to_abs_pos(position_sp=0, speed_sp=1000, stop_action="brake")
     # robot.slider.close(False, 100, 11)
@@ -71,8 +71,10 @@ def pick_up(robot: Robot, i):
         robot.slider.open_to_half()
         robot.drive_triple(0, -100, 0, 5, 14, 5, 0, "brake")
 
+    position = robot.slider.position
     robot.slider.run_timed(time_sp=1300, speed_sp=-1000)
-    time.sleep(0.6)
+    while robot.slider.position >= position - 400:
+        time.sleep(0.01)
 
 
 def run(r: Robot, speed_start=0):

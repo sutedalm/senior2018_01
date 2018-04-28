@@ -120,7 +120,8 @@ class MySlider(LargeMotor):
         self.open(wait, 100, 9)
 
     def open_to_half(self):
-        self.run_to_rel_pos(position_sp=620, speed_sp=1000, stop_action="brake")
+        self.position = 0
+        self.run_to_abs_pos(position_sp=620, speed_sp=1000, stop_action="brake")
         self.wait_while('running')
 
     def open_for_ships(self, wait=True):
@@ -154,7 +155,7 @@ class MyLifter(MediumMotor):
         # self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=250,
         #                     ramp_up_sp=1000, ramp_down_sp=1000, stop_action='hold')
         self.lifter_position += 1
-        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=350,
+        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=250,
                             stop_action='hold')
         if wait:
             self.wait_while('running')
