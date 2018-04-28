@@ -88,6 +88,8 @@ if __name__ == "__main__":
     rob = Robot()
     try:
         print("PART 1")
+        rob.ht_middle.mode = 'COLOR'
+        rob.beep()
         run(rob)
     finally:
         print("RESET")
