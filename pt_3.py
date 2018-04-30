@@ -90,6 +90,7 @@ def next_ship(r: Robot, offset, speed_measure, speed_maximum):
 
 def scan_ships(r: Robot, speed_start=0):
     r.ht_side.mode = 'COLOR'
+    r.ht_middle.mode = 'WHITE'
     ships = [MyColor.NOCOLOR, MyColor.NOCOLOR, MyColor.NOCOLOR, MyColor.NOCOLOR, MyColor.NOCOLOR, MyColor.NOCOLOR]
 
     # Move to ship line

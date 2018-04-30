@@ -353,7 +353,7 @@ class Robot:
 
         self.col_l = MyColorSensorEV3(INPUT_1, 8, 75)
         self.col_r = MyColorSensorEV3(INPUT_2, 3, 45)
-        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 30)
+        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 20)
         # self.col_l = MyColorSensorEV3(INPUT_1, 7, 85)
         # self.col_r = MyColorSensorEV3(INPUT_2, 4, 58)
         # self.ht_middle = MyColorSensorHT(INPUT_3, 0, 25)

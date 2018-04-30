@@ -22,7 +22,8 @@ def pick_up(robot: Robot, i):
     while robot.slider.position < 10:
         time.sleep(0.01)
     # time.sleep(0.3)
-    line_detected = robot.drive(0, 80, 9, 0, "run", 50, 50)
+    line_detected = robot.drive_triple(0, 80, 80, 4, 6, 0, 0, "run", 50, 50)
+    # line_detected = robot.drive(0, 80, 10, 0, "run", 50, 50)
     robot.lifter.move_up(False)
 
     if not line_detected:
