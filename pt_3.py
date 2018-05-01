@@ -382,7 +382,6 @@ def run(r: Robot, speed_start=0):
     positions = get_positions(ships, container)
     # positions = [5, 0, 4]
     drop_food(r, positions)    # Add positions
-    go_home_bitch(r)
     # drop_off(r)
 
 

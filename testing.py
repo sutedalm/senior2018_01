@@ -2,7 +2,7 @@
 
 from robot import Robot
 import time
-
+import  pt_3
 
 def festhalte_test(r: Robot):
         r.slider.close()
@@ -16,11 +16,13 @@ def festhalte_test(r: Robot):
 def main():
     r = Robot()
     try:
-        print("TESTING")
-        r.beep(True)
-        while True:
-            print("left: " + str(r.col_l.light_reflected()) + "right: " + str(r.col_r.light_reflected()))
-
+        # print("TESTING")
+        # r.beep(True)
+        # while True:
+        #     print("left: " + str(r.col_l.light_reflected()) + "right: " + str(r.col_r.light_reflected()))
+        r.lifter.move_to_top_position()
+        positions = [0, 0, 0]
+        pt_3.drop_food(r, positions)
         # time.sleep(2)
 
         # r.drive_triple(0, 50, 0, 10, 10, 10, 0, "brake")
