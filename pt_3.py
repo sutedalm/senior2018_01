@@ -88,6 +88,157 @@ def next_ship(r: Robot, offset, speed_measure, speed_maximum):
     return color
 
 
+def drop_0(r: Robot):
+    direction = r.get_direction_drive(-80, 0, 0, 5, "brake")  # Calculate error
+    r.turn(-direction)
+    r.drive_triple(0, -100, 0, 5, 23.5, 5, 0, "brake")
+
+    r.turn(105)
+
+    r.slider.open_for_ships(True)
+    r.drive_triple(0, 60, 60, 5, 5, 5, -30, "run", 50, 50)
+
+    r.drive(60, 80, 2, -15)
+    r.slider.close(False)
+    r.drive_triple(80, 80, 0, 5, 9, 5, 0, "brake")
+    r.slider.open_for_ships()
+
+    r.lifter.move_down()
+
+    r.drive_triple(0, -80, -60, 5, 0, 4, -20, "run")
+
+    r.slider.close(False)
+
+    r.col_l.set_inversed(True)
+    r.col_r.set_inversed(True)
+    direction = r.get_direction_drive(-60, 0, 2, 5, "brake")
+    r.col_l.set_inversed(False)
+    r.col_r.set_inversed(False)
+
+    r.turn(-90 - direction)
+    r.drive_triple(0, 100, 80, 5, 17, 5, 0, "run", 50, 50)
+    # r.drive_triple(0, 80, 0, 5, 20, 5, 0, "brake")
+
+
+def drop_1(r: Robot):
+    direction = r.get_direction_drive(-80, -100, 0, 5)  # Calculate error
+    r.drive_triple(-100, -100, 0, 0, 14, 5, 0, "brake")
+
+    r.turn(90 - direction)
+
+    r.slider.open_for_ships(True)
+
+    r.drive(0, 60, 10, 0, "run", 50, 50)
+
+    r.align_driving(60, 80, 0, 2)
+    drop_off(r)
+
+    r.col_r.set_inversed(True)
+    r.col_l.set_inversed(True)
+    r.drive(-80, -60, 7, 0, "run", 50, 50)
+    direction = r.get_direction_drive(-60, 0, 2, 5, "brake")
+    r.col_r.set_inversed(False)
+    r.col_l.set_inversed(False)
+
+    r.turn(-90 - direction)
+    r.drive_triple(0, 100, 80, 5, 10, 3, 0, "run", 50, 50)
+    # r.drive_triple(0, 80, 0, 5, 8, 5, 0, "brake")
+
+
+def drop_2(r: Robot):
+    direction = r.get_direction_drive(-80, -20, 1, 5, "brake")  # Calculate error
+    r.turn(90 - direction)
+
+    r.slider.open_for_ships(True)
+
+    r.drive(0, 80, 5, 0, "run", -1, 50)
+    r.drive(80, 80, 6)
+    drop_off(r)
+
+    r.col_r.set_inversed(True)
+    r.drive(-80, -80, 7, 0, "run", -1, 50)
+    r.col_r.set_inversed(False)
+    r.drive(-80, 0, 7, 0, "brake")
+    r.turn(-90)
+    r.drive(0, 80, 2, 0, "run", 50, 50)
+
+
+def drop_3(r: Robot):
+    direction = r.get_direction_drive(80, 20, 6, 5, "brake")  # Calculate error
+
+    r.turn(90 - direction)
+
+    r.slider.open_for_ships(True)
+
+    r.drive(0, 80, 5, 0, "run", 50, -1)
+    r.drive(80, 80, 6)
+
+    drop_off(r)
+
+    r.col_l.set_inversed(True)
+    r.drive(-80, -80, 7, 0, "run", 50, -1)
+    r.col_l.set_inversed(False)
+    r.drive(-80, 0, 7, 0, "brake")
+    r.turn(-90)
+    r.drive(0, -80, 4, 0, "run", 50, 50)
+
+
+def drop_4(r: Robot):
+    direction = r.get_direction_drive(80, 100, 0, 5)  # Calculate error
+    r.drive_triple(100, 100, 0, 0, 19, 5, 0, "brake")
+
+    r.turn(90 - direction)
+
+    r.slider.open_for_ships(True)
+
+    r.drive(0, 60, 10, 0, "run", 50, 50)
+
+    r.align_driving(60, 80, 0, 2)
+
+    drop_off(r)
+
+    r.col_r.set_inversed(True)
+    r.col_l.set_inversed(True)
+    r.drive(-80, -60, 7, 0, "run", 50, 50)
+    direction = r.get_direction_drive(-60, 0, 2, 5, "brake")
+    r.col_r.set_inversed(False)
+    r.col_l.set_inversed(False)
+
+    r.turn(-90 - direction)
+
+    r.drive_triple(0, -100, -80, 5, 10, 3, 0, "run", 50, 50)
+
+
+def drop_5(r: Robot):
+    direction = r.get_direction_drive(80, 100, 0, 5, "run")  # Calculate error
+    r.drive_triple(100, 100, 0, 0, 32, 5, 0, "brake")
+
+    r.turn(70 - direction)
+
+    r.slider.open_for_ships(True)
+    r.drive_triple(0, 60, 60, 5, 5, 5, 25, "run", 50, 50)
+
+    r.drive(60, 80, 2, 25)
+    r.slider.close(False)
+    r.drive_triple(80, 80, 0, 5, 9, 5, 20, "brake")
+    r.slider.open_for_ships()
+
+    r.lifter.move_down()
+
+    r.drive_triple(0, -80, -60, 5, 0, 4, 35, "run")
+
+    r.slider.close(False)
+
+    r.col_l.set_inversed(True)
+    r.col_r.set_inversed(True)
+    direction = r.get_direction_drive(-60, 0, 2, 5, "brake")
+    r.col_l.set_inversed(False)
+    r.col_r.set_inversed(False)
+
+    r.turn(-90 - direction)
+    r.drive_triple(0, -100, -80, 5, 25, 5, 0, "run", 50, 50)
+
+
 def scan_ships(r: Robot, speed_start=0):
     r.ht_side.mode = 'COLOR'
     r.ht_middle.mode = 'WHITE'
@@ -97,7 +248,7 @@ def scan_ships(r: Robot, speed_start=0):
     r.slider.close(False)
     r.drive(speed_start, 60, 5, 0, "run", 50, 50)
 
-    direction = r.get_direction_drive(60, 0, 11, 5, "brake")
+    direction = r.get_direction_drive(60, 0, 10.5, 5, "brake")
     r.turn(-90 - direction)
 
     r.slider.hold_closed()
@@ -118,8 +269,8 @@ def scan_ships(r: Robot, speed_start=0):
     r.line_follow(50, 60, 4, offset, "run", False, False, False, 2)
     r.line_follow(60,  70, 15, offset, "brake", False, False, True, 2)
     r.line_follow(70, 30, 11, offset, "brake", False, False, False, 2)
-    r.drive(0, -80, 15, -5)
-    r.drive_color(-80, -20, 15, -1, "brake", False, True)
+    r.drive(0, -80, 15)
+    r.drive_color(-80, -20, 15, 0, "brake", False, True)
 
     # Start ship scanning
 
@@ -151,11 +302,12 @@ def scan_ships(r: Robot, speed_start=0):
     ships[5] = MyColor.NOCOLOR
 
     # Move to center
-    r.drive(0, -100, 7, -25)
-    r.drive(-100, -100, 2)
-    r.drive(-100, 0, 7, 25, "brake")
+    # r.drive(0, -100, 7, -30)
+    # r.drive(-100, -100, 2)
+    # r.drive(-100, 0, 7, 30, "brake")
 
-    r.pivot(-90)
+    # r.pivot(-90)
+    r.turn(-90)
     return ships
 
 
@@ -187,163 +339,53 @@ def drop_food(r: Robot, positions):
     r.drive(0, 80, 3, 0, "run", 50, 50)
     direction = r.get_direction_drive(80, 0, 0, 4, "brake")
     r.turn(-direction)
-    r.drive(0, -80, 2, 0, "run", 50, 50)
-    direction = r.get_direction_drive(-80, 0, 4, 5, "brake")
+
+    r.drive(0, -100, 5, 0, "run", 50)
+    r.drive_triple(-100, -100, 0, 2, 2, 5, 0, "brake")
+    # r.drive(0, -80, 2, 0, "run", 50, 50)
+    # direction = r.get_direction_drive(-80, 0, 4, 5, "brake")
 
     r.turn(90 - direction)
 
     position = True     # True = In front of line; False = behind line
+    # speed_start = 0
+    r.drive(0, -80, 5, 0, "run", 50, 50)
     i = 0
     while i < 3:
         destination = positions[i]
         r.slider.hold_closed()
         if position:
-            r.drive(0, -80, 5, 0, "run", 50, 50)
+            # r.drive(-speed_start, -80, 5, 0, "run", 50, 50)
             position = False
 
             if target_position(destination):
                 direction = r.get_direction_drive(-80, -20, 2, 5, "brake")  # Calculate error
                 r.turn(-direction)
+                r.drive(0, 80, 5, 0, "run", 50, 50)
                 i -= 1
             else:
                 if destination is 2:
-                    direction = r.get_direction_drive(-80, -20, 1, 5, "brake")  # Calculate error
-                    r.turn(90 - direction)
-
-                    r.slider.open_for_ships(True)
-
-                    r.drive(0, 80, 5, 0, "run", -1, 50)
-                    r.drive(80, 80, 6)
-                    drop_off(r)
-
-                    r.col_r.set_inversed(True)
-                    r.drive(-80, -80, 7, 0, "run", -1, 50)
-                    r.col_r.set_inversed(False)
-                    r.drive(-80, 0, 7, 0, "brake")
-                    r.turn(-90)
+                    drop_2(r)
                 elif destination is 1:
-                    direction = r.get_direction_drive(-80, -20, 19, 5, "brake")  # Calculate error
-
-                    r.turn(90 - direction)
-
-                    r.slider.open_for_ships(True)
-
-                    r.drive(0, 60, 10, 0, "run", 50, 50)
-
-                    r.align_driving(60, 80, 0, 2)
-                    drop_off(r)
-
-                    r.col_r.set_inversed(True)
-                    r.col_l.set_inversed(True)
-                    r.drive(-80, -60, 7, 0, "run", 50, 50)
-                    direction = r.get_direction_drive(-60, 0, 2, 5, "brake")
-                    r.col_r.set_inversed(False)
-                    r.col_l.set_inversed(False)
-
-                    r.turn(-90 - direction)
-                    r.drive_triple(0, 80, 0, 5, 8, 5, 0, "brake")
+                    drop_1(r)
                 else:   # destination is 0
-                    direction = r.get_direction_drive(-80, -20, 33.5, 5, "brake")  # Calculate error
-                    r.turn(105 - direction)
-
-                    r.slider.open_for_ships(True)
-                    r.drive_triple(0, 60, 60, 5, 5, 5, -30, "run", 50, 50)
-
-                    r.drive(60, 80, 2, -15)
-                    r.slider.close(False)
-                    r.drive_triple(80, 80, 0, 5, 9, 5, 0, "brake")
-                    r.slider.open_for_ships()
-
-                    r.lifter.move_down()
-
-                    r.drive_triple(0, -80, -60, 5, 0, 4, -20, "run")
-
-                    r.slider.close(False)
-
-                    r.col_l.set_inversed(True)
-                    r.col_r.set_inversed(True)
-                    direction = r.get_direction_drive(-60, 0, 2, 5, "brake")
-                    r.col_l.set_inversed(False)
-                    r.col_r.set_inversed(False)
-
-                    r.turn(-90 - direction)
-                    r.drive_triple(0, 80, 0, 5, 20, 5, 0, "brake")
+                    drop_0(r)
         else:
-            r.drive(0, 80, 3, 0, "run", 50, 50)
+            # r.drive(speed_start, 80, 3, 0, "run", 50, 50)
             position = True
 
             if not target_position(destination):
                 direction = r.get_direction_drive(80, 20, 2, 5, "brake")  # Calculate error
                 r.turn(-direction)
+                r.drive(0, -80, 0, 0, "run", 50, 50)
                 i -= 1
             else:
                 if destination is 3:
-                    direction = r.get_direction_drive(80, 20, 6, 5, "brake")  # Calculate error
-
-                    r.turn(90 - direction)
-
-                    r.slider.open_for_ships(True)
-
-                    r.drive(0, 80, 5, 0, "run", 50, -1)
-                    r.drive(80, 80, 6)
-
-                    drop_off(r)
-
-                    r.col_l.set_inversed(True)
-                    r.drive(-80, -80, 7, 0, "run", 50, -1)
-                    r.col_l.set_inversed(False)
-                    r.drive(-80, 0, 7, 0, "brake")
-                    r.turn(-90)
+                    drop_3(r)
                 elif destination is 4:
-                    direction = r.get_direction_drive(80, 20, 24, 5, "brake")  # Calculate error
-
-                    r.turn(90 - direction)
-
-                    r.slider.open_for_ships(True)
-
-                    r.drive(0, 60, 10, 0, "run", 50, 50)
-
-                    r.align_driving(60, 80, 0, 2)
-
-                    drop_off(r)
-
-                    r.col_r.set_inversed(True)
-                    r.col_l.set_inversed(True)
-                    r.drive(-80, -60, 7, 0, "run", 50, 50)
-                    direction = r.get_direction_drive(-60, 0, 2, 5, "brake")
-                    r.col_r.set_inversed(False)
-                    r.col_l.set_inversed(False)
-
-                    r.turn(-90 - direction)
-
-                    r.drive_triple(0, -80, 0, 5, 8, 5, 0, "brake")
+                    drop_4(r)
                 else:   # destination is 5
-                    direction = r.get_direction_drive(80, 20, 37, 5, "brake")  # Calculate error
-
-                    r.turn(70 - direction)
-
-                    r.slider.open_for_ships(True)
-                    r.drive_triple(0, 60, 60, 5, 5, 5, 25, "run", 50, 50)
-
-                    r.drive(60, 80, 2, 25)
-                    r.slider.close(False)
-                    r.drive_triple(80, 80, 0, 5, 9, 5, 20, "brake")
-                    r.slider.open_for_ships()
-
-                    r.lifter.move_down()
-
-                    r.drive_triple(0, -80, -60, 5, 0, 4, 35, "run")
-
-                    r.slider.close(False)
-
-                    r.col_l.set_inversed(True)
-                    r.col_r.set_inversed(True)
-                    direction = r.get_direction_drive(-60, 0, 2, 5, "brake")
-                    r.col_l.set_inversed(False)
-                    r.col_r.set_inversed(False)
-
-                    r.turn(-90 - direction)
-                    r.drive_triple(0, -80, 0, 5, 25, 5, 0, "brake")
+                    drop_5(r)
         i += 1
 
     if position:

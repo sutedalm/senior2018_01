@@ -46,6 +46,8 @@ class MyColorSensorHT(Sensor):
         if self.mode is not 'COLOR':
             self.mode = 'COLOR'
 
+        object_detected = False
+
         for i in range(0, iterations):
             col = self.value()
             if col in {2, 3}:
@@ -56,9 +58,13 @@ class MyColorSensorHT(Sensor):
                 return MyColor.YELLOW
             if col in {7, 8, 9, 10}:
                 return MyColor.RED
-        if col is 0:
-            return MyColor.NOCOLOR
-        return MyColor.ERROR
+            if col is not 0:
+                object_detected = True
+
+        if object_detected:
+            return MyColor.ERROR
+
+        return MyColor.NOCOLOR
 
     def light_reflected(self):
         if self.mode is not 'WHITE':
@@ -155,7 +161,7 @@ class MyLifter(MediumMotor):
         # self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=250,
         #                     ramp_up_sp=1000, ramp_down_sp=1000, stop_action='hold')
         self.lifter_position += 1
-        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=250,
+        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=200,
                             stop_action='hold')
         if wait:
             self.wait_while('running')
