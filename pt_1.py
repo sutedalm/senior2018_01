@@ -35,21 +35,26 @@ def run(r: Robot):
     # decelerate to first container
     r.slider.open_half_to_full(False)
     # r.drive_triple(80, 100, 100, 10, 5, 13)
-    r.drive(70, 100, 28)
+    r.drive(70, 100, 27)
     # r.drive_triple(100, 80, 20, 9, 2, 4, 0)
 
     # first container
     # r.drive_triple(100, 100, 40, 0, 3, 7, 0, "brake")
-    r.drive_triple(100, 100, 50, 0, 3, 6, 0, "brake")
+    # r.drive_triple(100, 100, 50, 0, 0, 2, 0, "brake")
+    r.drive_triple(100, 50, 0, 3, 0, 5, 0, "brake")
+    # r.drive(100, 50, 3, 0, "brake")
+    # time.sleep(5)
+    # r.drive(50, 0, 5, 0, "brake")
     r.turn(-direction)
     r.slider.collect()
 
     iterator = set_color(r, iterator)
 
     # second container
-    r.slider.open()
+    # r.slider.open()
+    r.slider.open_to_half()
     # r.drive_triple(0, 80, 0, 4.5, 0, 4.5, 0, "brake")
-    r.drive_triple(0, 90, 0, 4.5, 0, 4.5, 0, "brake")
+    r.drive_triple(r.consts.drive_min_speed, 80, r.consts.drive_min_speed, 4.5, 0, 4.5, 0, "brake")
     r.slider.collect()
 
     iterator = set_color(r, iterator)
@@ -62,8 +67,8 @@ def run(r: Robot):
     # r.drive_triple(0, 100, 60, 6, 3, 5, 0)
     # r.drive(60, 50, 6, 0, "brake")
 
-    r.drive_triple(0, 100, 100, 6, 0, 5, 0)
-    r.drive(100, 50, 9, 0, "brake")
+    r.drive_triple(0, 100, 50, 7, 0, 3, 0, "run")
+    r.drive(50, 0, 8, 0, "brake")
 
     r.slider.collect(True)
     iterator = set_color(r, iterator)
@@ -71,8 +76,9 @@ def run(r: Robot):
     if iterator <= 2:
         # forth container
         r.drive_triple(50, 50, 0, 3.5, 0, 2, 0, "brake")
-        r.slider.open()
-        r.drive_triple(0, 60, 0, 4, 0, 4, 0, "brake")
+        # r.slider.open()
+        r.slider.open_to_half()
+        r.drive_triple(r.consts.drive_min_speed, 70, r.consts.drive_min_speed, 4, 0, 4, 0, "brake")
         r.slider.collect()
 
         set_color(r, iterator)
