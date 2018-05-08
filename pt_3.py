@@ -93,9 +93,12 @@ def drop_0(r: Robot):
     r.turn(-direction)
     r.drive_triple(0, -100, 0, 5, 23.5, 5, 0, "brake")
 
+    r.slider.open_for_ships(False)
+
     r.turn(105)
 
-    r.slider.open_for_ships(True)
+    r.slider.wait_while('running')
+
     r.drive_triple(0, 60, 60, 5, 5, 5, -30, "run", 50, 50)
 
     r.drive(60, 80, 2, -15)
@@ -124,9 +127,11 @@ def drop_1(r: Robot):
     direction = r.get_direction_drive(-80, -100, 0, 5)  # Calculate error
     r.drive_triple(-100, -100, 0, 0, 14, 5, 0, "brake")
 
+    r.slider.open_for_ships(False)
+
     r.turn(90 - direction)
 
-    r.slider.open_for_ships(True)
+    r.slider.wait_while('running')
 
     r.drive(0, 60, 10, 0, "run", 50, 50)
 
@@ -147,9 +152,11 @@ def drop_1(r: Robot):
 
 def drop_2(r: Robot):
     direction = r.get_direction_drive(-80, -20, 1, 5, "brake")  # Calculate error
+    r.slider.open_for_ships(False)
+
     r.turn(90 - direction)
 
-    r.slider.open_for_ships(True)
+    r.slider.wait_while('running')
 
     r.drive(0, 80, 5, 0, "run", -1, 50)
     r.drive(80, 80, 6)
@@ -166,9 +173,11 @@ def drop_2(r: Robot):
 def drop_3(r: Robot):
     direction = r.get_direction_drive(80, 20, 6, 5, "brake")  # Calculate error
 
+    r.slider.open_for_ships(False)
+
     r.turn(90 - direction)
 
-    r.slider.open_for_ships(True)
+    r.slider.wait_while('running')
 
     r.drive(0, 80, 5, 0, "run", 50, -1)
     r.drive(80, 80, 6)
@@ -187,9 +196,11 @@ def drop_4(r: Robot):
     direction = r.get_direction_drive(80, 100, 0, 5)  # Calculate error
     r.drive_triple(100, 100, 0, 0, 19, 5, 0, "brake")
 
+    r.slider.open_for_ships(False)
+
     r.turn(90 - direction)
 
-    r.slider.open_for_ships(True)
+    r.slider.wait_while('running')
 
     r.drive(0, 60, 10, 0, "run", 50, 50)
 
@@ -213,9 +224,12 @@ def drop_5(r: Robot):
     direction = r.get_direction_drive(80, 100, 0, 5, "run")  # Calculate error
     r.drive_triple(100, 100, 0, 0, 32, 5, 0, "brake")
 
+    r.slider.open_for_ships(False)
+
     r.turn(70 - direction)
 
-    r.slider.open_for_ships(True)
+    r.slider.wait_while('running')
+
     r.drive_triple(0, 60, 60, 5, 5, 5, 25, "run", 50, 50)
 
     r.drive(60, 80, 2, 25)
@@ -246,15 +260,17 @@ def scan_ships(r: Robot, speed_start=0):
 
     # Move to ship line
     r.slider.close(False)
-    r.drive(speed_start, 60, 5, 0, "run", 50, 50)
+    r.drive(speed_start, 70, 5, 0, "run", 50, 50)
 
-    direction = r.get_direction_drive(60, 0, 10.5, 5, "brake")
+    direction = r.get_direction_drive(70, 0, 10.5, 5, "brake")
     r.turn(-90 - direction)
 
     r.slider.hold_closed()
 
     # r.drive_triple(0, 100, 0, 5, 0, 5, 0, "brake")
-    r.drive(0, -70, 5, 0, "run", 50, 50)
+    line_detected = r.drive(0, -70, 3, 0, "run", 50, 50)
+    if line_detected:
+        r.brake()
 
     direction = r.get_direction_drive(-70, 0, 0, 5, "brake")
     r.turn(-25 - direction)

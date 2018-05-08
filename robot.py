@@ -116,8 +116,9 @@ class MySlider(LargeMotor):
     def hold_closed(self):
         self.run_direct(duty_cycle_sp=-40)
 
-    def collect(self, wait=True):
-        self.run_timed(time_sp=2000, speed_sp=-700, ramp_down_sp=1000)
+    def collect(self, wait=True, duration=20):
+        duration *= 100
+        self.run_timed(time_sp=duration, speed_sp=-700, ramp_down_sp=1000)
         if wait:
             self.wait_while('running')
             self.hold_closed()
@@ -357,9 +358,9 @@ class Robot:
         self.slider = MySlider(OUTPUT_A)
         self.lifter = MyLifter(OUTPUT_D)
 
-        self.col_l = MyColorSensorEV3(INPUT_1, 8, 75)
-        self.col_r = MyColorSensorEV3(INPUT_2, 3, 45)
-        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 20)
+        self.col_l = MyColorSensorEV3(INPUT_1, 8, 80)
+        self.col_r = MyColorSensorEV3(INPUT_2, 3, 50)
+        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 25)
         # self.col_l = MyColorSensorEV3(INPUT_1, 7, 85)
         # self.col_r = MyColorSensorEV3(INPUT_2, 4, 58)
         # self.ht_middle = MyColorSensorHT(INPUT_3, 0, 25)
