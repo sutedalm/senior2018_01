@@ -30,7 +30,7 @@ def run(r: Robot):
 
     # align while driving over first line
     r.slider.run_to_rel_pos(position_sp=200, speed_sp=1000, stop_action="brake")
-    direction = r.get_direction_drive(80, 70, 0, 8, "run", 3)  # Calculate error
+    direction = r.get_direction_drive(80, 70, 0, 8, "run", 1)  # Calculate error
 
     # decelerate to first container
     r.slider.open_half_to_full(False)

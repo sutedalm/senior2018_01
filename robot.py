@@ -204,14 +204,14 @@ class MyDrivingMotor(LargeMotor):
 
 class RobotConstants:
     tyre_size = 6.24                        # Durchmesser des Reifens in cm
-    motor_distance = 19.38                  # Abstand der Rädermittelpunkte in cm
-    motor_distance_turn = 19.75
+    motor_distance = 19.35       # auf teppich: 19.38                  # Abstand der Rädermittelpunkte in cm
+    motor_distance_turn = 19.3      # auf teppich: 19.75
     sensor_distance = 14.5
     pivot_min_speed = 30
     drive_min_speed = 50
     col_trigger_val = 50
 
-    drive_kp = 5
+    drive_kp = 4 #auf teppich: 5
     drive_ki = 0.02
     drive_kd = 2
 
@@ -221,7 +221,7 @@ class RobotConstants:
 
     lflw_kp = 1
     lflw_ki = 0
-    lflw_kd = 1
+    lflw_kd = 0.7 # auf teppich: 1
 
 
 class Utils:

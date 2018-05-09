@@ -136,6 +136,7 @@ def run(r: Robot, speed_start=0):
                     pick_up(r, i)
                     r.turn(-90)
         i += 1
+        r.slider.hold_closed()
 
     if position:
         r.drive(speed_start, -70, 5, 0, "run", 50, 50)
