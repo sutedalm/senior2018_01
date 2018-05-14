@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-"""
-http://ev3dev-lang.readthedocs.io/projects/python-ev3dev/en/stable/motors.html
-https://github.com/Klabbedi/ev3
-"""
 from robot import Robot
 import pt_1
 import pt_2
