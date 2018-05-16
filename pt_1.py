@@ -12,10 +12,29 @@ import time
 def set_color(r: Robot, iterator):
     color = r.ht_middle.get_color()
     print(color.name)
-    if color is not MyColor.NOCOLOR and color is not MyColor.ERROR:
+    if color is not MyColor.NOCOLOR:    # and color is not MyColor.ERROR:
         r.container_colors[iterator] = color
         iterator += 1
     return iterator
+
+
+def filter_colors(r: Robot):
+    old_colors = r.container_colors
+    print("Detected colors: " + str(old_colors))
+    valid_colors = [MyColor.RED, MyColor.GREEN, MyColor.BLUE, MyColor.YELLOW]
+    new_colors = []
+
+    for c in old_colors:
+        if c in new_colors or c == MyColor.ERROR:
+            for new_color in valid_colors:
+                if new_color not in old_colors and new_color not in new_colors:
+                    new_colors.append(new_color)
+                    break
+        else:
+            new_colors.append(c)
+
+    r.container_colors = new_colors
+    print("Filtered colors: " + str(r.container_colors))
 
 
 def run(r: Robot):
@@ -88,6 +107,8 @@ def run(r: Robot):
     else:
         r.lifter.move_to_bottom_position(False)
         r.drive_triple(0, -100, -80, 15, 50, 5)
+
+    filter_colors(r)
 
 
 if __name__ == "__main__":
