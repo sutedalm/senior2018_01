@@ -118,7 +118,7 @@ class MySlider(LargeMotor):
 
     def collect(self, wait=True, duration=20):
         duration *= 100
-        self.run_timed(time_sp=duration, speed_sp=-700, ramp_down_sp=1000)
+        self.run_timed(time_sp=duration, speed_sp=-500, ramp_down_sp=1000)
         if wait:
             self.wait_while('running')
             self.hold_closed()

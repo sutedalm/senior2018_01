@@ -4,6 +4,7 @@ from robot import Robot
 import time
 import  pt_3
 
+
 def festhalte_test(r: Robot):
         r.slider.close()
         r.drive_triple(0, 60, 0, 5, 20, 5, 0, "brake")
@@ -16,7 +17,9 @@ def festhalte_test(r: Robot):
 def main():
     r = Robot()
     try:
-        r.turn(90)
+        r.drive_triple(0, 100, 50, 10, 20, 5, -2, "run", 50, 0)
+        r.drive(50, 0, 9.5, -1, "brake")
+        # r.turn(90)
         # print("TESTING")
         # r.beep(True)
         # while True:
