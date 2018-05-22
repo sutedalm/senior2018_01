@@ -421,15 +421,21 @@ def go_home_bitch(r: Robot):
     r.turn(-direction)
 
     r.drive_triple(0, -100, -100, 8, 75, 5, 0, "run")
-    r.drive(-100, -100, 30, 0, "run", 50, 50)
 
-    r.drive_triple(-100, -100, 0, 8, 40, 5, 0, "brake")
+    direction = r.get_direction_drive(-100, 0, 38, 5, "brake", 3)
 
-    r.pivot(-80)
+    r.turn(-80 - direction)
+
+    # r.drive(-100, -100, 30, 0, "run", 50, 50)
+
+    # r.drive_triple(-100, -100, 0, 8, 40, 5, 0, "brake")
+
+    # r.pivot(-80)
 
     r.drive(0, -100, 5)
-    r.drive_time(-100, -100, 57, 4, "brake", 2)
-    r.drive_triple(0, 100, 50, 10, 10, 5, -2, "run", 50, 0)
+    r.drive_time(-100, -100, 45, 2, "brake", 1)
+    r.reset_motor_pos(0)
+    r.drive_triple(0, 100, 50, 10, 7, 8, -6, "run", 50, 0)
     r.drive(50, 50, 10, -1, "run", 50, 0)
     r.drive(50, 0, 10.5, 0, "brake")
 

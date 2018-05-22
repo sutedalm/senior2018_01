@@ -137,7 +137,7 @@ class MySlider(LargeMotor):
             self.wait_while('running')
 
     def open_for_base(self, wait=True):
-        self.run_to_rel_pos(position_sp=190, speed_sp=1000, stop_action="brake")
+        self.run_to_rel_pos(position_sp=200, speed_sp=1000, stop_action="brake")
         if wait:
             self.wait_while('running')
 
@@ -205,7 +205,7 @@ class MyDrivingMotor(LargeMotor):
 class RobotConstants:
     tyre_size = 6.24                        # Durchmesser des Reifens in cm
     motor_distance = 19.35       # auf teppich: 19.38                  # Abstand der Rädermittelpunkte in cm
-    motor_distance_turn = 19.3      # auf teppich: 19.75
+    motor_distance_turn = 19.5988      # auf teppich: 19.75
     sensor_distance = 14.5
     pivot_min_speed = 30
     drive_min_speed = 50
@@ -358,9 +358,9 @@ class Robot:
         self.slider = MySlider(OUTPUT_A)
         self.lifter = MyLifter(OUTPUT_D)
 
-        self.col_l = MyColorSensorEV3(INPUT_1, 8, 80)
-        self.col_r = MyColorSensorEV3(INPUT_2, 3, 50)
-        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 25)
+        self.col_l = MyColorSensorEV3(INPUT_1, 8, 69)
+        self.col_r = MyColorSensorEV3(INPUT_2, 3, 45)
+        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 15)
         # self.col_l = MyColorSensorEV3(INPUT_1, 7, 85)
         # self.col_r = MyColorSensorEV3(INPUT_2, 4, 58)
         # self.ht_middle = MyColorSensorHT(INPUT_3, 0, 25)

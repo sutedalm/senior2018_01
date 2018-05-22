@@ -29,7 +29,7 @@ def pick_up(robot: Robot, i):
     if not line_detected:
         line_detected = robot.drive(80, 80, 4, 0, "run", 50, 50)
 
-    robot.slider.run_to_abs_pos(position_sp=0, speed_sp=1000, stop_action="brake")
+    robot.slider.run_to_abs_pos(position_sp=10, speed_sp=1000, stop_action="brake")
     # robot.slider.close(False, 100, 11)
 
     if not line_detected:
@@ -39,32 +39,32 @@ def pick_up(robot: Robot, i):
         robot.drive(80, 0, 5, 0, "brake")
 
         # time.sleep(0.5)
-        robot.slider.wait_while('running', 6000)
+        robot.slider.wait_while('running', 500)
         robot.slider.hold_closed()
 
-        robot.drive_triple(0, -100, -100, 5, 10, 10, 0, "run", 50, 50)    # Move to line
-        robot.drive(-100, 0, 11, 0, "brake")
+        robot.drive_triple(0, -80, -80, 5, 10, 10, 0, "run", 50, 50)    # Move to line
+        robot.drive(-80, 0, 11, 0, "brake")
 
-        robot.drive_triple(0, 70, 0, 3, 0, 2.5, 0, "brake")
+        robot.drive_triple(0, 60, 0, 3, 0, 2.5, 0, "brake")
 
         robot.slider.open_to_half()
         robot.drive_triple(0, -100, 0, 7, 7, 2, 0, "brake")
     elif i is 1:
         robot.drive(80, 0, 7.5, 0, "brake")
 
-        robot.slider.wait_while('running', 6000)
+        robot.slider.wait_while('running', 500)
         robot.slider.hold_closed()
 
         # time.sleep(0.5)
 
-        robot.drive_triple(0, -80, 0, 3, 0, 3, 0, "brake", 50, 50)
+        robot.drive_triple(0, -70, 0, 3, 0, 3, 0, "brake", 50, 50)
 
         robot.slider.open_to_half()
         robot.drive_triple(0, -100, 0, 5, 14, 5, 0, "brake")
     elif i is 2:
         robot.drive(80, 0, 9, 0, "brake")
 
-        robot.slider.wait_while('running', 6000)
+        robot.slider.wait_while('running', 500)
         robot.slider.hold_closed()
 
         robot.drive_triple(0, -80, 0, 4, 0, 3.5, 0, "brake")
