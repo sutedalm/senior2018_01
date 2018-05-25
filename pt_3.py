@@ -433,11 +433,12 @@ def go_home_bitch(r: Robot):
     # r.pivot(-80)
 
     r.drive(0, -100, 5)
-    r.drive_time(-100, -100, 45, 2, "brake", 1)
+    r.drive_time(-100, -100, 45, 0, "brake", 1.5)
     r.reset_motor_pos(0)
-    r.drive_triple(0, 100, 50, 10, 7, 8, -6, "run", 50, 0)
-    r.drive(50, 50, 10, -1, "run", 50, 0)
-    r.drive(50, 0, 10.5, 0, "brake")
+    line_detected = r.drive_triple(0, 100, 50, 5, 12, 8, -10, "run", 30, 0)
+    if not line_detected:
+        r.drive(50, 50, 10, -1, "run", 30, 0)
+    r.drive(50, 0, 11, 0, "brake")
 
 
 def run(r: Robot, speed_start=0):
