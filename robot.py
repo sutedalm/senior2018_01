@@ -134,7 +134,7 @@ class MySlider(LargeMotor):
     def open_for_ships(self, wait=True):
         self.run_to_rel_pos(position_sp=230, speed_sp=1000, stop_action="brake")
         if wait:
-            self.wait_while('running')
+            self.wait_while('running', 5000)
 
     def open_for_base(self, wait=True):
         self.run_to_rel_pos(position_sp=200, speed_sp=1000, stop_action="brake")
@@ -204,7 +204,7 @@ class MyDrivingMotor(LargeMotor):
 
 class RobotConstants:
     tyre_size = 6.24                        # Durchmesser des Reifens in cm
-    motor_distance = 19.35       # auf teppich: 19.38                  # Abstand der Rädermittelpunkte in cm
+    motor_distance = 19.95       # auf teppich: 19.38                  # Abstand der Rädermittelpunkte in cm
     motor_distance_turn = 19.5988      # auf teppich: 19.75
     sensor_distance = 14.5
     pivot_min_speed = 30

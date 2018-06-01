@@ -15,6 +15,7 @@ def main():
         r.ht_middle.mode = 'COLOR'
         r.wait_until_button()
         r.reset()
+        time.sleep(0.1)
 
         pt_1.run(r)
 

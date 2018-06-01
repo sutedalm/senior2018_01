@@ -273,7 +273,7 @@ def scan_ships(r: Robot, speed_start=0):
         r.brake()
 
     direction = r.get_direction_drive(-70, 0, 0, 5, "brake")
-    r.turn(-25 - direction)
+    r.turn(-26 - direction)
 
     r.drive_triple(0, -100, 0, 10, 22, 5, -20, "brake")
 
