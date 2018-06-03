@@ -162,7 +162,7 @@ class MyLifter(MediumMotor):
         # self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=250,
         #                     ramp_up_sp=1000, ramp_down_sp=1000, stop_action='hold')
         self.lifter_position += 1
-        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=200,
+        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=400,
                             stop_action='hold')
         if wait:
             self.wait_while('running')

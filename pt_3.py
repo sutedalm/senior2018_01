@@ -273,7 +273,7 @@ def scan_ships(r: Robot, speed_start=0):
         r.brake()
 
     direction = r.get_direction_drive(-70, 0, 0, 5, "brake")
-    r.turn(-26 - direction)
+    r.turn(-25 - direction)
 
     r.drive_triple(0, -100, 0, 10, 22, 5, -20, "brake")
 
@@ -323,7 +323,7 @@ def scan_ships(r: Robot, speed_start=0):
     # r.drive(-100, 0, 7, 30, "brake")
 
     # r.pivot(-90)
-    r.turn(-90)
+    r.turn(-100)
     return ships
 
 
@@ -356,10 +356,10 @@ def drop_food(r: Robot, positions):
     direction = r.get_direction_drive(80, 0, 0, 4, "brake")
     r.turn(-direction)
 
-    r.drive(0, -100, 5, 0, "run", 50)
-    r.drive_triple(-100, -100, 0, 2, 2, 5, 0, "brake")
-    # r.drive(0, -80, 2, 0, "run", 50, 50)
-    # direction = r.get_direction_drive(-80, 0, 4, 5, "brake")
+    # r.drive(0, -100, 5, 0, "run", 50)
+    # r.drive_triple(-100, -100, 0, 2, 2, 5, 0, "brake")
+    r.drive(0, -80, 2, 0, "run", 50, 50)
+    direction = r.get_direction_drive(-80, 0, 4, 5, "brake")
 
     r.turn(90 - direction)
 
