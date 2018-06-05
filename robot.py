@@ -162,7 +162,7 @@ class MyLifter(MediumMotor):
         # self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=250,
         #                     ramp_up_sp=1000, ramp_down_sp=1000, stop_action='hold')
         self.lifter_position += 1
-        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=400,
+        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=200,
                             stop_action='hold')
         if wait:
             self.wait_while('running')
@@ -205,7 +205,7 @@ class MyDrivingMotor(LargeMotor):
 class RobotConstants:
     tyre_size = 6.24                        # Durchmesser des Reifens in cm
     motor_distance = 19.95       # auf teppich: 19.38                  # Abstand der Rädermittelpunkte in cm
-    motor_distance_turn = 19.5988      # auf teppich: 19.75
+    motor_distance_turn = 19.8      # auf teppich: 19.75
     sensor_distance = 14.5
     pivot_min_speed = 30
     drive_min_speed = 50
@@ -360,7 +360,7 @@ class Robot:
 
         self.col_l = MyColorSensorEV3(INPUT_1, 8, 69)
         self.col_r = MyColorSensorEV3(INPUT_2, 3, 45)
-        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 15)
+        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 24)
         # self.col_l = MyColorSensorEV3(INPUT_1, 7, 85)
         # self.col_r = MyColorSensorEV3(INPUT_2, 4, 58)
         # self.ht_middle = MyColorSensorHT(INPUT_3, 0, 25)
@@ -368,7 +368,7 @@ class Robot:
 
         self._btn = Button()
 
-        self.container_colors = [MyColor.BLUE, MyColor.GREEN, MyColor.YELLOW]
+        self.container_colors = [MyColor.BLUE, MyColor.YELLOW, MyColor.RED]
 
         print("press button to start")
         # self.wait_until_button()
@@ -672,6 +672,7 @@ class Robot:
              kp=RobotConstants.turn_kp, ki=RobotConstants.turn_ki, kd=RobotConstants.turn_kd):
         print("TURNING")
         print("dir: " + str(direction))
+
         distance_degree = self._util.cm_to_deg(math.pi / 180 * abs(direction) * self.consts.motor_distance_turn)
         driven_distance = 0
 
@@ -812,12 +813,12 @@ class Robot:
                 self.drive(speed, end_speed, distance_deceleration, turn, brake_action)
 
     def reset_motor_pos(self, dif=0):
-        if dif > 0:
-            self._lMot.position = dif
+        if dif < 0:
+            self._lMot.position = -dif
             self._rMot.position = 0
         else:
             self._lMot.position = 0
-            self._rMot.position = -dif
+            self._rMot.position = dif
 
     def line_follow(self, speed_start, speed, distance=30, offset=50, brake_action="run",
                     side=False, l_col_trigger=False, r_col_trigger=False,
@@ -925,7 +926,7 @@ class Robot:
         self._rMot.run_direct()
         self._lMot.run_direct()
 
-        dif = self._lMot.position - self._rMot.position
+        dif = self._rMot.position - self._lMot.position
         self.reset_motor_pos(dif)
         # print("l_pos: " + str(self._lMot.position) + "; r_pos: " + str(self._rMot.position))
 
@@ -968,14 +969,17 @@ class Robot:
                 direction *= -1
             if speed < 0:
                 direction *= -1
+
         print("measured angle: " + str(direction))
+        direction = min(max_direction, max(-max_direction, direction))
+        print("returned angle: " + str(direction))
 
         self.reset_motor_pos()
-        return min(max_direction, max(-max_direction, direction))
+        return direction
 
     def get_direction_drive(self, speed=60, end_speed=40,
                             distance_constant=2.5, distance_deceleration=5, brake_action="run",
-                            max_direction=10):
+                            max_direction=90):
         print("GET_DIRECTION_DRIVE")
 
         direction = self.get_direction(speed, "run",

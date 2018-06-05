@@ -10,9 +10,9 @@ def main(r: Robot):
     iterations = 5
     for i in range(0, iterations):
         r.reset()
+        r._lMot.reset()
+        r._rMot.reset()
 
-        end_speed = 40
-        max_speed = 100
         kp = RobotConstants.turn_kp
         ki = RobotConstants.turn_ki
         kd = RobotConstants.turn_kd
@@ -70,7 +70,7 @@ def main(r: Robot):
         print("Motor Distance: " + str(motor_distance))
         distances.append(motor_distance)
         r.reset()
-        r.turn(90)
+        r.turn(-90)
         time.sleep(0.5)
 
     avg = 0

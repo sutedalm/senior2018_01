@@ -2,7 +2,7 @@
 
 from robot import Robot
 import time
-import  pt_3
+import pt_3
 
 
 def festhalte_test(r: Robot):
@@ -17,8 +17,12 @@ def festhalte_test(r: Robot):
 def main():
     r = Robot()
     try:
-        r.drive_triple(0, 100, 50, 10, 20, 5, -2, "run", 50, 0)
-        r.drive(50, 0, 9.5, -1, "brake")
+        r.turn(-90)
+        time.sleep(3)
+        r.turn(90)
+        # r.get_direction_drive(60, 40, 2, 0, "run", 100)
+        # r.drive_triple(0, 100, 50, 10, 20, 5, -2, "run", 50, 0)
+        # r.drive(50, 0, 9.5, -1, "brake")
         # r.turn(90)
         # print("TESTING")
         # r.beep(True)

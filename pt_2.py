@@ -72,6 +72,9 @@ def pick_up(robot: Robot, i):
         robot.slider.open_to_half()
         robot.drive_triple(0, -100, 0, 5, 14, 5, 0, "brake")
 
+    else:
+        return
+
     position = robot.slider.position
     robot.slider.run_timed(time_sp=1300, speed_sp=-1000)
     while robot.slider.position >= position - 400:
@@ -86,6 +89,7 @@ def run(r: Robot, speed_start=0):
     i = 0
     while i < 3:
         color = colors[2-i]     # LIFO
+        print("color:" + color.to_text())
         r.slider.hold_closed()
         if position:
             r.drive(speed_start, -70, 5, 0, "run", 50, 50)

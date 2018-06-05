@@ -273,7 +273,7 @@ def scan_ships(r: Robot, speed_start=0):
         r.brake()
 
     direction = r.get_direction_drive(-70, 0, 0, 5, "brake")
-    r.turn(-25 - direction)
+    r.turn(-26 - direction)
 
     r.drive_triple(0, -100, 0, 10, 22, 5, -20, "brake")
 
@@ -425,20 +425,29 @@ def go_home_bitch(r: Robot):
     direction = r.get_direction_drive(-100, 0, 38, 5, "brake", 3)
 
     r.turn(-80 - direction)
+    r.drive(0, -100, 35, 0, "run")
+    r.drive(-100, -100, 10, 0, "run", 0, 50)
+    r.drive_time(-100, -100, 15, 0, "run", 0.8)
+    r.drive(0, 100, 7, -5, "run", 0, 50)
+    r.drive_triple(100, 100, 60, 10, 5, 5, -1, "run")
+    # r.drive(100, 100, 20, -3, "run")
+    r.drive(60, 60, 20, -3, "run", 30, 30)
+    r.drive_triple(60, 70, 0, 4, 0, 6.9, -3, "brake")
 
     # r.drive(-100, -100, 30, 0, "run", 50, 50)
 
     # r.drive_triple(-100, -100, 0, 8, 40, 5, 0, "brake")
 
+
     # r.pivot(-80)
 
-    r.drive(0, -100, 5)
-    r.drive_time(-100, -100, 45, 0, "brake", 1.5)
-    r.reset_motor_pos(0)
-    line_detected = r.drive_triple(0, 100, 50, 5, 12, 8, -10, "run", 30, 0)
-    if not line_detected:
-        r.drive(50, 50, 10, -1, "run", 30, 0)
-    r.drive(50, 0, 11, 0, "brake")
+    # r.drive(0, -100, 5)
+    # r.drive_time(-100, -100, 45, 0, "brake", 1.5)
+    # r.reset_motor_pos(0)
+    # line_detected = r.drive_triple(0, 100, 50, 5, 12, 8, -10, "run", 30, 0)
+    # if not line_detected:
+    #     r.drive(50, 50, 10, -1, "run", 30, 0)
+    # r.drive(50, 0, 11, 0, "brake")
 
 
 def run(r: Robot, speed_start=0):
