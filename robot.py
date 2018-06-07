@@ -118,7 +118,7 @@ class MySlider(LargeMotor):
 
     def collect(self, wait=True, duration=20):
         duration *= 100
-        self.run_timed(time_sp=duration, speed_sp=-500, ramp_down_sp=1000)
+        self.run_timed(time_sp=duration, speed_sp=-1000, ramp_up_sp=100, ramp_down_sp=100)
         if wait:
             self.wait_while('running')
             self.hold_closed()
@@ -134,7 +134,7 @@ class MySlider(LargeMotor):
     def open_for_ships(self, wait=True):
         self.run_to_rel_pos(position_sp=230, speed_sp=1000, stop_action="brake")
         if wait:
-            self.wait_while('running', 5000)
+            self.wait_while('running', 1000)
 
     def open_for_base(self, wait=True):
         self.run_to_rel_pos(position_sp=200, speed_sp=1000, stop_action="brake")
@@ -162,7 +162,7 @@ class MyLifter(MediumMotor):
         # self.run_to_abs_pos(position_sp=self.position - self.position_difference, speed_sp=250,
         #                     ramp_up_sp=1000, ramp_down_sp=1000, stop_action='hold')
         self.lifter_position += 1
-        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=200,
+        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=220,
                             stop_action='hold')
         if wait:
             self.wait_while('running')
@@ -171,7 +171,7 @@ class MyLifter(MediumMotor):
     def move_down(self, wait=True):
         # self.run_to_abs_pos(position_sp=self.position + self.position_difference, speed_sp=200, stop_action='hold')
         self.lifter_position -= 1
-        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=200,
+        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=220,
                             stop_action='hold')
         if wait:
             self.wait_while('running')
@@ -786,6 +786,55 @@ class Robot:
                 self._lMot.position -= distance_degree
             else:
                 self._lMot.position += distance_degree
+
+    def drive_wall(self, speed_start, speed, distance, direction=0, brake_action="run",
+                   l_col_trigger=-1, r_col_trigger=-1):
+
+        # print("DRIVING")
+
+        driven_distance = 0
+        distance = abs(self._util.cm_to_deg(distance))
+        # print("distance: " + str(distance))
+
+        min_speed = self.consts.drive_min_speed
+        if speed_start is 0:
+            speed_start = math.copysign(min_speed, speed)
+
+        line_detected = False
+
+        self._rMot.run_direct()
+        self._lMot.run_direct()
+
+        while not self._util.distance_reached(driven_distance, distance, speed_start) and not line_detected:
+            line_detected = self.col_l.light_reflected() <= l_col_trigger or \
+                            self.col_r.light_reflected() <= r_col_trigger
+
+            l_pos = self._lMot.position
+            r_pos = self._rMot.position
+            r_pos = (self._rMot.position+r_pos)/2
+            l_pos = (self._lMot.position+l_pos)/2
+
+            driven_distance = (r_pos + l_pos) / 2
+            if self._util.distance_reached(driven_distance, distance, speed_start) or line_detected:
+                # only for faster brake response time
+                break
+
+            speed_accelerated = self._util.min_speed(speed_start + abs(driven_distance) /
+                                                     distance * (speed - speed_start), min_speed)
+
+            if direction <= 0 and self._lMot.is_stalled:
+                self.beep()
+                min_speed += 2
+            if direction >= 0 and self._rMot.is_stalled:
+                self.beep()
+                min_speed += 2
+
+            for (motor, power) in zip((self._lMot, self._rMot),
+                                      self._util.steering(direction, speed_accelerated)):
+                motor.duty_cycle_sp = power
+        self.reset_motor_pos()
+        self.brake(brake_action)
+        return line_detected
 
     def align_driving(self, speed=60, end_speed=40, distance_constant=2.5, distance_deceleration=5, brake_action="run"):
         print("ALIGN DRIVING")

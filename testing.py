@@ -13,13 +13,20 @@ def festhalte_test(r: Robot):
         r.slider.close()
         r.drive_triple(0, -60, 0, 5, 10, 5, 0, "brake")
 
+def einsammel_test(r: Robot):
+    while True:
+        r.wait_until_button()
+        r.slider.open()
+        r.wait_until_button()
+        r.slider.collect()
 
 def main():
     r = Robot()
     try:
-        r.turn(-90)
-        time.sleep(3)
-        r.turn(90)
+        einsammel_test(r)
+        # r.turn(-90)
+        # time.sleep(3)
+        # r.turn(90)
         # r.get_direction_drive(60, 40, 2, 0, "run", 100)
         # r.drive_triple(0, 100, 50, 10, 20, 5, -2, "run", 50, 0)
         # r.drive(50, 0, 9.5, -1, "brake")

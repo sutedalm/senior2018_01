@@ -22,14 +22,14 @@ def pick_up(robot: Robot, i):
     while robot.slider.position < 10:
         time.sleep(0.01)
     # time.sleep(0.3)
-    line_detected = robot.drive_triple(0, 80, 80, 4, 6, 0, 0, "run", 50, 50)
+    line_detected = robot.drive_triple(0, 80, 80, 4, 4.5, 0, 0, "run", 50, 50)
     # line_detected = robot.drive(0, 80, 10, 0, "run", 50, 50)
     robot.lifter.move_up(False)
 
     if not line_detected:
-        line_detected = robot.drive(80, 80, 4, 0, "run", 50, 50)
+        line_detected = robot.drive(80, 80, 5.5, 0, "run", 50, 50)
 
-    robot.slider.run_to_abs_pos(position_sp=10, speed_sp=1000, stop_action="brake")
+    robot.slider.run_to_abs_pos(position_sp=10, speed_sp=900, stop_action="brake")
     # robot.slider.close(False, 100, 11)
 
     if not line_detected:
@@ -75,10 +75,16 @@ def pick_up(robot: Robot, i):
     else:
         return
 
-    position = robot.slider.position
-    robot.slider.run_timed(time_sp=1300, speed_sp=-1000)
-    while robot.slider.position >= position - 400:
+    # robot.slider.run_to_abs_pos(position_sp=220, speed_sp=1000)
+    robot.slider.run_forever(speed_sp=-1000)
+    while robot.slider.position >= 220:
         time.sleep(0.01)
+    # robot.slider.wait_while('running', 1000)
+    # robot.slider.close(False)
+    # position = robot.slider.position
+    # robot.slider.run_timed(time_sp=1300, speed_sp=-1000)
+    # while robot.slider.position >= position - 400:
+    #       time.sleep(0.01)
 
 
 def run(r: Robot, speed_start=0):
@@ -100,19 +106,24 @@ def run(r: Robot, speed_start=0):
                 r.turn(-direction)
                 i -= 1
             else:
-                # direction = r.get_direction_drive(-70, -50, 4, 9, "brake")  # Calculate error
                 direction = r.get_direction_drive(-70, -100, 0, 4)  # Calculate error
-                r.drive_triple(-100, -100, -50, 2, 0, 7, 0, "brake")
-
-                r.slider.position = 0
-                r.slider.run_forever(speed_sp=100)
 
                 if color is MyColor.GREEN:
-                    r.turn(-90 - direction)
+                    r.drive_triple(-100, -100, -50, 2, 0, 7.5, 0, "brake")
+
+                    r.slider.position = 0
+                    r.slider.run_forever(speed_sp=100)
+
+                    r.turn(-90 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(90)
                 else:   # blue
-                    r.turn(90 - direction)
+                    r.drive_triple(-100, -100, -50, 2, 0, 6, 0, "brake")
+
+                    r.slider.position = 0
+                    r.slider.run_forever(speed_sp=100)
+
+                    r.turn(90 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(-90)
         else:
@@ -125,21 +136,24 @@ def run(r: Robot, speed_start=0):
             else:
                 # direction = r.get_direction_drive(70, 50, 8.5, 10, "brake")  # Calculate error
                 direction = r.get_direction_drive(70, 100, 0, 4, "brake")  # Calculate error
-                r.drive_triple(100, 100, 50, 2, 5.5, 7, 0, "brake")
-
-                r.slider.position = 0
-                r.slider.run_forever(speed_sp=100)
 
                 if color is MyColor.RED:
-                    r.turn(-90 - direction)
+                    r.drive_triple(100, 100, 50, 2, 7, 5, 0, "brake")
+
+                    r.slider.position = 0
+                    r.slider.run_forever(speed_sp=100)
+                    r.turn(-90 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(90)
                 else:   # Yellow
-                    r.turn(90 - direction)
+                    r.drive_triple(100, 100, 50, 2, 8, 5, 0, "brake")
+
+                    r.slider.position = 0
+                    r.slider.run_forever(speed_sp=100)
+                    r.turn(88 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(-90)
         i += 1
-        r.slider.hold_closed()
 
     if position:
         r.drive(speed_start, -70, 5, 0, "run", 50, 50)

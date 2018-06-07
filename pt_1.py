@@ -12,7 +12,7 @@ import time
 def set_color(r: Robot, iterator):
     color = r.ht_middle.get_color()
     print(color.name)
-    if color is not MyColor.NOCOLOR:    # and color is not MyColor.ERROR:
+    if color is not MyColor.NOCOLOR and color is not MyColor.ERROR:
         r.container_colors[iterator] = color
         iterator += 1
     return iterator
@@ -49,12 +49,12 @@ def run(r: Robot):
 
     # align while driving over first line
     r.slider.run_to_rel_pos(position_sp=200, speed_sp=1000, stop_action="brake")
-    direction = r.get_direction_drive(80, 60, 0, 8, "run", 1)  # Calculate error
+    direction = r.get_direction_drive(80, 60, 0, 9, "run", 1)  # Calculate error
 
     # decelerate to first container
     r.slider.open_half_to_full(False)
     # r.drive_triple(80, 100, 100, 10, 5, 13)
-    r.drive(60, 100, 27)
+    r.drive(60, 100, 26)
     # r.drive_triple(100, 80, 20, 9, 2, 4, 0)
 
     # first container
