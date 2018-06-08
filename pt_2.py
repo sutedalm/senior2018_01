@@ -42,8 +42,8 @@ def pick_up(robot: Robot, i):
         robot.slider.wait_while('running', 500)
         robot.slider.hold_closed()
 
-        robot.drive_triple(0, -80, -80, 5, 10, 10, 0, "run", 50, 50)    # Move to line
-        robot.drive(-80, 0, 11, 0, "brake")
+        robot.drive_triple(0, -70, -70, 5, 10, 10, 0, "run", 50, 50)    # Move to line
+        robot.drive(-70, 0, 11, 0, "brake")
 
         robot.drive_triple(0, 60, 0, 3, 0, 2.5, 0, "brake")
 
@@ -57,7 +57,7 @@ def pick_up(robot: Robot, i):
 
         # time.sleep(0.5)
 
-        robot.drive_triple(0, -70, 0, 3, 0, 3, 0, "brake", 50, 50)
+        robot.drive_triple(0, -60, 0, 3, 0, 3, 0, "brake", 50, 50)
 
         robot.slider.open_to_half()
         robot.drive_triple(0, -100, 0, 5, 14, 5, 0, "brake")
@@ -67,7 +67,7 @@ def pick_up(robot: Robot, i):
         robot.slider.wait_while('running', 500)
         robot.slider.hold_closed()
 
-        robot.drive_triple(0, -80, 0, 4, 0, 3.5, 0, "brake")
+        robot.drive_triple(0, -80, 0, 3, 0, 4.5, 0, "brake")
 
         robot.slider.open_to_half()
         robot.drive_triple(0, -100, 0, 5, 14, 5, 0, "brake")
