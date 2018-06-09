@@ -136,6 +136,11 @@ class MySlider(LargeMotor):
         if wait:
             self.wait_while('running', 1000)
 
+    def open_after_ships(self, wait=True):
+        self.run_to_rel_pos(position_sp=240, speed_sp=1000, stop_action="brake")
+        if wait:
+            self.wait_while('running', 1000)
+
     def open_for_base(self, wait=True):
         self.run_to_rel_pos(position_sp=200, speed_sp=1000, stop_action="brake")
         if wait:

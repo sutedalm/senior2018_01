@@ -105,7 +105,7 @@ def drop_0(r: Robot):
     r.drive(60, 80, 2.5, -15)
     r.slider.close(False)
     r.drive_triple(80, 80, 0, 5, 9, 5, 0, "brake")
-    r.slider.open_for_ships()
+    r.slider.open_after_ships()
 
     r.lifter.move_down()
 
@@ -243,7 +243,7 @@ def drop_5(r: Robot):
     r.drive(60, 80, 2.5, 25)
     r.slider.close(False)
     r.drive_triple(80, 80, 0, 5, 9, 5, 20, "brake")
-    r.slider.open_for_ships()
+    r.slider.open_after_ships()
 
     r.lifter.move_down()
 
@@ -341,7 +341,7 @@ def drop_off(r: Robot, speed_end=-80):
     r.slider.close(False)
     r.drive_triple(80, 80, 0, 5, 7, 5, 0, "brake")
     time.sleep(0.2)
-    r.slider.open_for_ships()
+    r.slider.open_after_ships()
 
     # r.drive_triple(0, -60, 0, 1, 0, 1, 0, "brake")
     r.lifter.move_down()
@@ -445,6 +445,7 @@ def go_home_bitch(r: Robot):
     # r.drive(100, 100, 20, -3, "run")
     r.drive_wall(60, 50, 20, -10, "run", 30, 30)
     r.drive_wall(50, 70, 4, -7)
+    r.slider.run_direct(duty_cycle_sp=10)
     r.drive_wall(70, 0, 6.7, -1, "brake")
     # r.drive_triple(60, 70, 0, 4, 0, 6.9, -7, "brake")
 
