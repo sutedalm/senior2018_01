@@ -210,7 +210,7 @@ class MyDrivingMotor(LargeMotor):
 class RobotConstants:
     tyre_size = 6.24                        # Durchmesser des Reifens in cm
     motor_distance = 19.95       # auf teppich: 19.38                  # Abstand der Rädermittelpunkte in cm
-    motor_distance_turn = 19.8      # auf teppich: 19.75
+    motor_distance_turn = 19.69      # auf teppich: 19.75
     sensor_distance = 14.5
     pivot_min_speed = 30
     drive_min_speed = 50
@@ -363,7 +363,7 @@ class Robot:
         self.slider = MySlider(OUTPUT_A)
         self.lifter = MyLifter(OUTPUT_D)
 
-        self.col_l = MyColorSensorEV3(INPUT_1, 8, 69)
+        self.col_l = MyColorSensorEV3(INPUT_1, 5, 70)
         self.col_r = MyColorSensorEV3(INPUT_2, 3, 45)
         self.ht_middle = MyColorSensorHT(INPUT_3, 0, 24)
         # self.col_l = MyColorSensorEV3(INPUT_1, 7, 85)
@@ -973,7 +973,7 @@ class Robot:
         self.brake()
         self.reset_motor_pos()
 
-    def get_direction(self, speed, brake_action="run",
+    def get_direction(self, speed, brake_action="run", previous_line_detected=False,
                       kp=RobotConstants.drive_kp, ki=RobotConstants.drive_ki, kd=RobotConstants.drive_kd,
                       max_direction=10):
 
@@ -990,7 +990,10 @@ class Robot:
 
         last_error = integral = 0
 
-        while not (l_triggered and r_triggered):
+        if previous_line_detected:
+            print("get_direction uebersprungen")
+
+        while (not (l_triggered and r_triggered)) and not previous_line_detected:
             driven_distance = (abs(self._rMot.position) + abs(self._lMot.position)) / 2
             l_col = self.col_l.light_reflected()
             r_col = self.col_r.light_reflected()
@@ -1033,10 +1036,10 @@ class Robot:
 
     def get_direction_drive(self, speed=60, end_speed=40,
                             distance_constant=2.5, distance_deceleration=5, brake_action="run",
-                            max_direction=90):
+                            max_direction=90, previous_line_detected=False):
         print("GET_DIRECTION_DRIVE")
 
-        direction = self.get_direction(speed, "run",
+        direction = self.get_direction(speed, "run", previous_line_detected,
                                        RobotConstants.drive_kp, RobotConstants.drive_ki, RobotConstants.drive_kd,
                                        max_direction)
 

@@ -98,15 +98,15 @@ def run(r: Robot, speed_start=0):
         print("color:" + color.to_text())
         r.slider.hold_closed()
         if position:
-            r.drive(speed_start, -70, 5, 0, "run", 50, 50)
+            line_detected = r.drive(speed_start, -70, 5, 0, "run", 50, 50)
             speed_start = 0
             position = False
             if target_position(color):
-                direction = r.get_direction_drive(-70, -50, 3, 4, "brake")  # Calculate error
+                direction = r.get_direction_drive(-70, -50, 3, 4, "brake", 90, line_detected)  # Calculate error
                 r.turn(-direction)
                 i -= 1
             else:
-                direction = r.get_direction_drive(-70, -100, 0, 4)  # Calculate error
+                direction = r.get_direction_drive(-70, -100, 0, 4, "run", 90, line_detected)  # Calculate error
 
                 if color is MyColor.GREEN:
                     r.drive_triple(-100, -100, -50, 2, 0, 7.5, 0, "brake")
@@ -114,7 +114,7 @@ def run(r: Robot, speed_start=0):
                     r.slider.position = 0
                     r.slider.run_forever(speed_sp=100)
 
-                    r.turn(-90 - direction, 40, 40, 100, 4, 4)
+                    r.turn(-89 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(90)
                 else:   # blue
@@ -123,26 +123,26 @@ def run(r: Robot, speed_start=0):
                     r.slider.position = 0
                     r.slider.run_forever(speed_sp=100)
 
-                    r.turn(90 - direction, 40, 40, 100, 4, 4)
+                    r.turn(89 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(-90)
         else:
-            r.drive(0, 70, 3, 0, "run", 50, 50)
+            line_detected = r.drive(0, 70, 3, 0, "run", 50, 50)
             position = True
             if not target_position(color):
-                direction = r.get_direction_drive(70, 50, 3, 6, "brake")  # Calculate error
+                direction = r.get_direction_drive(70, 50, 3, 6, "brake", 90, line_detected)  # Calculate error
                 r.turn(-direction)
                 i -= 1
             else:
                 # direction = r.get_direction_drive(70, 50, 8.5, 10, "brake")  # Calculate error
-                direction = r.get_direction_drive(70, 100, 0, 4, "brake")  # Calculate error
+                direction = r.get_direction_drive(70, 100, 0, 4, "run", 90, line_detected)  # Calculate error
 
                 if color is MyColor.RED:
                     r.drive_triple(100, 100, 50, 2, 7, 5, 0, "brake")
 
                     r.slider.position = 0
                     r.slider.run_forever(speed_sp=100)
-                    r.turn(-90 - direction, 40, 40, 100, 4, 4)
+                    r.turn(-91 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(90)
                 else:   # Yellow
@@ -156,8 +156,8 @@ def run(r: Robot, speed_start=0):
         i += 1
 
     if position:
-        r.drive(speed_start, -70, 5, 0, "run", 50, 50)
-        direction = r.get_direction_drive(-70, -20, 3, 6, "brake")  # Calculate error
+        line_detected = r.drive(speed_start, -70, 5, 0, "run", 50, 50)
+        direction = r.get_direction_drive(-70, -20, 3, 6, "brake", 90, line_detected)  # Calculate error
         r.turn(-direction)
 
 
