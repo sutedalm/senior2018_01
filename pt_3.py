@@ -290,9 +290,9 @@ def scan_ships(r: Robot, speed_start=0):
     speed_measure = 100
     speed_maximum = 100
 
-    r.line_follow(50, 60, 4, offset, "run", False, False, False, 2)
-    r.line_follow(60,  70, 15, offset, "brake", False, False, True, 2)
-    r.line_follow(70, 30, 11, offset, "brake", False, False, False, 2)
+    r.line_follow(50, 70, 4, offset, "run", False, False, False, 2)
+    r.line_follow(70,  80, 15, offset, "brake", False, False, True, 2)
+    r.line_follow(80, 50, 11, offset, "brake", False, False, False, 2)
     r.drive_triple(0, -100, -100, 5, 10, 0)
     # r.drive(0, -80, 15)
     r.drive_color(-100, -20, 15, 0, "brake", False, True)
@@ -418,8 +418,8 @@ def drop_food(r: Robot, positions):
         direction = r.get_direction_drive(-80, -20, 2, 5, "brake", 90, line_detected)  # Calculate error
         r.turn(-direction)
 
-    line_detected = r.drive(0, 60, 3, 0, "run", 50, 50)
-    direction = r.get_direction_drive(60, 20, 0, 5, "brake", line_detected)  # Calculate error
+    line_detected = r.drive(0, 80, 3, 0, "run", 50, 50)
+    direction = r.get_direction_drive(80, 50, 0, 4, "brake", line_detected)  # Calculate error
     r.turn(90 - direction)
 
 

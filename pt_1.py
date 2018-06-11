@@ -73,7 +73,7 @@ def run(r: Robot):
     # r.slider.open()
     r.slider.open_to_half()
     # r.drive_triple(0, 80, 0, 4.5, 0, 4.5, 0, "brake")
-    r.drive_triple(r.consts.drive_min_speed, 50, r.consts.drive_min_speed, 4.5, 0, 4.5, 0, "brake")
+    r.drive_triple(r.consts.drive_min_speed, 50, r.consts.drive_min_speed, 4.5, 0, 5, 0, "brake")
     r.slider.collect(True, 15)
 
     iterator = set_color(r, iterator)
