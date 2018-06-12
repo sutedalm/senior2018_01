@@ -114,7 +114,7 @@ def run(r: Robot, speed_start=0):
                     r.slider.position = 0
                     r.slider.run_forever(speed_sp=100)
 
-                    r.turn(-90 - direction)     # , 40, 40, 100, 4, 4)
+                    r.turn(-90 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(90)
                 else:   # blue
@@ -123,7 +123,7 @@ def run(r: Robot, speed_start=0):
                     r.slider.position = 0
                     r.slider.run_forever(speed_sp=100)
 
-                    r.turn(89 - direction)  # , 40, 40, 100, 4, 4)
+                    r.turn(90 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(-90)
         else:
@@ -142,7 +142,7 @@ def run(r: Robot, speed_start=0):
 
                     r.slider.position = 0
                     r.slider.run_forever(speed_sp=100)
-                    r.turn(-91 - direction)     # , 40, 40, 100, 4, 4)
+                    r.turn(-91 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(90)
                 else:   # Yellow
@@ -150,7 +150,7 @@ def run(r: Robot, speed_start=0):
 
                     r.slider.position = 0
                     r.slider.run_forever(speed_sp=100)
-                    r.turn(89 - direction)  # , 40, 40, 100, 4, 4)
+                    r.turn(89 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(-90)
         i += 1
