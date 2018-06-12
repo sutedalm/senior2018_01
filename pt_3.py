@@ -8,6 +8,7 @@ import time
 def get_positions(ships, container):
     ship_flags = [False, False, False, False, False, False]
     container_flags = [False, False, False]
+    iteration_range = [3, 2, 4, 1, 5, 0]
     positions = [0, 0, 0]
 
     # Color with same Color
@@ -16,7 +17,7 @@ def get_positions(ships, container):
             container[container_iterator] = MyColor.ERROR
 
         if container[container_iterator] is not MyColor.ERROR and not container_flags[container_iterator]:
-            for ship_iterator in range(0, 6):
+            for ship_iterator in iteration_range:
                 if ships[ship_iterator] is container[container_iterator] and not ship_flags[ship_iterator]:
                     positions[container_iterator] = ship_iterator
                     ship_flags[ship_iterator] = True
@@ -26,7 +27,7 @@ def get_positions(ships, container):
     # Color with Error
     for container_iterator in range(0, 3):
         if container[container_iterator] is not MyColor.ERROR and not container_flags[container_iterator]:
-            for ship_iterator in range(0, 6):
+            for ship_iterator in iteration_range:
                 if ships[ship_iterator] is MyColor.ERROR and not ship_flags[ship_iterator]:
                     positions[container_iterator] = ship_iterator
                     ship_flags[ship_iterator] = True
@@ -36,7 +37,7 @@ def get_positions(ships, container):
     # Error with different Color or Error
     for container_iterator in range(0, 3):
         if container[container_iterator] is MyColor.ERROR and not container_flags[container_iterator]:
-            for ship_iterator in range(0, 6):
+            for ship_iterator in iteration_range:
                 if ships[ship_iterator] is not MyColor.NOCOLOR and not ship_flags[ship_iterator]:
                     positions[container_iterator] = ship_iterator
                     ship_flags[ship_iterator] = True
@@ -46,7 +47,7 @@ def get_positions(ships, container):
     # Color with different Color (or Error)
     for container_iterator in range(0, 3):
         if container[container_iterator] is not MyColor.ERROR and not container_flags[container_iterator]:
-            for ship_iterator in range(0, 6):
+            for ship_iterator in iteration_range:
                 if ships[ship_iterator] is not MyColor.NOCOLOR and not ship_flags[ship_iterator]:
                     positions[container_iterator] = ship_iterator
                     ship_flags[ship_iterator] = True
@@ -65,7 +66,7 @@ def get_positions(ships, container):
     # Rest with Nocolor
     for container_iterator in range(0, 3):
         if not container_flags[container_iterator]:
-            for ship_iterator in range(0, 6):
+            for ship_iterator in iteration_range:
                 if not ship_flags[ship_iterator]:
                     positions[container_iterator] = ship_iterator
                     ship_flags[ship_iterator] = True
@@ -276,23 +277,23 @@ def scan_ships(r: Robot, speed_start=0):
     r.slider.hold_closed()
 
     # r.drive_triple(0, 100, 0, 5, 0, 5, 0, "brake")
-    line_detected = r.drive(0, -70, 3, 0, "run", 50, 50)
+    line_detected = r.drive(0, -80, 3, 0, "run", 50, 50)
     if line_detected:
         r.brake()
 
-    direction = r.get_direction_drive(-70, 0, 0, 5, "brake", line_detected)
+    direction = r.get_direction_drive(-80, 0, 0, 5, "brake", line_detected)
     r.turn(-25 - direction, 40, 40, 100, 4, 4)
 
-    r.drive_triple(0, -100, 0, 10, 22, 5, -20, "brake")
+    r.drive_triple(0, -100, 0, 5, 27, 5, -20, "brake")
 
     # Align to ship line
     offset = 50
     speed_measure = 100
     speed_maximum = 100
 
-    r.line_follow(50, 70, 4, offset, "run", False, False, False, 2)
-    r.line_follow(70,  80, 15, offset, "brake", False, False, True, 2)
-    r.line_follow(80, 50, 11, offset, "brake", False, False, False, 2)
+    r.line_follow(50, 80, 4, offset, "run", False, False, False, 2)
+    r.line_follow(80,  90, 15, offset, "brake", False, False, True, 2)
+    r.line_follow(90, 50, 11, offset, "brake", False, False, False, 2)
     r.drive_triple(0, -100, -100, 5, 10, 0)
     # r.drive(0, -80, 15)
     r.drive_color(-100, -20, 15, 0, "brake", False, True)
@@ -340,10 +341,9 @@ def drop_off(r: Robot, speed_end=-80):
     r.slider.stop(stop_action='brake')
     r.slider.close(False)
     r.drive_triple(80, 80, 0, 5, 7, 5, 0, "brake")
-    time.sleep(0.2)
+
     r.slider.open_after_ships()
 
-    # r.drive_triple(0, -60, 0, 1, 0, 1, 0, "brake")
     r.lifter.move_down()
 
     r.drive_triple(0, -80, speed_end, 5, 4, 5, 0, "run")
@@ -362,13 +362,13 @@ def drop_food(r: Robot, positions):
     r.col_r.mode = 'COL-REFLECT'
 
     line_detected = r.drive(0, 80, 3, 0, "run", 50, 50)
-    direction = r.get_direction_drive(80, 0, 0, 4, "brake", 90, line_detected)
+    direction = r.get_direction_drive(80, 0, 0, 3, "brake", 90, line_detected)
     r.turn(-direction)
 
     # r.drive(0, -100, 5, 0, "run", 50)
     # r.drive_triple(-100, -100, 0, 2, 2, 5, 0, "brake")
-    line_detected = r.drive(0, -80, 2, 0, "run", 50, 50)
-    direction = r.get_direction_drive(-80, 0, 3.5, 5, "brake", 90, line_detected)
+    line_detected = r.drive(0, -80, 1, 0, "run", 50, 50)
+    direction = r.get_direction_drive(-80, 0, 5.5, 3, "brake", 90, line_detected)
 
     r.turn(90 - direction)
 
@@ -419,7 +419,7 @@ def drop_food(r: Robot, positions):
         r.turn(-direction)
 
     line_detected = r.drive(0, 80, 3, 0, "run", 50, 50)
-    direction = r.get_direction_drive(80, 50, 0, 4, "brake", line_detected)  # Calculate error
+    direction = r.get_direction_drive(80, 50, 0, 3, "brake", line_detected)  # Calculate error
     r.turn(90 - direction)
 
 
@@ -433,32 +433,19 @@ def go_home_bitch(r: Robot):
 
     direction = r.get_direction_drive(-100, 0, 38, 5, "brake", 3)
 
-    r.turn(-80 - direction)
-    r.drive_triple(0, -100, -100, 5, 30, 0)
+    r.turn(-75 - direction)
+    r.drive_wall(0, -100, 3)
+    r.drive_wall(-100, -100, 32)
     r.drive_wall(-100, -100, 10, 0, "run", 0, 50)
+    r.drive_wall(-100, 0, 2, 0, "run")
 
-    r.drive_wall(-100, -100, 2, 0, "run")
     r.drive_wall(50, 100, 1, -20, "run", 0, 50)
     r.drive_wall(100, 100, 15, -25)
     r.drive_wall(100, 60, 5, -25)
-    # r.drive_triple(100, 100, 60, 10, 5, 5, -25, "run")
-    # r.drive(100, 100, 20, -3, "run")
     r.drive_wall(60, 50, 20, -10, "run", 30, 30)
     r.drive_wall(50, 70, 4, -7)
-    r.slider.run_direct(duty_cycle_sp=10)
+    r.slider.run_direct(duty_cycle_sp=30)
     r.drive_wall(70, 0, 6.7, -1, "brake")
-    # r.drive_triple(60, 70, 0, 4, 0, 6.9, -7, "brake")
-
-    # r.drive_time(-100, -100, 15, 0, "run", 0.5)
-    # r.drive(0, 100, 7, -5, "run", 0, 50)
-    # r.drive_triple(100, 100, 60, 10, 5, 5, -1, "run")
-    # # r.drive(100, 100, 20, -3, "run")
-    # r.drive(60, 60, 20, -3, "run", 30, 30)
-    # r.drive_triple(60, 70, 0, 4, 0, 6.9, -3, "brake")
-
-    # r.drive(-100, -100, 30, 0, "run", 50, 50)
-
-    # r.drive_triple(-100, -100, 0, 8, 40, 5, 0, "brake")
 
 
 def run(r: Robot, speed_start=0):

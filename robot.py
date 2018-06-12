@@ -101,17 +101,17 @@ class MySlider(LargeMotor):
     def open(self, wait=True, speed=100, duration=13):
         speed *= 10
         duration *= 100
-        self.run_timed(time_sp=duration, speed_sp=speed, ramp_up_sp=800, ramp_down_sp=700)
+        self.run_timed(time_sp=duration, speed_sp=speed, ramp_up_sp=100, ramp_down_sp=100)
         if wait:
-            self.wait_while('running')
+            self.wait_while('running', duration + 1000)
             self.run_forever(speed_sp=200)
 
     def close(self, wait=True, speed=100, duration=13):
         speed *= -10
         duration *= 100
-        self.run_timed(time_sp=duration, speed_sp=speed, ramp_up_sp=800, ramp_down_sp=700)
+        self.run_timed(time_sp=duration, speed_sp=speed, ramp_up_sp=100, ramp_down_sp=100)
         if wait:
-            self.wait_while('running')
+            self.wait_while('running', duration + 1000)
 
     def hold_closed(self):
         self.run_direct(duty_cycle_sp=-40)
@@ -120,16 +120,19 @@ class MySlider(LargeMotor):
         duration *= 100
         self.run_timed(time_sp=duration, speed_sp=-1000, ramp_up_sp=100, ramp_down_sp=100)
         if wait:
-            self.wait_while('running')
+            self.wait_while('running', duration + 1000)
             self.hold_closed()
 
     def open_half_to_full(self, wait=True):
-        self.open(wait, 100, 9)
+        self.run_timed(time_sp=900, speed_sp=1000)
+        if wait:
+            self.wait_while('running', 1900)
+            self.run_forever(speed_sp=200)
 
     def open_to_half(self):
         self.position = 0
         self.run_to_abs_pos(position_sp=620, speed_sp=1000, stop_action="brake")
-        self.wait_while('running')
+        self.wait_while('running', 3000)
 
     def open_for_ships(self, wait=True):
         self.run_to_rel_pos(position_sp=230, speed_sp=1000, stop_action="brake")
@@ -144,7 +147,7 @@ class MySlider(LargeMotor):
     def open_for_base(self, wait=True):
         self.run_to_rel_pos(position_sp=200, speed_sp=1000, stop_action="brake")
         if wait:
-            self.wait_while('running')
+            self.wait_while('running', 1000)
 
 
 class MyLifterPosition(IntEnum):
@@ -210,7 +213,7 @@ class MyDrivingMotor(LargeMotor):
 class RobotConstants:
     tyre_size = 6.24                        # Durchmesser des Reifens in cm
     motor_distance = 19.95       # auf teppich: 19.38                  # Abstand der Rädermittelpunkte in cm
-    motor_distance_turn = 19.69      # auf teppich: 19.75
+    motor_distance_turn = 19.45      # auf teppich: 19.75
     sensor_distance = 14.5
     pivot_min_speed = 30
     drive_min_speed = 50
@@ -371,7 +374,7 @@ class Robot:
         # self.ht_middle = MyColorSensorHT(INPUT_3, 0, 25)
         self.ht_side = MyColorSensorHT(INPUT_4)
 
-        self._btn = Button()
+        self.btn = Button()
 
         self.container_colors = [MyColor.BLUE, MyColor.YELLOW, MyColor.RED]
 
@@ -379,7 +382,7 @@ class Robot:
         # self.wait_until_button()
 
     def wait_until_button(self):
-        while not self._btn.any():
+        while not self.btn.any():
             time.sleep(0.01)
 
     @staticmethod
