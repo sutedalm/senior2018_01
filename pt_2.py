@@ -118,7 +118,7 @@ def run(r: Robot, speed_start=0):
                     pick_up(r, i)
                     r.turn(90)
                 else:   # blue
-                    r.drive_triple(-100, -100, -50, 2, 0, 6.5, 0, "brake")
+                    r.drive_triple(-100, -100, -50, 2, 0, 6, 0, "brake")
 
                     r.slider.position = 0
                     r.slider.run_forever(speed_sp=100)
