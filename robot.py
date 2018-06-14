@@ -213,7 +213,7 @@ class MyDrivingMotor(LargeMotor):
 class RobotConstants:
     tyre_size = 6.24                        # Durchmesser des Reifens in cm
     motor_distance = 19.95       # auf teppich: 19.38                  # Abstand der Rädermittelpunkte in cm
-    motor_distance_turn = 19.45      # auf teppich: 19.75
+    motor_distance_turn = 19.2      # auf teppich: 19.75
     sensor_distance = 14.5
     pivot_min_speed = 30
     drive_min_speed = 50
@@ -368,7 +368,7 @@ class Robot:
 
         self.col_l = MyColorSensorEV3(INPUT_1, 5, 70)
         self.col_r = MyColorSensorEV3(INPUT_2, 3, 45)
-        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 24)
+        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 25)
         # self.col_l = MyColorSensorEV3(INPUT_1, 7, 85)
         # self.col_r = MyColorSensorEV3(INPUT_2, 4, 58)
         # self.ht_middle = MyColorSensorHT(INPUT_3, 0, 25)

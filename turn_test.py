@@ -14,10 +14,12 @@ def main():
             if r.btn.up:
                 r.beep()
                 time.sleep(1)
+                r.reset_motor_pos()
                 r.turn(90)
             elif r.btn.down:
                 r.beep()
                 time.sleep(1)
+                r.reset_motor_pos()
                 r.turn(-90)
 
             if r.btn.left and not left_pressed:
