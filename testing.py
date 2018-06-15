@@ -25,7 +25,7 @@ def einsammel_test(r: Robot):
 def main():
     r = Robot()
     try:
-        einsammel_test(r)
+        r.drive_triple(0, 100, 80, 15, 15, 5, 0, "run", -1, -1, 5)
         # r.turn(-90)
         # time.sleep(3)
         # r.turn(90)

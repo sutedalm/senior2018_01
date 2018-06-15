@@ -109,7 +109,7 @@ def run(r: Robot, speed_start=0):
                 direction = r.get_direction_drive(-70, -100, 0, 4, "run", 90, line_detected)  # Calculate error
 
                 if color is MyColor.GREEN:
-                    r.drive_triple(-100, -100, -50, 2, 0, 7, 0, "brake")
+                    r.drive_triple(-100, -100, -50, 2, 0, 6.5, 0, "brake")
 
                     r.slider.position = 0
                     r.slider.run_forever(speed_sp=100)
@@ -118,12 +118,12 @@ def run(r: Robot, speed_start=0):
                     pick_up(r, i)
                     r.turn(90)
                 else:   # blue
-                    r.drive_triple(-100, -100, -50, 2, 0, 6, 0, "brake")
+                    r.drive_triple(-100, -100, -50, 2, 0, 6.5, 0, "brake")
 
                     r.slider.position = 0
                     r.slider.run_forever(speed_sp=100)
 
-                    r.turn(90 - direction, 40, 40, 100, 4, 4)
+                    r.turn(91 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(-90)
         else:
@@ -150,7 +150,7 @@ def run(r: Robot, speed_start=0):
 
                     r.slider.position = 0
                     r.slider.run_forever(speed_sp=100)
-                    r.turn(89 - direction, 40, 40, 100, 4, 4)
+                    r.turn(90 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(-90)
         i += 1

@@ -45,7 +45,7 @@ def run(r: Robot):
     r.lifter.move_to_top_position(False)
 
     # accelerate to first line
-    r.drive_triple(0, 100, 80, 10, 20, 5)
+    r.drive_triple(0, 100, 80, 15, 15, 5)
 
     # align while driving over first line
     r.slider.run_to_rel_pos(position_sp=200, speed_sp=1000, stop_action="brake")
@@ -56,7 +56,7 @@ def run(r: Robot):
     r.drive(90, 100, 25)
 
     # first container
-    r.drive_triple(100, 50, 0, 5, 0, 3, 0, "brake")
+    r.drive_triple(100, 50, 0, 5, 0, 4.7, 0, "brake")
 
     r.turn(-direction)
     r.slider.collect()
@@ -80,7 +80,7 @@ def run(r: Robot):
     # r.drive_triple(0, 100, 60, 6, 3, 5, 0)
     # r.drive(60, 50, 6, 0, "brake")
 
-    r.drive_triple(0, 100, 50, 7, 0, 3, 0, "run")
+    r.drive_triple(0, 100, 50, 6, 0, 4, 0, "run")
     r.drive(50, 0, 8, 0, "brake")
 
     r.slider.collect(True)
@@ -97,10 +97,10 @@ def run(r: Robot):
         set_color(r, iterator)
 
         r.lifter.move_to_bottom_position(False)
-        r.drive_triple(0, -100, -80, 21, 50, 5)
+        r.drive_triple(0, -100, -80, 21, 50, 5, 1)  #schief fahren hardcode
     else:
         r.lifter.move_to_bottom_position(False)
-        r.drive_triple(0, -100, -80, 15, 50, 5)
+        r.drive_triple(0, -100, -80, 15, 50, 5, 1)
 
     filter_colors(r)
 

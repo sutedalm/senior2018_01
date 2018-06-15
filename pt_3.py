@@ -116,7 +116,7 @@ def drop_0(r: Robot):
 
     r.col_l.set_inversed(True)
     r.col_r.set_inversed(True)
-    direction = r.get_direction_drive(-60, 0, 1.5, 5, "brake")
+    direction = r.get_direction_drive(-60, 0, 1, 5, "brake")
     r.col_l.set_inversed(False)
     r.col_r.set_inversed(False)
 
@@ -145,7 +145,7 @@ def drop_1(r: Robot):
     r.col_r.set_inversed(True)
     r.col_l.set_inversed(True)
     r.drive(-80, -60, 7, 0, "run", 50, 50)
-    direction = r.get_direction_drive(-60, 0, 2, 5, "brake")
+    direction = r.get_direction_drive(-60, 0, 1.5, 5, "brake")
     r.col_r.set_inversed(False)
     r.col_l.set_inversed(False)
 
@@ -169,7 +169,7 @@ def drop_2(r: Robot):
     drop_off(r)
 
     r.col_r.set_inversed(True)
-    r.drive(-80, -80, 7, 0, "run", -1, 50)
+    r.drive(-80, -80, 6.5, 0, "run", -1, 50)
     r.col_r.set_inversed(False)
     r.drive(-80, 0, 7, 0, "brake")
     r.turn(-90)
@@ -192,7 +192,7 @@ def drop_3(r: Robot):
     drop_off(r)
 
     r.col_l.set_inversed(True)
-    r.drive(-80, -80, 7, 0, "run", 50, -1)
+    r.drive(-80, -80, 6.5, 0, "run", 50, -1)
     r.col_l.set_inversed(False)
     r.drive(-80, 0, 7, 0, "brake")
     r.turn(-90)
@@ -219,7 +219,7 @@ def drop_4(r: Robot):
     r.col_r.set_inversed(True)
     r.col_l.set_inversed(True)
     r.drive(-80, -60, 7, 0, "run", 50, 50)
-    direction = r.get_direction_drive(-60, 0, 2, 5, "brake")
+    direction = r.get_direction_drive(-60, 0, 1.5, 5, "brake")
     r.col_r.set_inversed(False)
     r.col_l.set_inversed(False)
 
@@ -242,19 +242,19 @@ def drop_5(r: Robot):
     r.drive_triple(0, 60, 60, 5, 5, 5, 25, "run", 50, 50)
 
     r.drive(60, 80, 3.5, 25)
-    r.slider.close(False)
+    r.slider.close(False, 90)
     r.drive_triple(80, 80, 0, 5, 8, 5, 20, "brake")
     r.slider.open_after_ships()
 
     r.lifter.move_down()
 
-    r.drive_triple(0, -80, -60, 5, 0, 4, 35, "run")
+    r.drive_triple(0, -80, -60, 5, 0, 4, 45, "run")
 
     r.slider.close(False)
 
     r.col_l.set_inversed(True)
     r.col_r.set_inversed(True)
-    direction = r.get_direction_drive(-60, 0, 1, 4.5, "brake")
+    direction = r.get_direction_drive(-60, 0, 1, 4, "brake")
     r.col_l.set_inversed(False)
     r.col_r.set_inversed(False)
 
@@ -282,9 +282,9 @@ def scan_ships(r: Robot, speed_start=0):
         r.brake()
 
     direction = r.get_direction_drive(-80, 0, 0, 5, "brake", line_detected)
-    r.turn(-26 - direction, 40, 40, 100, 4, 4)
+    r.turn(-28 - direction, 40, 40, 100, 4, 4)
 
-    r.drive_triple(0, -100, 0, 5, 27, 5, -20, "brake")
+    r.drive_triple(0, -100, 0, 5, 27, 5, -18, "brake")
 
     # Align to ship line
     offset = 50
@@ -444,7 +444,8 @@ def go_home_bitch(r: Robot):
     r.drive_wall(100, 60, 5, -25)
     r.drive_wall(60, 50, 20, -10, "run", 30, 30)
     r.drive_wall(50, 70, 4, -7)
-    r.slider.run_direct(duty_cycle_sp=30)
+    r.slider.run_to_rel_pos(position_sp=10, speed_sp=100)
+    # r.slider.run_direct(duty_cycle_sp=30)
     r.drive_wall(70, 0, 6.6, -1, "brake")
 
 
