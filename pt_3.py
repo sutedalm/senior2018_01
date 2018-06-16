@@ -464,6 +464,7 @@ def z_part__drop(r: Robot):
                     z_drop_drive_rev()
                     r.turn(-90)
                     r.slider.close(False)
+
                     r.drive(0, 80, 2, 0, "run", 50, 50)
                 elif destination is 1:
                     direction = r.get_direction_drive(-80, -100, 0, 5)  # Calculate error
@@ -475,6 +476,7 @@ def z_part__drop(r: Robot):
                     z_drop_drive_rev()
                     r.turn(-90)
                     r.slider.close(False)
+
                     r.drive_triple(0, 100, 80, 5, 10, 3, 0, "run", 50, 50)
         else:
             # r.drive(speed_start, 80, 3, 0, "run", 50, 50)
@@ -496,6 +498,7 @@ def z_part__drop(r: Robot):
                     z_drop_drive_rev()
                     r.turn(-90)
                     r.slider.close(False)
+
                     r.drive(0, -80, 4, 0, "run", 50, 50)
                 elif destination is 4:
                     direction = r.get_direction_drive(80, 100, 0, 5)  # Calculate error
@@ -527,7 +530,7 @@ def z_main(r: Robot):
 
     r.drive_triple(0, -100, -100, 8, 75, 5, 0, "run")
 
-    direction = r.get_direction_drive(-100, 0, 40, 5, "brake", 3)
+    direction = r.get_direction_drive(-100, 0, 42, 5, "brake", 3)
 
     r.turn(-90 - direction)
     r.drive_triple(0, 100, 100, 5, 18, 0)
