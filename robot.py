@@ -176,6 +176,13 @@ class MyLifter(MediumMotor):
             self.wait_while('running')
         # self.lifter_position += 1
 
+    def z_move_up_partly(self, wait=True):
+        self.run_to_abs_pos(position_sp=-0.5 * self.position_difference, speed_sp=400,
+                            stop_action='hold')
+        if wait:
+            self.wait_while('running')
+        # self.lifter_position += 1
+
     def move_down(self, wait=True):
         # self.run_to_abs_pos(position_sp=self.position + self.position_difference, speed_sp=200, stop_action='hold')
         self.lifter_position -= 1
@@ -184,6 +191,14 @@ class MyLifter(MediumMotor):
         if wait:
             self.wait_while('running')
         # self.lifter_position -= 1
+
+    def z_move_down(self, wait=True):
+        # self.run_to_abs_pos(position_sp=self.position + self.position_difference, speed_sp=200, stop_action='hold')
+        self.lifter_position -= 1
+        self.run_to_abs_pos(position_sp=-self.lifter_position * self.position_difference, speed_sp=800,
+                            stop_action='hold')
+        if wait:
+            self.wait_while('running', 1)
 
     def move_to_bottom_position(self, wait=True):
         self.lifter_position = MyLifterPosition.BOTTOM
@@ -213,7 +228,7 @@ class MyDrivingMotor(LargeMotor):
 class RobotConstants:
     tyre_size = 6.24                        # Durchmesser des Reifens in cm
     motor_distance = 19.95       # auf teppich: 19.38                  # Abstand der Rädermittelpunkte in cm
-    motor_distance_turn = 19.2      # auf teppich: 19.75
+    motor_distance_turn = 19.1      # auf teppich: 19.75
     sensor_distance = 14.5
     pivot_min_speed = 30
     drive_min_speed = 50
@@ -227,7 +242,7 @@ class RobotConstants:
     turn_ki = 0
     turn_kd = 0.5
 
-    lflw_kp = 0.9
+    lflw_kp = 0.8
     lflw_ki = 0
     lflw_kd = 0.7   # auf teppich: 1
 
@@ -367,8 +382,8 @@ class Robot:
         self.lifter = MyLifter(OUTPUT_D)
 
         self.col_l = MyColorSensorEV3(INPUT_1, 5, 72)
-        self.col_r = MyColorSensorEV3(INPUT_2, 3, 45)
-        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 21)
+        self.col_r = MyColorSensorEV3(INPUT_2, 3, 51)
+        self.ht_middle = MyColorSensorHT(INPUT_3, 0, 28)
         # self.col_l = MyColorSensorEV3(INPUT_1, 7, 85)
         # self.col_r = MyColorSensorEV3(INPUT_2, 4, 58)
         # self.ht_middle = MyColorSensorHT(INPUT_3, 0, 25)
@@ -377,6 +392,8 @@ class Robot:
         self.btn = Button()
 
         self.container_colors = [MyColor.BLUE, MyColor.YELLOW, MyColor.RED]
+
+        self.ship_positions = [0, 1, 5]
 
         print("press button to start")
         # self.wait_until_button()
@@ -996,7 +1013,7 @@ class Robot:
         if previous_line_detected:
             print("get_direction uebersprungen")
 
-        while (not (l_triggered and r_triggered)) and not previous_line_detected:
+        while (not (l_triggered and r_triggered)):  # and not previous_line_detected:
             driven_distance = (abs(self._rMot.position) + abs(self._lMot.position)) / 2
             l_col = self.col_l.light_reflected()
             r_col = self.col_r.light_reflected()

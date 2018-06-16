@@ -49,14 +49,14 @@ def run(r: Robot):
 
     # align while driving over first line
     r.slider.run_to_rel_pos(position_sp=200, speed_sp=1000, stop_action="brake")
-    direction = r.get_direction_drive(80, 90, 0, 10, "run", 1)  # Calculate error
+    direction = r.get_direction_drive(80, 80, 0, 10, "run", 1)  # Calculate error
 
     # decelerate to first container
     r.slider.open_half_to_full(False)
-    r.drive(90, 100, 25)
+    r.drive(80, 100, 24.5)
 
     # first container
-    r.drive_triple(100, 50, 0, 5, 0, 4.7, 0, "brake")
+    r.drive_triple(100, 50, 0, 4, 0, 4, 0, "brake")
 
     r.turn(-direction)
     r.slider.collect()

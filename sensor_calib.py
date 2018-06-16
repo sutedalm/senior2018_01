@@ -13,7 +13,7 @@ def main():
         r.col_l.mode = 'COL-REFLECT'
         r.col_r.mode = 'COL-REFLECT'
 
-        l_min = r_min = mid_min = 9999
+        l_min   = r_min = mid_min = 9999
         l_max = r_max = mid_max = 0
 
         r._lMot.run_to_rel_pos(speed_sp=150, position_sp=2*360, stop_action="brake")

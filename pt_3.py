@@ -230,9 +230,9 @@ def drop_4(r: Robot):
 
 def drop_5(r: Robot):
     direction = r.get_direction_drive(80, 100, 0, 5, "run")  # Calculate error
-    r.drive_triple(100, 100, 0, 0, 33, 5, 0, "brake")
+    r.drive_triple(100, 100, 0, 0, 32.5, 5, 0, "brake")
 
-    r.turn(68 - direction)
+    r.turn(69 - direction)
 
     r.slider.position = 0
     r.slider.open_for_ships(False)
@@ -277,24 +277,24 @@ def scan_ships(r: Robot, speed_start=0):
     r.slider.hold_closed()
 
     # r.drive_triple(0, 100, 0, 5, 0, 5, 0, "brake")
-    line_detected = r.drive(0, -80, 3, 0, "run", 50, 50)
+    line_detected = r.drive(0, -70, 3, 0, "run", 50, 50)
     if line_detected:
         r.brake()
 
-    direction = r.get_direction_drive(-80, 0, 0, 5, "brake", line_detected)
-    r.turn(-28 - direction, 40, 40, 100, 4, 4)
+    direction = r.get_direction_drive(-70, 0, 0, 5, "brake", line_detected)
+    r.turn(-31 - direction, 40, 40, 100, 4, 4)
 
-    r.drive_triple(0, -100, 0, 5, 27, 5, -18, "brake")
+    r.drive_triple(0, -100, 0, 5, 27, 5, -17, "brake")
 
     # Align to ship line
     offset = 50
     speed_measure = 100
     speed_maximum = 100
 
-    r.line_follow(50, 80, 4, offset, "run", False, False, False, 2)
-    r.line_follow(80,  90, 15, offset, "brake", False, False, True, 2)
-    r.line_follow(90, 50, 11, offset, "brake", False, False, False, 2)
-    r.drive_triple(0, -100, -100, 5, 10, 0)
+    r.line_follow(50, 70, 4, offset, "run", False, False, False, 2)
+    r.line_follow(70,  80, 15, offset, "run", False, False, True, 2)
+    r.line_follow(80, 50, 13, offset, "brake", False, False, False, 1)
+    r.drive_triple(0, -100, -100, 5, 12, 0)
     # r.drive(0, -80, 15)
     r.drive_color(-100, -20, 15, 0, "brake", False, True)
 
@@ -423,6 +423,153 @@ def drop_food(r: Robot, positions):
     r.turn(90 - direction)
 
 
+def get_free_ship_position(r: Robot):
+    occupied = r.ship_positions
+    for i in [2, 3, 1, 4]:
+        if i not in occupied:
+            return i
+
+
+def z_drop_drive(r: Robot):
+    r.drive_triple(0, 100, 0, 2.5, 0, 2.5, 0, "brake")
+
+
+def z_drop_drive_rev(r: Robot):
+    r.drive_triple(0, -100, 0, 2.5, 0, 2.5, 0, "brake")
+
+
+def z_part__drop(r: Robot):
+    r.drive(0, -80, 5, 0, "run", 50, 50)
+    position = True
+    finished = False
+    destination = get_free_ship_position(r)
+    while not finished:
+        if position:
+            # r.drive(-speed_start, -80, 5, 0, "run", 50, 50)
+            position = False
+
+            if target_position(destination):
+                direction = r.get_direction_drive(-80, -50, 0, 5, "brake")  # Calculate error
+                r.turn(-direction)
+                r.drive(0, 80, 2, 0, "run", 50, 50)
+                finished = False
+            else:
+                finished = True
+                if destination is 2:
+                    direction = r.get_direction_drive(-80, -20, 1, 5, "brake")  # Calculate error
+
+                    r.turn(90 - direction)
+                    z_drop_drive(r)
+                    r.lifter.z_move_down()
+                    z_drop_drive_rev()
+                    r.turn(-90)
+                    r.slider.close(False)
+                    r.drive(0, 80, 2, 0, "run", 50, 50)
+                elif destination is 1:
+                    direction = r.get_direction_drive(-80, -100, 0, 5)  # Calculate error
+                    r.drive_triple(-100, -100, 0, 0, 14, 5, 0, "brake")
+
+                    r.turn(90 - direction)
+                    z_drop_drive(r)
+                    r.lifter.z_move_down()
+                    z_drop_drive_rev()
+                    r.turn(-90)
+                    r.slider.close(False)
+                    r.drive_triple(0, 100, 80, 5, 10, 3, 0, "run", 50, 50)
+        else:
+            # r.drive(speed_start, 80, 3, 0, "run", 50, 50)
+            position = True
+
+            if not target_position(destination):
+                direction = r.get_direction_drive(80, 20, 0, 5, "brake")  # Calculate error
+                r.turn(-direction)
+                r.drive(0, -80, 2, 0, "run", 50, 50)
+                finished = False
+            else:
+                finished = True
+                if destination is 3:
+                    direction = r.get_direction_drive(80, 20, 6, 5, "brake")  # Calculate error
+
+                    r.turn(90 - direction)
+                    z_drop_drive(r)
+                    r.lifter.z_move_down()
+                    z_drop_drive_rev()
+                    r.turn(-90)
+                    r.slider.close(False)
+                    r.drive(0, -80, 4, 0, "run", 50, 50)
+                elif destination is 4:
+                    direction = r.get_direction_drive(80, 100, 0, 5)  # Calculate error
+                    r.drive_triple(100, 100, 0, 0, 19, 5, 0, "brake")
+
+                    r.turn(90 - direction)
+                    z_drop_drive(r)
+                    r.lifter.z_move_down()
+                    z_drop_drive_rev()
+                    r.turn(-90)
+                    r.slider.close(False)
+
+                    r.drive_triple(0, -100, -80, 5, 10, 3, 0, "run", 50, 50)
+    if position:
+        line_detected = r.drive(0, -80, 5, 0, "run", 50, 50)
+        direction = r.get_direction_drive(-80, -20, 2, 5, "brake", 90, line_detected)  # Calculate error
+        r.turn(-direction)
+
+    line_detected = r.drive(0, 80, 3, 0, "run", 50, 50)
+    direction = r.get_direction_drive(80, 50, 0, 3, "brake", line_detected)  # Calculate error
+    r.turn(90 - direction)
+
+
+def z_main(r: Robot):
+    r.slider.open_for_base(False)
+    line_detected = r.drive(0, -80, 3, 0, "run", 50, 50)
+    direction = r.get_direction_drive(-80, 0, 0, 5, "brake", 90, line_detected)  # Calculate error
+    r.turn(-direction)
+
+    r.drive_triple(0, -100, -100, 8, 75, 5, 0, "run")
+
+    direction = r.get_direction_drive(-100, 0, 40, 5, "brake", 3)
+
+    r.turn(-90 - direction)
+    r.drive_triple(0, 100, 100, 5, 18, 0)
+    r.drive(100, 100, 10, 0, "run", 0, 50)
+    r.drive_time(100, 0, 7, 0, "brake", 1)
+
+    r.lifter.z_move_up_partly(False)
+    # time.sleep(0.5)
+    r.drive(0, -100, 10, 0, "run", 0, 50)
+    r.drive_triple(-100, -100, 0, 5, 31.5, 5, 0, "brake")
+    r.lifter.move_up(False)
+    r.turn(90)
+
+    r.drive_triple(0, 100, 10, 15, 10, 5, 0, "brake")
+
+    r.drive(100, 100, 40, 0, "run", 50, 50)
+
+    r.drive_triple(0, 100, 100, 5, 10, 10, 0, "run", 50, 50)
+    # transition
+
+    r.drive(100, 100, 45, -16)
+    r.drive(100, 100, 5)
+    r.drive(100, 100, 45, 16)
+
+    line_detected = r.drive(100, 70, 5, 0, "run", 50, 50)
+
+    direction = r.get_direction_drive(70, 0, 10.5, 5, "brake", 90, line_detected)
+    r.turn(-90 - direction)
+
+    z_part__drop(r)
+    # direction = r.get_direction_drive(80, 80, 100, 10, "run", 1)  # Calculate error
+
+    # r.drive_wall(50, 100, 1, -20, "run", 0, 50)
+    # r.drive_wall(100, 100, 15, -25)
+    # r.drive_wall(100, 60, 5, -25)
+    # r.drive_wall(60, 50, 20, -10, "run", 30, 30)
+    # r.drive_wall(50, 70, 4, -7)
+    # r.slider.run_to_rel_pos(position_sp=10, speed_sp=100)
+    # # r.slider.run_direct(duty_cycle_sp=30)
+    # r.drive_wall(70, 0, 6.4, -1, "brake")
+
+
 def go_home_bitch(r: Robot):
     r.slider.open_for_base(False)
     line_detected = r.drive(0, -80, 3, 0, "run", 50, 50)
@@ -446,7 +593,7 @@ def go_home_bitch(r: Robot):
     r.drive_wall(50, 70, 4, -7)
     r.slider.run_to_rel_pos(position_sp=10, speed_sp=100)
     # r.slider.run_direct(duty_cycle_sp=30)
-    r.drive_wall(70, 0, 6.6, -1, "brake")
+    r.drive_wall(70, 0, 6, -1, "brake")
 
 
 def run(r: Robot, speed_start=0):
@@ -458,6 +605,7 @@ def run(r: Robot, speed_start=0):
     # container = [MyColor.BLUE, MyColor.GREEN, MyColor.YELLOW]
 
     positions = get_positions(ships, container)
+    r.ship_positions = positions
     # positions = [5, 0, 4]
     drop_food(r, positions)    # Add positions
     # drop_off(r)

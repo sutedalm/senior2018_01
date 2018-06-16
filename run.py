@@ -23,6 +23,7 @@ def main():
         pt_2.transition(r)
 
         pt_3.run(r, 100)
+        # pt_3.z_main(r)
         pt_3.go_home_bitch(r)
     finally:
         print("RESET")

@@ -29,7 +29,7 @@ def pick_up(robot: Robot, i):
     if not line_detected:
         line_detected = robot.drive(80, 80, 5.5, 0, "run", 50, 50)
 
-    robot.slider.run_to_abs_pos(position_sp=10, speed_sp=900, stop_action="brake")
+    robot.slider.run_to_abs_pos(position_sp=10, speed_sp=800, stop_action="brake")
     # robot.slider.close(False, 100, 11)
 
     if not line_detected:
@@ -45,7 +45,7 @@ def pick_up(robot: Robot, i):
         robot.drive_triple(0, -70, -70, 5, 10, 10, 0, "run", 50, 50)    # Move to line
         robot.drive(-70, 0, 11, 0, "brake")
 
-        robot.drive_triple(0, 60, 0, 3, 0, 2.5, 0, "brake")
+        robot.drive_triple(0, 60, 0, 3, 0, 2, 0, "brake")
 
         robot.slider.open_to_half()
         robot.drive_triple(0, -100, 0, 7, 7, 2, 0, "brake")
@@ -109,16 +109,16 @@ def run(r: Robot, speed_start=0):
                 direction = r.get_direction_drive(-70, -100, 0, 4, "run", 90, line_detected)  # Calculate error
 
                 if color is MyColor.GREEN:
-                    r.drive_triple(-100, -100, -50, 2, 0, 6.5, 0, "brake")
+                    r.drive_triple(-100, -100, -50, 2, 0, 7, 0, "brake")
 
                     r.slider.position = 0
                     r.slider.run_forever(speed_sp=100)
 
-                    r.turn(-90 - direction, 40, 40, 100, 4, 4)
+                    r.turn(-91 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(90)
                 else:   # blue
-                    r.drive_triple(-100, -100, -50, 2, 0, 6.5, 0, "brake")
+                    r.drive_triple(-100, -100, -50, 2, 0, 7, 0, "brake")
 
                     r.slider.position = 0
                     r.slider.run_forever(speed_sp=100)
@@ -146,11 +146,11 @@ def run(r: Robot, speed_start=0):
                     pick_up(r, i)
                     r.turn(90)
                 else:   # Yellow
-                    r.drive_triple(100, 100, 50, 2, 8, 5, 0, "brake")
+                    r.drive_triple(100, 100, 50, 2, 7.5, 5, 0, "brake")
 
                     r.slider.position = 0
                     r.slider.run_forever(speed_sp=100)
-                    r.turn(90 - direction, 40, 40, 100, 4, 4)
+                    r.turn(91 - direction, 40, 40, 100, 4, 4)
                     pick_up(r, i)
                     r.turn(-90)
         i += 1
